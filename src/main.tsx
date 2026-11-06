@@ -1,96 +1,505 @@
-import { StrictMode, useEffect, useRef, useState } from 'react';
+import { StrictMode, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { validateDraft, type DraftErrors, type DraftInput } from './draft';
-import { readDrafts, saveDraft as persistDraft, type Draft } from './draft-store';
+import { DocumentDetailModal } from './components/DocumentDetailModal';
+import { DocumentList } from './components/DocumentList';
+import { FormAV } from './components/forms/FormAV';
+import { FormPO } from './components/forms/FormPO';
+import { FormPR } from './components/forms/FormPR';
+import { FormPVPayment } from './components/forms/FormPVPayment';
+import { FormRB } from './components/forms/FormRB';
+import { FormRC } from './components/forms/FormRC';
+import { RoleSwitcher } from './components/RoleSwitcher';
+import {
+  approveDocumentStage,
+  createEmptyDocument,
+  generatePvFromSource,
+  loadAllDocuments,
+  recordPvPayment,
+  rejectDocument,
+  saveDocument,
+  submitDocument,
+} from './store/document-store';
 import './style.css';
+import type {
+  AnyDocument,
+  AVDocument,
+  DocType,
+  PODocument,
+  PRDocument,
+  PVDocument,
+  PVPaymentDetails,
+  RBDocument,
+  RCDocument,
+  UserRole,
+} from './types/document';
 
-const emptyForm: DraftInput = { title: '', branch: '', amount: '', purpose: '', requiredDate: '' };
-const rupiah = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 });
+const NAV_ITEMS: Array<{ id: DocType | 'ALL'; label: string; icon: string }> = [
+  { id: 'ALL', label: 'Ringkasan & Semua Dokumen', icon: '▤' },
+  { id: 'PR', label: 'Permintaan Pembelian (PR)', icon: '📝' },
+  { id: 'PO', label: 'Pesanan Pembelian (PO)', icon: '📦' },
+  { id: 'AV', label: 'Uang Muka (AV)', icon: '💵' },
+  { id: 'RB', label: 'Penggantian Biaya (RB)', icon: '🧾' },
+  { id: 'RC', label: 'Realisasi Uang Muka (RC)', icon: '⚖️' },
+  { id: 'PV', label: 'Voucher Pembayaran (PV)', icon: '💳' },
+];
 
 function App() {
-  const [initial] = useState(() => {
-    try { return { drafts: readDrafts(localStorage), error: '' }; }
-    catch { return { drafts: [] as Draft[], error: 'Draf tidak dapat dibaca. Data yang tersimpan tidak diubah; periksa penyimpanan browser.' }; }
+  const [documents, setDocuments] = useState<AnyDocument[]>(() => {
+    return loadAllDocuments(localStorage);
   });
-  const [drafts, setDrafts] = useState(initial.drafts);
-  const [form, setForm] = useState(emptyForm);
-  const [errors, setErrors] = useState<DraftErrors>({});
-  const [editingId, setEditingId] = useState<string>();
-  const [open, setOpen] = useState(false);
-  const [notice, setNotice] = useState('');
-  const [saveError, setSaveError] = useState('');
-  const dialog = useRef<HTMLDialogElement>(null);
+  const [activeTab, setActiveTab] = useState<DocType | 'ALL'>('ALL');
+  const [activeRole, setActiveRole] = useState<UserRole>('PEMOHON');
+  const [notice, setNotice] = useState<string>('');
+
+  // Modals state
+  const [activeFormType, setActiveFormType] = useState<DocType | null>(null);
+  const [editingDoc, setEditingDoc] = useState<AnyDocument | null>(null);
+  const [detailDoc, setDetailDoc] = useState<AnyDocument | null>(null);
+  const [payingPv, setPayingPv] = useState<PVDocument | null>(null);
+
+  // Sync documents state when updated
+  function refreshDocs() {
+    setDocuments(loadAllDocuments(localStorage));
+  }
 
   useEffect(() => {
-    if (open) dialog.current?.showModal();
-  }, [open]);
+    refreshDocs();
+  }, []);
 
-  function closeForm() {
-    dialog.current?.close();
-    setOpen(false);
-    setForm(emptyForm);
-    setEditingId(undefined);
-    setErrors({});
-    setSaveError('');
+  function handleCreateDoc(type: DocType) {
+    const emptyDoc = createEmptyDocument(type, 'Pusat');
+    setEditingDoc(emptyDoc);
+    setActiveFormType(type);
   }
 
-  function openForm(draft?: Draft) {
-    setForm(draft ? { title: draft.title, branch: draft.branch, amount: String(draft.amount), purpose: draft.purpose ?? '', requiredDate: draft.requiredDate ?? '' } : emptyForm);
-    setEditingId(draft?.id);
-    setErrors({});
-    setSaveError('');
-    setNotice('');
-    setOpen(true);
+  function handleEditDoc(doc: AnyDocument) {
+    setEditingDoc(doc);
+    setActiveFormType(doc.docType);
   }
 
-  function saveDraft(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const nextErrors = validateDraft(form);
-    setErrors(nextErrors);
-    if (Object.keys(nextErrors).length) return;
-    try {
-      setDrafts(persistDraft(localStorage, form, editingId));
-      setNotice(editingId ? 'Perubahan draf tersimpan di browser ini.' : 'Draf tersimpan di browser ini.');
-      closeForm();
-    } catch {
-      setSaveError('Draf tidak tersimpan. Data sebelumnya tidak diubah; periksa penyimpanan browser atau muat ulang halaman.');
-    }
+  function handleSaveDoc(doc: AnyDocument) {
+    saveDocument(localStorage, doc);
+    refreshDocs();
+    setActiveFormType(null);
+    setEditingDoc(null);
+    setNotice(`Draf dokumen ${doc.docNumber} berhasil disimpan.`);
   }
+
+  function handleSubmitDoc(docId: string) {
+    submitDocument(localStorage, docId, `${activeRole} (User Aktif)`);
+    refreshDocs();
+    setNotice(`Dokumen berhasil diajukan ke Tahap 1 (Atasan Langsung).`);
+  }
+
+  function handleApproveDoc(
+    docId: string,
+    role: 'ATASAN' | 'AYU' | 'BOD_HERY' | 'BOD_HASHIMOTO',
+    comment?: string
+  ) {
+    approveDocumentStage(localStorage, docId, role, `${role} (Simulator)`, comment);
+    refreshDocs();
+    setNotice(`Persetujuan berhasil dicatat oleh ${role}.`);
+  }
+
+  function handleRejectDoc(
+    docId: string,
+    role: 'ATASAN' | 'AYU' | 'BOD_HERY' | 'BOD_HASHIMOTO',
+    comment: string
+  ) {
+    rejectDocument(localStorage, docId, role, `${role} (Simulator)`, comment);
+    refreshDocs();
+    setNotice(`Dokumen ditolak dan dikembalikan ke Draf untuk revisi pemohon.`);
+  }
+
+  function handleGeneratePv(sourceDocId: string) {
+    const pv = generatePvFromSource(localStorage, sourceDocId, 'Keuangan (Simulator)');
+    refreshDocs();
+    setNotice(`Payment Voucher ${pv.docNumber} berhasil dibuat dan masuk antrean pembayaran.`);
+    setActiveTab('PV');
+  }
+
+  function handleRecordPvPayment(pvId: string, details: PVPaymentDetails) {
+    recordPvPayment(localStorage, pvId, details);
+    refreshDocs();
+    setPayingPv(null);
+    setNotice(`Pembayaran berhasil dicatat. Status PV & dokumen induk kini LUNAS (Paid).`);
+  }
+
+  // Pre-filtered lists for inheritance
+  const availablePrs = documents.filter(
+    (d): d is PRDocument => d.docType === 'PR' && d.status === 'APPROVED'
+  );
+  const availableAvs = documents.filter(
+    (d): d is AVDocument => d.docType === 'AV' && d.status === 'PAID'
+  );
+
+  // Metrics
+  const myDraftsCount = documents.filter((d) => d.status === 'DRAFT').length;
+  const inReviewCount = documents.filter(
+    (d) => d.status === 'SUBMITTED' || d.status === 'IN_REVIEW'
+  ).length;
+  const approvedQueueCount = documents.filter(
+    (d) => d.status === 'APPROVED' && d.docType !== 'PV'
+  ).length;
+  const paidCount = documents.filter((d) => d.status === 'PAID').length;
 
   return (
     <div className="shell">
+      {/* Sidebar */}
       <aside className="sidebar">
-        <div className="brand"><span className="brand-mark">B</span><div><strong>BLC</strong><small>PROCUREMENT</small></div></div>
-        <div className="nav-label">RUANG KERJA</div>
-        <nav aria-label="Navigasi utama"><a className="nav-active" href="#permintaan"><span aria-hidden="true">▤</span> Permintaan pembelian</a></nav>
-        <div className="sidebar-note"><span className="dot" />Rancangan awal<span>Versi lokal untuk evaluasi</span></div>
+        <div className="brand">
+          <span className="brand-mark">B</span>
+          <div>
+            <strong>BLC</strong>
+            <small>PROCUREMENT</small>
+          </div>
+        </div>
+
+        <div className="nav-label">RUANG KERJA SIKLUS PENGADAAN</div>
+        <nav aria-label="Navigasi jenis dokumen">
+          {NAV_ITEMS.map((item) => (
+            <a
+              key={item.id}
+              href={`#${item.id}`}
+              className={activeTab === item.id ? 'nav-active' : ''}
+              onClick={(e) => {
+                e.preventDefault();
+                setActiveTab(item.id);
+              }}
+            >
+              <span aria-hidden="true">{item.icon}</span>
+              {item.label}
+            </a>
+          ))}
+        </nav>
+
+        <div className="sidebar-note">
+          <span className="dot" />
+          Prototipe Front-End Interaktif
+          <span>Fase 1 IPD — Multi-Peran & Multi-Tahap</span>
+        </div>
       </aside>
-      <main className="main" id="permintaan">
-        <header className="topbar"><span>Ruang kerja <span className="slash">/</span> Permintaan pembelian</span><span className="top-tag">BLC PROCUREMENT</span></header>
+
+      {/* Main Container */}
+      <main className="main" id="workspace-main">
+        <header className="topbar">
+          <span>
+            BLC Procurement <span className="slash">/</span> Ruang Kerja{' '}
+            <span className="slash">/</span>{' '}
+            <strong>{NAV_ITEMS.find((n) => n.id === activeTab)?.label}</strong>
+          </span>
+          <span className="top-tag">LOCAL EVALUATION PROTOTYPE</span>
+        </header>
+
         <div className="content">
-          <div className="preview-note"><strong>Pratinjau lokal</strong><span>Hanya untuk evaluasi. Jangan gunakan data perusahaan atau transaksi nyata.</span></div>
-          <div className="page-heading"><div><div className="eyebrow">PENGADAAN <span> / </span> PURCHASE REQUEST</div><h1>Permintaan pembelian</h1><p>Siapkan dan pantau draf permintaan dalam satu tempat.</p></div><button className="primary" disabled={!!initial.error} onClick={() => openForm()}><span aria-hidden="true">＋</span> Buat draf PR</button></div>
-          <section className="summary" aria-label="Ringkasan draf"><div><span className="summary-label">DRAF DI BROWSER INI</span><strong>{drafts.length.toString().padStart(2, '0')}</strong><span className="summary-caption">Permintaan tersimpan</span></div><div className="summary-rule" /><div className="summary-detail"><span className="summary-icon" aria-hidden="true">↗</span><div><strong>Mulai dari permintaan</strong><p>Buat draf terlebih dahulu untuk menyiapkan rincian pembelian.</p></div></div></section>
-          {initial.error && <div className="notice error-notice" role="alert">{initial.error}</div>}
-          {notice && <div className="notice" role="status">{notice}</div>}
-          <section className="list-card" aria-labelledby="list-title">
-            <div className="section-head"><div><h2 id="list-title">Draf permintaan</h2><p>Daftar draf yang disimpan pada perangkat ini.</p></div><span className="count">{drafts.length} draf</span></div>
-            {drafts.length === 0 ? <div className="empty"><div className="empty-icon" aria-hidden="true">▤</div><h3>{initial.error ? 'Draf tidak dapat ditampilkan' : 'Belum ada draf permintaan'}</h3><p>{initial.error ? 'Periksa penyimpanan browser untuk mengakses draf.' : 'Mulai dengan membuat draf PR pertama Anda.'}</p>{!initial.error && <button className="secondary" onClick={() => openForm()}>Buat draf PR <span aria-hidden="true">↗</span></button>}</div> :
-              <div className="table-wrap"><table><thead><tr><th scope="col">PERMINTAAN</th><th scope="col">CABANG</th><th scope="col">NOMINAL</th><th scope="col">DIBUAT</th><th scope="col">STATUS</th><th scope="col">TINDAKAN</th></tr></thead><tbody>{drafts.map(draft => <tr key={draft.id}><td><strong>{draft.title}</strong><small>Purchase Request</small></td><td>{draft.branch}</td><td>{rupiah.format(draft.amount)}</td><td>{new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(draft.createdAt))}</td><td><span className="badge">Draf</span></td><td><button className="edit-button" aria-label={`Ubah draf ${draft.title}`} onClick={() => openForm(draft)}>Ubah</button></td></tr>)}</tbody></table></div>}
+          {/* Role Simulator Bar */}
+          <RoleSwitcher activeRole={activeRole} onRoleChange={setActiveRole} />
+
+          {/* Quick Notice */}
+          {notice && (
+            <div className="notice" role="status" style={{ marginBottom: '20px' }}>
+              <strong>Notifikasi Sistem:</strong> {notice}
+            </div>
+          )}
+
+          {/* Page Heading & Creation Actions */}
+          <div className="page-heading">
+            <div>
+              <div className="eyebrow">
+                BLC PROCUREMENT <span> / </span> DOCUMENT LIFECYCLE
+              </div>
+              <h1>Ruang Kerja Transaksi Pengadaan</h1>
+              <p>
+                Kelola seluruh siklus hidup dokumen: pengajuan, persetujuan berjenjang, penerbitan
+                voucher, dan pembayaran.
+              </p>
+            </div>
+
+            {activeRole === 'PEMOHON' && (
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  className="primary"
+                  onClick={() => handleCreateDoc('PR')}
+                >
+                  <span aria-hidden="true">＋</span> Buat PR
+                </button>
+                <button
+                  type="button"
+                  className="secondary"
+                  onClick={() => handleCreateDoc('PO')}
+                >
+                  <span aria-hidden="true">＋</span> Buat PO
+                </button>
+                <button
+                  type="button"
+                  className="secondary"
+                  onClick={() => handleCreateDoc('AV')}
+                >
+                  <span aria-hidden="true">＋</span> Buat AV
+                </button>
+                <button
+                  type="button"
+                  className="secondary"
+                  onClick={() => handleCreateDoc('RB')}
+                >
+                  <span aria-hidden="true">＋</span> Buat RB
+                </button>
+                <button
+                  type="button"
+                  className="secondary"
+                  onClick={() => handleCreateDoc('RC')}
+                >
+                  <span aria-hidden="true">＋</span> Buat RC
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Summary Metric Cards */}
+          <section className="summary" aria-label="Ringkasan Aktivitas">
+            <div>
+              <span className="summary-label">DRAF AKTIF</span>
+              <strong>{myDraftsCount.toString().padStart(2, '0')}</strong>
+              <span className="summary-caption">Dokumen draf</span>
+            </div>
+            <div className="summary-rule" />
+            <div>
+              <span className="summary-label">SEDANG DITINJAU</span>
+              <strong>{inReviewCount.toString().padStart(2, '0')}</strong>
+              <span className="summary-caption">Persetujuan berjenjang</span>
+            </div>
+            <div className="summary-rule" />
+            <div>
+              <span className="summary-label">ANTREAN PV (APPROVED)</span>
+              <strong>{approvedQueueCount.toString().padStart(2, '0')}</strong>
+              <span className="summary-caption">Siap dibuat voucher</span>
+            </div>
+            <div className="summary-rule" />
+            <div>
+              <span className="summary-label">LUNAS / SELESAI</span>
+              <strong>{paidCount.toString().padStart(2, '0')}</strong>
+              <span className="summary-caption">Tuntas dibayar</span>
+            </div>
           </section>
-          <p className="footer-note">Pratinjau awal · Persetujuan dan pembayaran belum tersedia</p>
+
+          {/* Main Document List */}
+          <DocumentList
+            documents={documents}
+            activeTab={activeTab}
+            activeRole={activeRole}
+            onOpenDetail={setDetailDoc}
+            onEditDoc={handleEditDoc}
+            onSubmitDoc={handleSubmitDoc}
+            onGeneratePv={handleGeneratePv}
+            onPayPv={setPayingPv}
+          />
         </div>
       </main>
-      {open && <dialog ref={dialog} className="modal" aria-labelledby="form-title" onCancel={event => { event.preventDefault(); closeForm(); }}><section className="drawer"><div className="drawer-head"><div><div className="eyebrow">PURCHASE REQUEST</div><h2 id="form-title">{editingId ? 'Ubah draf PR' : 'Buat draf PR'}</h2><p>Isi informasi awal permintaan pembelian.</p></div><button className="close" type="button" aria-label="Tutup formulir" onClick={closeForm}>×</button></div><form onSubmit={saveDraft} noValidate><div className="form-body"><div className="form-intro"><span>01</span><div><strong>Informasi permintaan</strong><p>Data ini hanya disimpan di browser Anda.</p></div></div>
-        {saveError && <div className="notice error-notice" role="alert">{saveError}</div>}
-        <label htmlFor="title">Judul permintaan <span>*</span></label><input id="title" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="Contoh: Pengadaan perlengkapan kantor" aria-invalid={!!errors.title} aria-describedby={errors.title ? 'title-error' : undefined} />{errors.title && <p className="error" id="title-error">{errors.title}</p>}
-        <label htmlFor="branch">Cabang <span>*</span></label><input id="branch" value={form.branch} onChange={e => setForm({ ...form, branch: e.target.value })} placeholder="Masukkan nama cabang" aria-invalid={!!errors.branch} aria-describedby={errors.branch ? 'branch-error' : undefined} />{errors.branch && <p className="error" id="branch-error">{errors.branch}</p>}
-        <label htmlFor="purpose">Tujuan pembelian</label><textarea id="purpose" value={form.purpose} onChange={e => setForm({ ...form, purpose: e.target.value })} placeholder="Jelaskan kebutuhan pembelian" rows={3} />
-        <label htmlFor="requiredDate">Tanggal kebutuhan</label><input id="requiredDate" type="date" value={form.requiredDate} onChange={e => setForm({ ...form, requiredDate: e.target.value })} aria-invalid={!!errors.requiredDate} aria-describedby={errors.requiredDate ? 'date-error' : undefined} />{errors.requiredDate && <p className="error" id="date-error">{errors.requiredDate}</p>}
-        <label htmlFor="amount">Perkiraan nominal <span>*</span></label><div className="money"><span>Rp</span><input id="amount" inputMode="numeric" value={form.amount} onChange={e => setForm({ ...form, amount: e.target.value })} placeholder="0" aria-invalid={!!errors.amount} aria-describedby={errors.amount ? 'amount-error' : 'amount-help'} /></div><p className="help" id="amount-help">Masukkan angka tanpa titik atau koma.</p>{errors.amount && <p className="error" id="amount-error">{errors.amount}</p>}
-        </div><div className="form-actions"><button type="button" className="secondary" onClick={closeForm}>Batal</button><button className="primary" type="submit">{editingId ? 'Simpan perubahan' : 'Simpan draf'} <span aria-hidden="true">→</span></button></div></form></section></dialog>}
+
+      {/* Creation / Edit Modals */}
+      {activeFormType === 'PR' && editingDoc && (
+        <dialog className="modal" open>
+          <section className="drawer">
+            <div className="drawer-head">
+              <div>
+                <div className="eyebrow">PURCHASE REQUEST</div>
+                <h2>Formulir Draf PR</h2>
+              </div>
+              <button
+                className="close"
+                type="button"
+                onClick={() => {
+                  setActiveFormType(null);
+                  setEditingDoc(null);
+                }}
+              >
+                ×
+              </button>
+            </div>
+            <FormPR
+              initialDoc={editingDoc as PRDocument}
+              onSave={handleSaveDoc}
+              onClose={() => {
+                setActiveFormType(null);
+                setEditingDoc(null);
+              }}
+            />
+          </section>
+        </dialog>
+      )}
+
+      {activeFormType === 'PO' && editingDoc && (
+        <dialog className="modal" open>
+          <section className="drawer" style={{ width: 'min(680px, 100%)' }}>
+            <div className="drawer-head">
+              <div>
+                <div className="eyebrow">PURCHASE ORDER</div>
+                <h2>Formulir Draf PO</h2>
+              </div>
+              <button
+                className="close"
+                type="button"
+                onClick={() => {
+                  setActiveFormType(null);
+                  setEditingDoc(null);
+                }}
+              >
+                ×
+              </button>
+            </div>
+            <FormPO
+              initialDoc={editingDoc as PODocument}
+              availablePrs={availablePrs}
+              onSave={handleSaveDoc}
+              onClose={() => {
+                setActiveFormType(null);
+                setEditingDoc(null);
+              }}
+            />
+          </section>
+        </dialog>
+      )}
+
+      {activeFormType === 'AV' && editingDoc && (
+        <dialog className="modal" open>
+          <section className="drawer">
+            <div className="drawer-head">
+              <div>
+                <div className="eyebrow">CASH ADVANCE</div>
+                <h2>Formulir Draf AV</h2>
+              </div>
+              <button
+                className="close"
+                type="button"
+                onClick={() => {
+                  setActiveFormType(null);
+                  setEditingDoc(null);
+                }}
+              >
+                ×
+              </button>
+            </div>
+            <FormAV
+              initialDoc={editingDoc as AVDocument}
+              onSave={handleSaveDoc}
+              onClose={() => {
+                setActiveFormType(null);
+                setEditingDoc(null);
+              }}
+            />
+          </section>
+        </dialog>
+      )}
+
+      {activeFormType === 'RB' && editingDoc && (
+        <dialog className="modal" open>
+          <section className="drawer">
+            <div className="drawer-head">
+              <div>
+                <div className="eyebrow">REIMBURSEMENT</div>
+                <h2>Formulir Draf RB</h2>
+              </div>
+              <button
+                className="close"
+                type="button"
+                onClick={() => {
+                  setActiveFormType(null);
+                  setEditingDoc(null);
+                }}
+              >
+                ×
+              </button>
+            </div>
+            <FormRB
+              initialDoc={editingDoc as RBDocument}
+              onSave={handleSaveDoc}
+              onClose={() => {
+                setActiveFormType(null);
+                setEditingDoc(null);
+              }}
+            />
+          </section>
+        </dialog>
+      )}
+
+      {activeFormType === 'RC' && editingDoc && (
+        <dialog className="modal" open>
+          <section className="drawer" style={{ width: 'min(640px, 100%)' }}>
+            <div className="drawer-head">
+              <div>
+                <div className="eyebrow">REALIZATION CASH ADVANCE</div>
+                <h2>Formulir Draf RC</h2>
+              </div>
+              <button
+                className="close"
+                type="button"
+                onClick={() => {
+                  setActiveFormType(null);
+                  setEditingDoc(null);
+                }}
+              >
+                ×
+              </button>
+            </div>
+            <FormRC
+              initialDoc={editingDoc as RCDocument}
+              availableAvs={availableAvs}
+              onSave={handleSaveDoc}
+              onClose={() => {
+                setActiveFormType(null);
+                setEditingDoc(null);
+              }}
+            />
+          </section>
+        </dialog>
+      )}
+
+      {/* PV Payment Modal for Finance */}
+      {payingPv && (
+        <dialog className="modal" open>
+          <section className="drawer" style={{ width: 'min(600px, 100%)' }}>
+            <div className="drawer-head">
+              <div>
+                <div className="eyebrow">FINANCE DISBURSEMENT</div>
+                <h2>Eksekusi Pembayaran PV</h2>
+              </div>
+              <button
+                className="close"
+                type="button"
+                onClick={() => setPayingPv(null)}
+              >
+                ×
+              </button>
+            </div>
+            <FormPVPayment
+              pv={payingPv}
+              onRecordPayment={handleRecordPvPayment}
+              onClose={() => setPayingPv(null)}
+            />
+          </section>
+        </dialog>
+      )}
+
+      {/* Detail & Multi-Stage Approval Modal */}
+      {detailDoc && (
+        <DocumentDetailModal
+          document={detailDoc}
+          activeRole={activeRole}
+          onClose={() => {
+            setDetailDoc(null);
+            refreshDocs();
+          }}
+          onApprove={handleApproveDoc}
+          onReject={handleRejectDoc}
+        />
+      )}
     </div>
   );
 }
 
-createRoot(document.getElementById('root')!).render(<StrictMode><App /></StrictMode>);
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <App />
+  </StrictMode>
+);
