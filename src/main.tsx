@@ -9,6 +9,7 @@ import { FormPVPayment } from './components/forms/FormPVPayment';
 import { FormRB } from './components/forms/FormRB';
 import { FormRC } from './components/forms/FormRC';
 import { RoleSwitcher } from './components/RoleSwitcher';
+import { ensureSeedDataLoaded } from './store/seed-data';
 import {
   approveDocumentStage,
   createEmptyDocument,
@@ -45,6 +46,7 @@ const NAV_ITEMS: Array<{ id: DocType | 'ALL'; label: string; icon: string }> = [
 
 function App() {
   const [documents, setDocuments] = useState<AnyDocument[]>(() => {
+    ensureSeedDataLoaded(localStorage);
     return loadAllDocuments(localStorage);
   });
   const [activeTab, setActiveTab] = useState<DocType | 'ALL'>('ALL');
