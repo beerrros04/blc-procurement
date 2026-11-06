@@ -18,10 +18,10 @@
     "semantic_hash": "506a08bb012898a9234da0c86eb6c761"
   },
   "src/main.tsx": {
-    "mtime": 1793980198.0490563,
-    "seen": 1794002502.7297556,
-    "ast_hash": "10bc318fbed025cb4f6346816db0a24f",
-    "semantic_hash": "10bc318fbed025cb4f6346816db0a24f"
+    "mtime": 1794006800.049134,
+    "seen": 1794006844.405032,
+    "ast_hash": "621a61af670488fbc8ec6dbac347cb61",
+    "semantic_hash": ""
   },
   "tsconfig.json": {
     "mtime": 1793979152.1555426,
@@ -30,10 +30,10 @@
     "semantic_hash": "cb1393ebc06a43fcf3c73bf875ed2ed0"
   },
   "BSD.md": {
-    "mtime": 1794002998.3419929,
-    "seen": 1794004571.8258271,
-    "ast_hash": "09436c9cdd3f45eb1b826c64c0e15d0d",
-    "semantic_hash": "09436c9cdd3f45eb1b826c64c0e15d0d"
+    "mtime": 1794005703.1557665,
+    "seen": 1794006844.405057,
+    "ast_hash": "7eca7782f91ab549f80a910d877d4c51",
+    "semantic_hash": ""
   },
   "DBD.md": {
     "mtime": 1794002248.0114396,
@@ -96,10 +96,10 @@
     "semantic_hash": "22d2a9619b16049e985b799b7d596815"
   },
   "TEMUAN-EMAIL-DAN-HAK-AKSES.md": {
-    "mtime": 1794002998.3425865,
-    "seen": 1794004571.8258307,
-    "ast_hash": "dc207f2ff43cef9d6f717375b20fb998",
-    "semantic_hash": "dc207f2ff43cef9d6f717375b20fb998"
+    "mtime": 1794005713.4860308,
+    "seen": 1794006844.4050763,
+    "ast_hash": "3cc4ca08d0bee643c15d996bd07eaaf4",
+    "semantic_hash": ""
   },
   "docs/media/Powerautomate/FireShot Capture 003 - BLC Procurement - Beranda - [caready.sharepoint.com].png": {
     "mtime": 1793977041.013253,
@@ -208,5 +208,131 @@
     "seen": 1794004571.8258588,
     "ast_hash": "7237c336c4b6b95bd0be1ff96b09582d",
     "semantic_hash": "7237c336c4b6b95bd0be1ff96b09582d"
+  },
+  "src/components/ApprovalStepper.tsx": {
+    "mtime": 1794006183.0833437,
+    "seen": 1794006844.404977,
+    "ast_hash": "4244baee178d757bc5eebfa18fa74734",
+    "semantic_hash": ""
+  },
+  "src/components/DocumentDetailModal.tsx": {
+    "mtime": 1794006361.3481338,
+    "seen": 1794006844.4049828,
+    "ast_hash": "72fa253942538255e6806bd90837e179",
+    "semantic_hash": ""
+  },
+  "src/components/DocumentList.tsx": {
+    "mtime": 1794006804.9180284,
+    "seen": 1794006844.4049864,
+    "ast_hash": "f89e02e7219a5795c494161434baf81c",
+    "semantic_hash": ""
+  },
+  "src/components/RoleSwitcher.tsx": {
+    "mtime": 1794006172.9758782,
+    "seen": 1794006844.4049897,
+    "ast_hash": "3b1811c2d96f7cf4118d194645be07f5",
+    "semantic_hash": ""
+  },
+  "src/components/forms/FormAV.tsx": {
+    "mtime": 1794006258.961995,
+    "seen": 1794006844.4049923,
+    "ast_hash": "bf3e091c4855b9ec40439ac11b0da821",
+    "semantic_hash": ""
+  },
+  "src/components/forms/FormPO.tsx": {
+    "mtime": 1794006246.9780507,
+    "seen": 1794006844.4049947,
+    "ast_hash": "c22bd8eb4c40ac6de003250a3eb4663b",
+    "semantic_hash": ""
+  },
+  "src/components/forms/FormPR.tsx": {
+    "mtime": 1794006228.679936,
+    "seen": 1794006844.4049973,
+    "ast_hash": "bf5f44fb177be5b727ab66f9f56920d6",
+    "semantic_hash": ""
+  },
+  "src/components/forms/FormPVPayment.tsx": {
+    "mtime": 1794006305.703112,
+    "seen": 1794006844.405,
+    "ast_hash": "cb5d3aba5acbbb6061aaa0e3489afe47",
+    "semantic_hash": ""
+  },
+  "src/components/forms/FormRB.tsx": {
+    "mtime": 1794006277.4810557,
+    "seen": 1794006844.4050043,
+    "ast_hash": "a98caf6b9be31b1d09ba112af93d99bf",
+    "semantic_hash": ""
+  },
+  "src/components/forms/FormRC.tsx": {
+    "mtime": 1794006294.9468074,
+    "seen": 1794006844.4050071,
+    "ast_hash": "b871780f062b335c44a16f20b4da5a6b",
+    "semantic_hash": ""
+  },
+  "src/domain/calculations.test.ts": {
+    "mtime": 1794006084.236465,
+    "seen": 1794006844.4050102,
+    "ast_hash": "bf3fe78d9f2780072d68d6f131260970",
+    "semantic_hash": ""
+  },
+  "src/domain/calculations.ts": {
+    "mtime": 1794006070.715903,
+    "seen": 1794006844.4050124,
+    "ast_hash": "d224be89573df718f1ecf955f2430406",
+    "semantic_hash": ""
+  },
+  "src/store/document-store.test.ts": {
+    "mtime": 1794006761.8842137,
+    "seen": 1794006844.4050345,
+    "ast_hash": "1325520142a1f25ae4f3726fd720c47d",
+    "semantic_hash": ""
+  },
+  "src/store/document-store.ts": {
+    "mtime": 1794006792.7562008,
+    "seen": 1794006844.4050372,
+    "ast_hash": "49db1fa913c8c1b60c040e3874816b96",
+    "semantic_hash": ""
+  },
+  "src/store/seed-data.ts": {
+    "mtime": 1794006437.1559217,
+    "seen": 1794006844.4050395,
+    "ast_hash": "14d2854516fd854f87a14f838afe42eb",
+    "semantic_hash": ""
+  },
+  "src/types/document.ts": {
+    "mtime": 1794006064.2806869,
+    "seen": 1794006844.4050422,
+    "ast_hash": "9e76d2d779750c02a58b16775ee76d7c",
+    "semantic_hash": ""
+  },
+  "src/workspace.test.ts": {
+    "mtime": 1794006770.9867108,
+    "seen": 1794006844.4050448,
+    "ast_hash": "404ba5f1bdda0826bdde17c067526d1c",
+    "semantic_hash": ""
+  },
+  ".superpowers/sdd/2026-11-07-document-workspace-frontend/progress.md": {
+    "mtime": 1794006827.8763902,
+    "seen": 1794006844.4050505,
+    "ast_hash": "48bb0beb681cb8a4d49d907ff291256c",
+    "semantic_hash": ""
+  },
+  "docs/superpowers/plans/2026-11-07-document-workspace-frontend.md": {
+    "mtime": 1794005950.4068031,
+    "seen": 1794006844.405084,
+    "ast_hash": "d53adb3bb38a488794ee6931ac2a52b8",
+    "semantic_hash": ""
+  },
+  "docs/superpowers/specs/2026-11-07-document-workspace-frontend-design.md": {
+    "mtime": 1794005688.997663,
+    "seen": 1794006844.4050865,
+    "ast_hash": "0e00d5d85a5d1f5cd9f79824ca11ed11",
+    "semantic_hash": ""
+  },
+  "package-lock.json": {
+    "mtime": 1793979101.0409648,
+    "seen": 1794006844.4051602,
+    "ast_hash": "c5eaa22eb4c1bf4b2adbd5ba1394bb9e",
+    "semantic_hash": ""
   }
 }
