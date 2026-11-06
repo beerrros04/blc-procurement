@@ -1,0 +1,14 @@
+{
+  "runs": [
+    {
+      "date": "2026-11-06",
+      "files": 14,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "note": "Agent token usage was not available from collaboration tools.",
+      "usage_recorded": false
+    }
+  ],
+  "total_input_tokens": 0,
+  "total_output_tokens": 0
+}

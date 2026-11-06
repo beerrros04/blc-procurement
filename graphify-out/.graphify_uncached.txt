@@ -1,0 +1,9 @@
+C:\Users\Bernard\Documents\personal's project\BLC\BSD.md
+C:\Users\Bernard\Documents\personal's project\BLC\DBD.md
+C:\Users\Bernard\Documents\personal's project\BLC\IPD.md
+C:\Users\Bernard\Documents\personal's project\BLC\PRD.md
+C:\Users\Bernard\Documents\personal's project\BLC\README.md
+C:\Users\Bernard\Documents\personal's project\BLC\TDD.md
+C:\Users\Bernard\Documents\personal's project\BLC\docs\superpowers\plans\2026-11-06-pr-draft.md
+C:\Users\Bernard\Documents\personal's project\BLC\index.html
+C:\Users\Bernard\Documents\personal's project\BLC\AGENTS.md

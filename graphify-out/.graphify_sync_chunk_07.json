@@ -1,0 +1,156 @@
+{
+  "nodes": [
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_007___blc_procurement___po_drafts___all_items____caready_sharepoint_com__po_drafts",
+      "label": "Tampilan daftar draf PO",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 007 - BLC Procurement - PO_Drafts - All Items - [caready.sharepoint.com].png",
+      "source_location": "seluruh gambar",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Gambar memperlihatkan daftar PO_Drafts dan kolom-kolomnya; keadaan kosong hanya berlaku pada tangkapan ini."
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_007___blc_procurement___po_drafts___all_items____caready_sharepoint_com__daftar_kosong",
+      "label": "Tampilan daftar kosong pada saat tangkapan",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 007 - BLC Procurement - PO_Drafts - All Items - [caready.sharepoint.com].png",
+      "source_location": "x=0-1249,y=0-547",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Tampilan menunjukkan daftar tanpa baris; ini tidak membuktikan daftar kosong pada waktu lain."
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_007___blc_procurement___po_drafts___all_items____caready_sharepoint_com__informasi_umum",
+      "label": "Kolom umum draf PO: judul, cabang, tujuan, tanggal kebutuhan dan anggaran",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 007 - BLC Procurement - PO_Drafts - All Items - [caready.sharepoint.com].png",
+      "source_location": "x=0-1249 dan x=1250-2499,y=0-547",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_007___blc_procurement___po_drafts___all_items____caready_sharepoint_com__nilai_pajak",
+      "label": "Kolom nominal draf PO: subtotal, PPN, biaya lain, diskon, total dan mata uang",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 007 - BLC Procurement - PO_Drafts - All Items - [caready.sharepoint.com].png",
+      "source_location": "x=0-2499,y=0-547",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_007___blc_procurement___po_drafts___all_items____caready_sharepoint_com__referensi_dokumen",
+      "label": "Kolom referensi draf PO: nomor PO, PR induk dan IAM",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 007 - BLC Procurement - PO_Drafts - All Items - [caready.sharepoint.com].png",
+      "source_location": "x=1250-3694,y=0-547",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_007___blc_procurement___po_drafts___all_items____caready_sharepoint_com__vendor_dan_syarat",
+      "label": "Kolom pemasok, syarat pembayaran dan pengiriman pada draf PO",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 007 - BLC Procurement - PO_Drafts - All Items - [caready.sharepoint.com].png",
+      "source_location": "x=2500-3694,y=0-547",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_007___blc_procurement___po_drafts___all_items____caready_sharepoint_com__pengajuan_persetujuan",
+      "label": "Kolom permintaan submit dan penyetuju pertama pada draf PO",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 007 - BLC Procurement - PO_Drafts - All Items - [caready.sharepoint.com].png",
+      "source_location": "x=1250-3694,y=0-547",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_007___blc_procurement___po_drafts___all_items____caready_sharepoint_com__po_drafts",
+      "target": "docs_media_powerautomate_fireshot_capture_007___blc_procurement___po_drafts___all_items____caready_sharepoint_com__daftar_kosong",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 007 - BLC Procurement - PO_Drafts - All Items - [caready.sharepoint.com].png",
+      "source_location": "x=0-1249,y=0-547",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_007___blc_procurement___po_drafts___all_items____caready_sharepoint_com__po_drafts",
+      "target": "docs_media_powerautomate_fireshot_capture_007___blc_procurement___po_drafts___all_items____caready_sharepoint_com__informasi_umum",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 007 - BLC Procurement - PO_Drafts - All Items - [caready.sharepoint.com].png",
+      "source_location": "x=0-1249 dan x=1250-2499,y=0-547",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_007___blc_procurement___po_drafts___all_items____caready_sharepoint_com__po_drafts",
+      "target": "docs_media_powerautomate_fireshot_capture_007___blc_procurement___po_drafts___all_items____caready_sharepoint_com__nilai_pajak",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 007 - BLC Procurement - PO_Drafts - All Items - [caready.sharepoint.com].png",
+      "source_location": "x=0-2499,y=0-547",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_007___blc_procurement___po_drafts___all_items____caready_sharepoint_com__po_drafts",
+      "target": "docs_media_powerautomate_fireshot_capture_007___blc_procurement___po_drafts___all_items____caready_sharepoint_com__referensi_dokumen",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 007 - BLC Procurement - PO_Drafts - All Items - [caready.sharepoint.com].png",
+      "source_location": "x=1250-3694,y=0-547",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_007___blc_procurement___po_drafts___all_items____caready_sharepoint_com__po_drafts",
+      "target": "docs_media_powerautomate_fireshot_capture_007___blc_procurement___po_drafts___all_items____caready_sharepoint_com__vendor_dan_syarat",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 007 - BLC Procurement - PO_Drafts - All Items - [caready.sharepoint.com].png",
+      "source_location": "x=2500-3694,y=0-547",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_007___blc_procurement___po_drafts___all_items____caready_sharepoint_com__po_drafts",
+      "target": "docs_media_powerautomate_fireshot_capture_007___blc_procurement___po_drafts___all_items____caready_sharepoint_com__pengajuan_persetujuan",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 007 - BLC Procurement - PO_Drafts - All Items - [caready.sharepoint.com].png",
+      "source_location": "x=1250-3694,y=0-547",
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [],
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "coverage": {
+    "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 007 - BLC Procurement - PO_Drafts - All Items - [caready.sharepoint.com].png": 548
+  },
+  "coverage_details": {
+    "width_px": 3695,
+    "height_px": 548,
+    "coverage": "seluruh gambar, tiga potongan horizontal"
+  }
+}

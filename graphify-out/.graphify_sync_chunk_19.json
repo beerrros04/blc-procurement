@@ -1,0 +1,567 @@
+{
+  "nodes": [
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_rb_form",
+      "label": "Formulir RB Drafts",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "Seluruh gambar",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Formulir pada screenshot; kondisi sistem dan validasi aktual tidak dapat dipastikan dari gambar saja."
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_general",
+      "label": "RB: informasi umum",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "1. Informasi umum",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_amount_tax",
+      "label": "RB: nilai dan pajak",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "2. Nilai dan pajak",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_payment",
+      "label": "RB: pembayaran ke penerima",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "3. Pembayaran ke",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_approval",
+      "label": "RB: persetujuan",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "4. Persetujuan",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_other",
+      "label": "RB: lainnya",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "5. Lainnya",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_submission",
+      "label": "RB: pengajuan dan lampiran",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "6. Ajukan",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_title",
+      "label": "RB Title — judul",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "1. Informasi umum",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Ditandai wajib dan ditampilkan kesalahan ketika kosong."
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_branch",
+      "label": "RB Branch — cabang",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "1. Informasi umum",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Teks bantuan menyatakan cabang wajib."
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_purpose",
+      "label": "RB Purpose — tujuan",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "1. Informasi umum",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Teks bantuan menyatakan tujuan wajib."
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_budget_type",
+      "label": "RB BudgetType — jenis anggaran",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "1. Informasi umum",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Teks bantuan menyatakan jenis anggaran wajib."
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_payment_due_date",
+      "label": "RB PaymentDueDate — tanggal jatuh tempo",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "1. Informasi umum",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_subtotal_amount",
+      "label": "RB SubtotalAmount",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "2. Nilai dan pajak",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Ditandai wajib; teks bantuan Jepang menyatakan sebelum pajak dan nol tidak diperbolehkan."
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_other_costs",
+      "label": "RB OtherCosts — biaya lain",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "2. Nilai dan pajak",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_discount_amount",
+      "label": "RB DiscountAmount — diskon",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "2. Nilai dan pajak",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_has_ppn",
+      "label": "RB HasPPN — penanda PPN",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "2. Nilai dan pajak",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_ppn",
+      "label": "RB PPN — nilai PPN",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "2. Nilai dan pajak",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_has_pph",
+      "label": "RB HasPPh — penanda PPh",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "2. Nilai dan pajak",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_pph_amount",
+      "label": "RB PPhAmount — nilai PPh",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "2. Nilai dan pajak",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_payment_method",
+      "label": "RB PaymentMethod — metode pembayaran",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "3. Pembayaran ke",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Teks bantuan menyatakan dikosongkan untuk Transfer."
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_transfer_fields",
+      "label": "RB data rekening untuk transfer",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "3. Pembayaran ke",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Nama bank, nomor rekening dan nama pemilik rekening dinyatakan wajib bila Transfer; tidak ada rincian rekening aktual dicatat."
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_stage1_approver",
+      "label": "RB Stage1Approver — penyetuju tahap 1",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "4. Persetujuan",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Ditandai wajib dan dipilih oleh pemohon; batas pilihan penyetuju tidak dijelaskan pada gambar."
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_vendor_name",
+      "label": "RB VendorName — nama toko atau pemasok",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "5. Lainnya",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Teks bantuan menyatakan opsional."
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_previous_register_id",
+      "label": "RB PreviousRegisterID — referensi pengajuan ulang",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "5. Lainnya",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Teks bantuan menyebut ID buku besar lama saat mengajukan ulang."
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_submit_requested",
+      "label": "RB SubmitRequested — ajukan draf",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "6. Ajukan",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Teks bantuan menyatakan ubah ke Ya setelah input selesai untuk mengajukan."
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_attachments",
+      "label": "RB Attachments — lampiran",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "6. Ajukan",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_rb_form",
+      "target": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_general",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "1. Informasi umum",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_rb_form",
+      "target": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_amount_tax",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "2. Nilai dan pajak",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_rb_form",
+      "target": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_payment",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "3. Pembayaran ke",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_rb_form",
+      "target": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_approval",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "4. Persetujuan",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_rb_form",
+      "target": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_other",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "5. Lainnya",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_rb_form",
+      "target": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_submission",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "6. Ajukan",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_general",
+      "target": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_title",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "1. Informasi umum",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_general",
+      "target": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_branch",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "1. Informasi umum",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_general",
+      "target": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_purpose",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "1. Informasi umum",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_general",
+      "target": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_budget_type",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "1. Informasi umum",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_general",
+      "target": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_payment_due_date",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "1. Informasi umum",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_amount_tax",
+      "target": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_subtotal_amount",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "2. Nilai dan pajak",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_amount_tax",
+      "target": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_other_costs",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "2. Nilai dan pajak",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_amount_tax",
+      "target": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_discount_amount",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "2. Nilai dan pajak",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_amount_tax",
+      "target": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_has_ppn",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "2. Nilai dan pajak",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_amount_tax",
+      "target": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_ppn",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "2. Nilai dan pajak",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_amount_tax",
+      "target": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_has_pph",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "2. Nilai dan pajak",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_amount_tax",
+      "target": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_pph_amount",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "2. Nilai dan pajak",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_payment",
+      "target": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_payment_method",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "3. Pembayaran ke",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_payment",
+      "target": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_transfer_fields",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "3. Pembayaran ke",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_approval",
+      "target": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_stage1_approver",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "4. Persetujuan",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_other",
+      "target": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_vendor_name",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "5. Lainnya",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_other",
+      "target": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_previous_register_id",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "5. Lainnya",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_submission",
+      "target": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_submit_requested",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "6. Ajukan",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_submission",
+      "target": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_attachments",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png",
+      "source_location": "6. Ajukan",
+      "weight": 1
+    }
+  ],
+  "hyperedges": [],
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "coverage": {
+    "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png": 1676
+  },
+  "coverage_details": {
+    "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png": {
+      "width": 1840,
+      "height": 1676,
+      "viewed": "seluruh gambar"
+    }
+  }
+}

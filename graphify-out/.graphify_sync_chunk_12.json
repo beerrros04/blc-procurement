@@ -1,0 +1,311 @@
+{
+  "nodes": [
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_ringkasan_pengajuan",
+      "label": "Ringkasan pengajuan procurement",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 012 - BLC Procurement - PV_Drafts - Ringkasan · 概要 - [caready.sharepoint.com].png",
+      "source_location": "Seluruh screenshot, y=0–6354",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Tabel ringkasan memuat daftar pengajuan, nilai, status, dan indikator tahap pada saat tangkapan."
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_kolom_identitas",
+      "label": "Kolom nomor, judul, jenis dan pemohon",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 012 - BLC Procurement - PV_Drafts - Ringkasan · 概要 - [caready.sharepoint.com].png",
+      "source_location": "Kepala tabel, y=0–1600",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_kolom_total",
+      "label": "Kolom total pengajuan",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 012 - BLC Procurement - PV_Drafts - Ringkasan · 概要 - [caready.sharepoint.com].png",
+      "source_location": "Kepala tabel, y=0–1600",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_kolom_dibayarkan",
+      "label": "Kolom berlabel Dibayarkan",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 012 - BLC Procurement - PV_Drafts - Ringkasan · 概要 - [caready.sharepoint.com].png",
+      "source_location": "Kepala tabel, y=0–1600",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_kolom_tahap",
+      "label": "Indikator empat tahap persetujuan",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 012 - BLC Procurement - PV_Drafts - Ringkasan · 概要 - [caready.sharepoint.com].png",
+      "source_location": "Tabel, y=0–6354",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Setiap baris menampilkan rangkaian indikator; arti warna dan alur per jenis tidak dijelaskan pada tangkapan ini."
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_status_persetujuan",
+      "label": "Status pengajuan menunggu, disetujui dan ditolak",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 012 - BLC Procurement - PV_Drafts - Ringkasan · 概要 - [caready.sharepoint.com].png",
+      "source_location": "Tabel, y=0–6354",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_status_pembayaran",
+      "label": "Kolom status pembayaran",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 012 - BLC Procurement - PV_Drafts - Ringkasan · 概要 - [caready.sharepoint.com].png",
+      "source_location": "Kepala tabel dan baris PV, y=0–6354",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_status_belum_dibayar",
+      "label": "Status pembayaran Belum dibayar",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 012 - BLC Procurement - PV_Drafts - Ringkasan · 概要 - [caready.sharepoint.com].png",
+      "source_location": "Baris PV, y=3200–6354",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_pv_disetujui_belum_dibayar",
+      "label": "PV dapat disetujui dan belum dibayar",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 012 - BLC Procurement - PV_Drafts - Ringkasan · 概要 - [caready.sharepoint.com].png",
+      "source_location": "Baris PV, y=3200–6354",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Tangkapan menampilkan kedua status sekaligus pada baris PV."
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_nilai_tidak_bukti_bayar",
+      "label": "Nilai Dibayarkan bukan bukti pembayaran aktual",
+      "file_type": "rationale",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 012 - BLC Procurement - PV_Drafts - Ringkasan · 概要 - [caready.sharepoint.com].png",
+      "source_location": "Baris menunggu dan PV belum dibayar, y=0–6354",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Nilai pada kolom Dibayarkan terlihat untuk baris menunggu dan PV yang berstatus belum dibayar; kolom itu sendiri tidak membuktikan pembayaran telah dilakukan."
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_pv_berparent",
+      "label": "Judul PV menampilkan rujukan dokumen PO, AV atau RB",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 012 - BLC Procurement - PV_Drafts - Ringkasan · 概要 - [caready.sharepoint.com].png",
+      "source_location": "Kolom judul, y=0–1600",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Judul beberapa baris PV mencantumkan tipe dokumen lain; tangkapan tidak mengungkap seluruh aturan relasinya."
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_pengajuan_cash_advance",
+      "label": "Baris pengajuan cash advance dan realisasi",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 012 - BLC Procurement - PV_Drafts - Ringkasan · 概要 - [caready.sharepoint.com].png",
+      "source_location": "Tabel, y=3200–4800",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_kolom_waktu",
+      "label": "Kolom waktu dibuat",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 012 - BLC Procurement - PV_Drafts - Ringkasan · 概要 - [caready.sharepoint.com].png",
+      "source_location": "Kepala tabel dan baris, y=0–6354",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_ringkasan_pengajuan",
+      "target": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_kolom_identitas",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 012 - BLC Procurement - PV_Drafts - Ringkasan · 概要 - [caready.sharepoint.com].png",
+      "source_location": "Tabel ringkasan, y=0–6354",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_ringkasan_pengajuan",
+      "target": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_kolom_total",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 012 - BLC Procurement - PV_Drafts - Ringkasan · 概要 - [caready.sharepoint.com].png",
+      "source_location": "Tabel ringkasan, y=0–6354",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_ringkasan_pengajuan",
+      "target": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_kolom_dibayarkan",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 012 - BLC Procurement - PV_Drafts - Ringkasan · 概要 - [caready.sharepoint.com].png",
+      "source_location": "Tabel ringkasan, y=0–6354",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_ringkasan_pengajuan",
+      "target": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_kolom_tahap",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 012 - BLC Procurement - PV_Drafts - Ringkasan · 概要 - [caready.sharepoint.com].png",
+      "source_location": "Tabel ringkasan, y=0–6354",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_ringkasan_pengajuan",
+      "target": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_status_persetujuan",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 012 - BLC Procurement - PV_Drafts - Ringkasan · 概要 - [caready.sharepoint.com].png",
+      "source_location": "Tabel ringkasan, y=0–6354",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_ringkasan_pengajuan",
+      "target": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_status_pembayaran",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 012 - BLC Procurement - PV_Drafts - Ringkasan · 概要 - [caready.sharepoint.com].png",
+      "source_location": "Tabel ringkasan, y=0–6354",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_ringkasan_pengajuan",
+      "target": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_pv_berparent",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 012 - BLC Procurement - PV_Drafts - Ringkasan · 概要 - [caready.sharepoint.com].png",
+      "source_location": "Tabel ringkasan, y=0–6354",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_ringkasan_pengajuan",
+      "target": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_pengajuan_cash_advance",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 012 - BLC Procurement - PV_Drafts - Ringkasan · 概要 - [caready.sharepoint.com].png",
+      "source_location": "Tabel ringkasan, y=0–6354",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_ringkasan_pengajuan",
+      "target": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_kolom_waktu",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 012 - BLC Procurement - PV_Drafts - Ringkasan · 概要 - [caready.sharepoint.com].png",
+      "source_location": "Tabel ringkasan, y=0–6354",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_status_pembayaran",
+      "target": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_status_belum_dibayar",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 012 - BLC Procurement - PV_Drafts - Ringkasan · 概要 - [caready.sharepoint.com].png",
+      "source_location": "Tabel ringkasan, y=0–6354",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_ringkasan_pengajuan",
+      "target": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_pv_disetujui_belum_dibayar",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 012 - BLC Procurement - PV_Drafts - Ringkasan · 概要 - [caready.sharepoint.com].png",
+      "source_location": "Baris PV, y=3200–6354",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_pv_disetujui_belum_dibayar",
+      "target": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_status_persetujuan",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 012 - BLC Procurement - PV_Drafts - Ringkasan · 概要 - [caready.sharepoint.com].png",
+      "source_location": "Tabel ringkasan, y=0–6354",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_pv_disetujui_belum_dibayar",
+      "target": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_status_belum_dibayar",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 012 - BLC Procurement - PV_Drafts - Ringkasan · 概要 - [caready.sharepoint.com].png",
+      "source_location": "Tabel ringkasan, y=0–6354",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_nilai_tidak_bukti_bayar",
+      "target": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_kolom_dibayarkan",
+      "relation": "rationale_for",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 012 - BLC Procurement - PV_Drafts - Ringkasan · 概要 - [caready.sharepoint.com].png",
+      "source_location": "Tabel ringkasan, y=0–6354",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_nilai_tidak_bukti_bayar",
+      "target": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_pv_disetujui_belum_dibayar",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 012 - BLC Procurement - PV_Drafts - Ringkasan · 概要 - [caready.sharepoint.com].png",
+      "source_location": "Tabel ringkasan, y=0–6354",
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [],
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "coverage": {
+    "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 012 - BLC Procurement - PV_Drafts - Ringkasan · 概要 - [caready.sharepoint.com].png": 6354
+  },
+  "coverage_note": "Seluruh tinggi gambar 6354 piksel ditinjau dalam empat potongan berurutan 0–1600, 1600–3200, 3200–4800, 4800–6354."
+}

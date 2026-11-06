@@ -1,0 +1,1281 @@
+{
+  "nodes": [
+    {
+      "id": "bsd_authority_levels",
+      "label": "Usulan tingkat HR 1, Ayu 2, Hery dan Hashimoto 3",
+      "file_type": "concept",
+      "source_location": "Rancangan tingkat dan kelompok persetujuan",
+      "rationale": "Tingkat bukan urutan tahap atau izin otomatis.",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md"
+    },
+    {
+      "id": "bsd_av_rc",
+      "label": "Realisasi uang muka AV dan RC",
+      "file_type": "concept",
+      "source_location": "BR-08 dan BR-09",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md"
+    },
+    {
+      "id": "bsd_legacy_skip_reasons",
+      "label": "Riwayat lama: tiga alasan tahap dilewati",
+      "file_type": "concept",
+      "source_location": "Rancangan tingkat dan kelompok persetujuan",
+      "rationale": "Pernah disetujui, tahap tidak dipakai jenis dokumen, atau pemohon sendiri; skip bukan persetujuan.",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md"
+    },
+    {
+      "id": "bsd_parallel_rejection_unresolved",
+      "label": "Kebijakan penolakan pada kelompok paralel belum diputuskan",
+      "file_type": "concept",
+      "source_location": "Rancangan tingkat dan kelompok persetujuan",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md"
+    },
+    {
+      "id": "bsd_payment",
+      "label": "Nilai terutang dan pembayaran PV",
+      "file_type": "concept",
+      "source_location": "BR-05 dan BR-06",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md"
+    },
+    {
+      "id": "bsd_rbrc_sequence_unresolved",
+      "label": "Urutan lengkap RB/RC masih belum pasti",
+      "file_type": "concept",
+      "source_location": "Rancangan tingkat dan kelompok persetujuan",
+      "rationale": "Usulan atasan, HR, Ayu, dua penyetuju paralel, dan konfirmasi Finance belum final.",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md"
+    },
+    {
+      "id": "bsd_reminder",
+      "label": "Tenggat dan pengingat realisasi",
+      "file_type": "concept",
+      "source_location": "BR-10",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md"
+    },
+    {
+      "id": "bsd_threshold",
+      "label": "Ambang dan pengecualian",
+      "file_type": "concept",
+      "source_location": "BR-01 hingga BR-03",
+      "rationale": "Batas Rp50 juta dan dasar ambang Rp5 juta belum disahkan untuk sistem baru.",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md"
+    },
+    {
+      "id": "temuan_email_dan_hak_akses_contract_uncertainty",
+      "label": "Kewajiban lampiran kontrak belum pasti",
+      "file_type": "concept",
+      "source_location": "Rincian yang mudah terlewat",
+      "rationale": "Lampiran kontrak dan nomor kontrak adalah hal berbeda; sumber historis perlu direkonsiliasi.",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md"
+    },
+    {
+      "id": "temuan_email_dan_hak_akses_finance_queue",
+      "label": "Antrean menunggu PV dan dokumen induk",
+      "file_type": "concept",
+      "source_location": "Perkembangan dan masukan pengguna pada email",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md"
+    },
+    {
+      "id": "temuan_email_dan_hak_akses_first_approver",
+      "label": "Pemohon memilih penyetuju pertama; RC menyebut atasan",
+      "file_type": "concept",
+      "source_location": "Rincian yang mudah terlewat",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md"
+    },
+    {
+      "id": "temuan_email_dan_hak_akses_historical_rbrc_routes",
+      "label": "Jalur historis RB dan RC",
+      "file_type": "concept",
+      "source_location": "Tingkat, peran dan tugas adalah hal yang berbeda",
+      "rationale": "Email RB 28 Okt: atasan → HR → Hery → Hashimoto; pengumuman RC 4 Nov menambahkan konfirmasi Finance.",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md"
+    },
+    {
+      "id": "temuan_email_dan_hak_akses_legacy_skip",
+      "label": "Tiga alasan skip pada riwayat lama",
+      "file_type": "concept",
+      "source_location": "Rincian yang mudah terlewat",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md"
+    },
+    {
+      "id": "temuan_email_dan_hak_akses_levels_roles_tasks",
+      "label": "Tingkat, peran dan tugas berbeda",
+      "file_type": "concept",
+      "source_location": "Tingkat, peran dan tugas adalah hal yang berbeda",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md"
+    },
+    {
+      "id": "temuan_email_dan_hak_akses_open_decisions",
+      "label": "Keputusan matriks, delegasi, skip, pajak dan migrasi",
+      "file_type": "concept",
+      "source_location": "Keputusan yang masih diperlukan",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md"
+    },
+    {
+      "id": "temuan_email_dan_hak_akses_paid_av_rc",
+      "label": "RC memilih AV sendiri yang dibayar; nilai berasal dari PV dibayar",
+      "file_type": "concept",
+      "source_location": "Perkembangan dan masukan pengguna pada email",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md"
+    },
+    {
+      "id": "temuan_email_dan_hak_akses_payment_reconciliation",
+      "label": "Pemeriksaan PV dan bukti transfer",
+      "file_type": "concept",
+      "source_location": "Perkembangan dan masukan pengguna pada email",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md"
+    },
+    {
+      "id": "temuan_email_dan_hak_akses_permissions_matrix",
+      "label": "Matriks kemampuan awal belum disahkan",
+      "file_type": "concept",
+      "source_location": "Matriks kemampuan awal — usulan, bukan izin final",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md"
+    },
+    {
+      "id": "temuan_email_dan_hak_akses_proposed_rbrc_sequence",
+      "label": "Usulan urutan RB/RC menunggu konfirmasi",
+      "file_type": "concept",
+      "source_location": "Tingkat, peran dan tugas adalah hal yang berbeda",
+      "rationale": "Posisi Ayu dan urutan penuh belum disahkan; dua penyetuju tingkat 3 dapat paralel dan keduanya diperlukan untuk RB/RC.",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md"
+    },
+    {
+      "id": "temuan_email_dan_hak_akses_rc_finance_branch",
+      "label": "Konfirmasi Finance RC: perbedaan usulan dan pengumuman",
+      "file_type": "concept",
+      "source_location": "Perkembangan dan masukan pengguna pada email",
+      "rationale": "Email 3 Nov: seorang Finance pada sisa/sama; 4 Nov: konfirmasi disebut umum; cabang perlu verifikasi.",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md"
+    },
+    {
+      "id": "bsd_business",
+      "label": "Rancangan proses bisnis",
+      "file_type": "document",
+      "source_location": "Peta proses",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md"
+    },
+    {
+      "id": "temuan_email_dan_hak_akses_evidence",
+      "label": "Bukti email dan rancangan hak akses",
+      "file_type": "document",
+      "source_location": "Sumber dan cara membaca",
+      "rationale": "Snapshot 26 Oktober–4 November; klaim perbaikan tidak membuktikan kondisi sistem saat ini.",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md"
+    },
+    {
+      "id": "bsd_pr_po_pv",
+      "label": "Alur PR, PO, GR, dan PV",
+      "file_type": "concept",
+      "source_location": "Peta proses",
+      "rationale": "Hubungan GR dengan PV dan keharusan GR masih perlu konfirmasi.",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md"
+    },
+    {
+      "id": "readme_paket",
+      "label": "Paket kebutuhan BLC Procurement",
+      "file_type": "document",
+      "source_location": "Dokumen",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\README.md"
+    },
+    {
+      "id": "bsd_approval",
+      "label": "Aturan persetujuan bertahap",
+      "file_type": "concept",
+      "source_location": "Alur umum",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md"
+    },
+    {
+      "id": "readme_pratinjau",
+      "label": "Pratinjau draf PR lokal",
+      "file_type": "concept",
+      "source_location": "Menjalankan pratinjau lokal",
+      "rationale": "Baru tersedia draf PR di browser, bukan login, backend, persetujuan, atau pembayaran.",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\README.md"
+    },
+    {
+      "id": "temuan_email_dan_hak_akses_notification_pdf",
+      "label": "Notifikasi AV dan PDF pernah bermasalah",
+      "file_type": "concept",
+      "source_location": "Perkembangan dan masukan pengguna pada email",
+      "rationale": "Laporan Oktober diikuti klaim perbaikan; tidak membuktikan kondisi saat ini.",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md"
+    },
+    {
+      "id": "readme_microsoft_365",
+      "label": "Login Microsoft 365 dipilih pengguna",
+      "file_type": "concept",
+      "source_location": "Keputusan terpenting yang masih terbuka",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\README.md"
+    },
+    {
+      "id": "temuan_email_dan_hak_akses_rb_historis_28_okt",
+      "label": "RB historis: atasan, Ira HR, Hery, Hashimoto",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md",
+      "source_location": "Informasi orang dan notifikasi yang terlihat pada email",
+      "rationale": "Email 28 Oktober menjelaskan urutan RB; RB yang sudah berjalan memakai aturan lama dengan Ayu sebagai penyetuju, bukan Ira."
+    },
+    {
+      "id": "temuan_email_dan_hak_akses_rc_historis_04_nov",
+      "label": "RC historis: atasan, Ira HR, Hery, Hashimoto, Keuangan",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md",
+      "source_location": "Informasi orang dan notifikasi yang terlihat pada email",
+      "rationale": "Alur serial sistem lama yang diumumkan 4 November; tidak membuktikan alur paralel sistem baru."
+    },
+    {
+      "id": "temuan_email_dan_hak_akses_rc_konfirmasi_tim_finance",
+      "label": "Usulan konfirmasi Finance RC oleh satu anggota tim",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md",
+      "source_location": "Informasi orang dan notifikasi yang terlihat pada email",
+      "rationale": "Rancangan 3 November menyebut Erika, Aprinia, dan Sifa; pengumuman berikutnya tidak merinci semua cabang dan anggota."
+    },
+    {
+      "id": "temuan_email_dan_hak_akses_rc_reminder_penerima",
+      "label": "Pengingat RC ke pemohon dan atasan, CC Ayu",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md",
+      "source_location": "Informasi orang dan notifikasi yang terlihat pada email",
+      "rationale": "Pengumuman menyebut pengingat pada hari kerja hingga RC diajukan, dengan pengecualian AV lama."
+    },
+    {
+      "id": "temuan_email_dan_hak_akses_alamat_email_tidak_tampak",
+      "label": "Alamat email lengkap tidak tampak pada screenshot",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md",
+      "source_location": "Informasi orang dan notifikasi yang terlihat pada email",
+      "rationale": "Header screenshot menampilkan nama; identitas akun harus diverifikasi dari sumber organisasi."
+    },
+    {
+      "id": "temuan_email_dan_hak_akses_screenshot_email",
+      "label": "Screenshot email perkembangan BLC Procurement",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md",
+      "source_location": "Sumber dan cara membaca",
+      "rationale": "Bukti percakapan historis dari akhir Oktober sampai awal November; kondisi sistem saat ini belum diverifikasi."
+    },
+    {
+      "id": "bsd_historical_rb_approval",
+      "label": "Alur RB historis dan pengecualian aturan lama",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md",
+      "source_location": "BR-07",
+      "rationale": "Urutan lama menggunakan atasan, HR, Hery, Hashimoto; pengajuan RB sebelumnya tetap memakai penyetuju lama."
+    },
+    {
+      "id": "bsd_historical_rc_approval",
+      "label": "Alur RC historis dan konfirmasi Keuangan",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md",
+      "source_location": "BR-07",
+      "rationale": "Pengumuman sistem lama menempatkan Keuangan setelah atasan, HR, Hery dan Hashimoto."
+    },
+    {
+      "id": "bsd_notification_rc_recipients",
+      "label": "Penerima pengingat RC historis",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md",
+      "source_location": "BR-10",
+      "rationale": "Pemohon, atasan, dan Ayu sebagai CC menurut pengumuman; penetapan sistem baru masih dibahas."
+    },
+    {
+      "id": "bsd_invoice_exception",
+      "label": "Pengecualian PO rutin atau mobilisasi",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md",
+      "source_location": "BR-03",
+      "rationale": "Kebutuhan PR, IAM dan nomor kontrak berbeda untuk kategori tertentu; invoice tetap wajib menurut email historis."
+    },
+    {
+      "id": "bsd_rc_outcomes",
+      "label": "Hasil realisasi RC: sisa, kekurangan, atau sama",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md",
+      "source_location": "BR-09",
+      "rationale": "Setiap hasil mengarah ke bukti, konfirmasi Keuangan, atau PV sesuai kondisi historis."
+    },
+    {
+      "id": "bsd_status_separation",
+      "label": "Status persetujuan dan pembayaran terpisah",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md",
+      "source_location": "Status usulan",
+      "rationale": "Persetujuan akhir belum berarti pembayaran telah dicatat."
+    },
+    {
+      "id": "readme_gambar_sumber",
+      "label": "Gambar sumber Powerautomate di folder proyek",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\README.md",
+      "source_location": "Sumber dan cara membaca",
+      "rationale": "Screenshot adalah arsip, bukan bukti langsung dari kondisi sistem saat ini."
+    },
+    {
+      "id": "readme_cakupan_tahap_pertama",
+      "label": "Tahap pertama procurement dan pembayaran",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\README.md",
+      "source_location": "Menjalankan pratinjau lokal",
+      "rationale": "Pratinjau draf PR belum mencakup backend, autentikasi, persetujuan, atau pembayaran."
+    },
+    {
+      "id": "readme_aturan_masih_terbuka",
+      "label": "Aturan persetujuan, keuangan dan infrastruktur masih terbuka",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\README.md",
+      "source_location": "Keputusan terpenting yang masih terbuka"
+    }
+  ],
+  "edges": [
+    {
+      "source": "bsd_business",
+      "target": "bsd_approval",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_location": "Aturan teramati dan rancangan tingkat",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md"
+    },
+    {
+      "source": "bsd_business",
+      "target": "bsd_authority_levels",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_location": "Aturan teramati dan rancangan tingkat",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md"
+    },
+    {
+      "source": "bsd_business",
+      "target": "bsd_av_rc",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_location": "Aturan teramati dan rancangan tingkat",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md"
+    },
+    {
+      "source": "bsd_business",
+      "target": "bsd_legacy_skip_reasons",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_location": "Aturan teramati dan rancangan tingkat",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md"
+    },
+    {
+      "source": "bsd_business",
+      "target": "bsd_parallel_rejection_unresolved",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_location": "Aturan teramati dan rancangan tingkat",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md"
+    },
+    {
+      "source": "bsd_business",
+      "target": "bsd_payment",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_location": "Aturan teramati dan rancangan tingkat",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md"
+    },
+    {
+      "source": "bsd_business",
+      "target": "bsd_pr_po_pv",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_location": "Aturan teramati dan rancangan tingkat",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md"
+    },
+    {
+      "source": "bsd_business",
+      "target": "bsd_rbrc_sequence_unresolved",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_location": "Aturan teramati dan rancangan tingkat",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md"
+    },
+    {
+      "source": "bsd_business",
+      "target": "bsd_reminder",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_location": "Aturan teramati dan rancangan tingkat",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md"
+    },
+    {
+      "source": "bsd_business",
+      "target": "bsd_threshold",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_location": "Aturan teramati dan rancangan tingkat",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md"
+    },
+    {
+      "source": "readme_paket",
+      "target": "bsd_business",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_location": "Dokumen",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\README.md"
+    },
+    {
+      "source": "readme_paket",
+      "target": "dbd_data",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_location": "Dokumen",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\README.md"
+    },
+    {
+      "source": "readme_paket",
+      "target": "ipd_roadmap",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_location": "Dokumen",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\README.md"
+    },
+    {
+      "source": "readme_paket",
+      "target": "prd_kebutuhan",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_location": "Dokumen",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\README.md"
+    },
+    {
+      "source": "readme_paket",
+      "target": "tdd_technical",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_location": "Dokumen",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\README.md"
+    },
+    {
+      "source": "readme_paket",
+      "target": "temuan_email_dan_hak_akses_evidence",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_location": "Dokumen",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\README.md"
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_evidence",
+      "target": "temuan_email_dan_hak_akses_contract_uncertainty",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_location": "Rincian temuan",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md"
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_evidence",
+      "target": "temuan_email_dan_hak_akses_finance_queue",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_location": "Rincian temuan",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md"
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_evidence",
+      "target": "temuan_email_dan_hak_akses_first_approver",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_location": "Rincian temuan",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md"
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_evidence",
+      "target": "temuan_email_dan_hak_akses_historical_rbrc_routes",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_location": "Rincian temuan",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md"
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_evidence",
+      "target": "temuan_email_dan_hak_akses_legacy_skip",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_location": "Rincian temuan",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md"
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_evidence",
+      "target": "temuan_email_dan_hak_akses_levels_roles_tasks",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_location": "Rincian temuan",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md"
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_evidence",
+      "target": "temuan_email_dan_hak_akses_notification_pdf",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_location": "Rincian temuan",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md"
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_evidence",
+      "target": "temuan_email_dan_hak_akses_open_decisions",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_location": "Rincian temuan",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md"
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_evidence",
+      "target": "temuan_email_dan_hak_akses_paid_av_rc",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_location": "Rincian temuan",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md"
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_evidence",
+      "target": "temuan_email_dan_hak_akses_payment_reconciliation",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_location": "Rincian temuan",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md"
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_evidence",
+      "target": "temuan_email_dan_hak_akses_permissions_matrix",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_location": "Rincian temuan",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md"
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_evidence",
+      "target": "temuan_email_dan_hak_akses_proposed_rbrc_sequence",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_location": "Rincian temuan",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md"
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_evidence",
+      "target": "temuan_email_dan_hak_akses_rc_finance_branch",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_location": "Rincian temuan",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md"
+    },
+    {
+      "source": "prd_finance_feedback",
+      "target": "temuan_email_dan_hak_akses_notification_pdf",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_location": "Perkembangan dan masukan pengguna pada email",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md"
+    },
+    {
+      "source": "readme_pratinjau",
+      "target": "prd_kebutuhan",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_location": "Menjalankan pratinjau lokal",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\README.md"
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_contract_uncertainty",
+      "target": "bsd_threshold",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_location": "Rincian yang mudah terlewat",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md"
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_payment_reconciliation",
+      "target": "bsd_payment",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_location": "Perkembangan dan masukan pengguna pada email",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md"
+    },
+    {
+      "source": "bsd_approval",
+      "target": "prd_approval",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_location": "Alur umum",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md"
+    },
+    {
+      "source": "bsd_authority_levels",
+      "target": "temuan_email_dan_hak_akses_levels_roles_tasks",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_location": "Rancangan tingkat dan kelompok persetujuan",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md"
+    },
+    {
+      "source": "bsd_legacy_skip_reasons",
+      "target": "temuan_email_dan_hak_akses_legacy_skip",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_location": "Rancangan tingkat dan kelompok persetujuan",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md"
+    },
+    {
+      "source": "bsd_rbrc_sequence_unresolved",
+      "target": "temuan_email_dan_hak_akses_proposed_rbrc_sequence",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_location": "Rancangan tingkat dan kelompok persetujuan",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md"
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_paid_av_rc",
+      "target": "bsd_av_rc",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_location": "Perkembangan dan masukan pengguna pada email",
+      "weight": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md"
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_evidence",
+      "target": "temuan_email_dan_hak_akses_rb_historis_28_okt",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md",
+      "source_location": "Informasi orang dan notifikasi yang terlihat pada email",
+      "weight": 1.0
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_evidence",
+      "target": "temuan_email_dan_hak_akses_rc_historis_04_nov",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md",
+      "source_location": "Informasi orang dan notifikasi yang terlihat pada email",
+      "weight": 1.0
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_evidence",
+      "target": "temuan_email_dan_hak_akses_rc_konfirmasi_tim_finance",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md",
+      "source_location": "Informasi orang dan notifikasi yang terlihat pada email",
+      "weight": 1.0
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_evidence",
+      "target": "temuan_email_dan_hak_akses_rc_reminder_penerima",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md",
+      "source_location": "Informasi orang dan notifikasi yang terlihat pada email",
+      "weight": 1.0
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_evidence",
+      "target": "temuan_email_dan_hak_akses_alamat_email_tidak_tampak",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md",
+      "source_location": "Informasi orang dan notifikasi yang terlihat pada email",
+      "weight": 1.0
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_evidence",
+      "target": "temuan_email_dan_hak_akses_screenshot_email",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md",
+      "source_location": "Informasi orang dan notifikasi yang terlihat pada email",
+      "weight": 1.0
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_historical_rbrc_routes",
+      "target": "temuan_email_dan_hak_akses_rb_historis_28_okt",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md",
+      "source_location": "Informasi orang dan notifikasi yang terlihat pada email",
+      "weight": 1.0
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_historical_rbrc_routes",
+      "target": "temuan_email_dan_hak_akses_rc_historis_04_nov",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md",
+      "source_location": "Informasi orang dan notifikasi yang terlihat pada email",
+      "weight": 1.0
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_rc_finance_branch",
+      "target": "temuan_email_dan_hak_akses_rc_konfirmasi_tim_finance",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md",
+      "source_location": "Informasi orang dan notifikasi yang terlihat pada email",
+      "weight": 1.0
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_rc_reminder_penerima",
+      "target": "bsd_reminder",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md",
+      "source_location": "Informasi orang dan notifikasi yang terlihat pada email",
+      "weight": 1.0
+    },
+    {
+      "source": "bsd_business",
+      "target": "bsd_historical_rb_approval",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md",
+      "source_location": "BR-07",
+      "weight": 1.0
+    },
+    {
+      "source": "bsd_business",
+      "target": "bsd_historical_rc_approval",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md",
+      "source_location": "BR-07",
+      "weight": 1.0
+    },
+    {
+      "source": "bsd_business",
+      "target": "bsd_notification_rc_recipients",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md",
+      "source_location": "BR-10",
+      "weight": 1.0
+    },
+    {
+      "source": "bsd_business",
+      "target": "bsd_invoice_exception",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md",
+      "source_location": "BR-03",
+      "weight": 1.0
+    },
+    {
+      "source": "bsd_business",
+      "target": "bsd_rc_outcomes",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md",
+      "source_location": "BR-09",
+      "weight": 1.0
+    },
+    {
+      "source": "bsd_business",
+      "target": "bsd_status_separation",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md",
+      "source_location": "Status usulan",
+      "weight": 1.0
+    },
+    {
+      "source": "bsd_historical_rb_approval",
+      "target": "temuan_email_dan_hak_akses_rb_historis_28_okt",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md",
+      "source_location": "BR-07",
+      "weight": 1.0
+    },
+    {
+      "source": "bsd_historical_rc_approval",
+      "target": "temuan_email_dan_hak_akses_rc_historis_04_nov",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md",
+      "source_location": "BR-07",
+      "weight": 1.0
+    },
+    {
+      "source": "bsd_notification_rc_recipients",
+      "target": "temuan_email_dan_hak_akses_rc_reminder_penerima",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md",
+      "source_location": "BR-10",
+      "weight": 1.0
+    },
+    {
+      "source": "bsd_invoice_exception",
+      "target": "bsd_threshold",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md",
+      "source_location": "BR-03",
+      "weight": 1.0
+    },
+    {
+      "source": "bsd_rc_outcomes",
+      "target": "bsd_av_rc",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md",
+      "source_location": "BR-09",
+      "weight": 1.0
+    },
+    {
+      "source": "bsd_status_separation",
+      "target": "bsd_payment",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md",
+      "source_location": "Status usulan",
+      "weight": 1.0
+    },
+    {
+      "source": "readme_paket",
+      "target": "readme_gambar_sumber",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\README.md",
+      "source_location": "Sumber dan cara membaca",
+      "weight": 1.0
+    },
+    {
+      "source": "readme_paket",
+      "target": "readme_cakupan_tahap_pertama",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\README.md",
+      "source_location": "Sumber dan cara membaca",
+      "weight": 1.0
+    },
+    {
+      "source": "readme_paket",
+      "target": "readme_aturan_masih_terbuka",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\README.md",
+      "source_location": "Sumber dan cara membaca",
+      "weight": 1.0
+    },
+    {
+      "source": "readme_cakupan_tahap_pertama",
+      "target": "readme_pratinjau",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\README.md",
+      "source_location": "Menjalankan pratinjau lokal",
+      "weight": 1.0
+    },
+    {
+      "source": "readme_gambar_sumber",
+      "target": "temuan_email_dan_hak_akses_screenshot_email",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\README.md",
+      "source_location": "Sumber dan cara membaca",
+      "weight": 1.0
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_screenshot_email",
+      "target": "docs_media_powerautomate_fireshot_capture_015___mail___bernard_wilson___outlook____outlook_cloud_microsoft__email_screenshot",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_rb_historis_28_okt",
+      "target": "docs_media_powerautomate_fireshot_capture_015___mail___bernard_wilson___outlook____outlook_cloud_microsoft__rb_alur",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_rc_historis_04_nov",
+      "target": "docs_media_powerautomate_fireshot_capture_015___mail___bernard_wilson___outlook____outlook_cloud_microsoft__rc_flow",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_rc_konfirmasi_tim_finance",
+      "target": "docs_media_powerautomate_fireshot_capture_015___mail___bernard_wilson___outlook____outlook_cloud_microsoft__finance_confirmation_proposal",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_rc_reminder_penerima",
+      "target": "docs_media_powerautomate_fireshot_capture_015___mail___bernard_wilson___outlook____outlook_cloud_microsoft__reminder",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_alamat_email_tidak_tampak",
+      "target": "docs_media_powerautomate_fireshot_capture_015___mail___bernard_wilson___outlook____outlook_cloud_microsoft__batas_alamat",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_notification_pdf",
+      "target": "docs_media_powerautomate_fireshot_capture_015___mail___bernard_wilson___outlook____outlook_cloud_microsoft__notif_av",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_payment_reconciliation",
+      "target": "docs_media_powerautomate_fireshot_capture_015___mail___bernard_wilson___outlook____outlook_cloud_microsoft__rekonsiliasi",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_finance_queue",
+      "target": "docs_media_powerautomate_fireshot_capture_015___mail___bernard_wilson___outlook____outlook_cloud_microsoft__menunggu_pv",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_legacy_skip",
+      "target": "docs_media_powerautomate_fireshot_capture_013_blc_procurement_approvalhistory_all_items_caready_sharepoint_com_history",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_legacy_skip",
+      "target": "docs_media_powerautomate_fireshot_capture_013_blc_procurement_approvalhistory_all_items_caready_sharepoint_com_previous_approval",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_legacy_skip",
+      "target": "docs_media_powerautomate_fireshot_capture_013_blc_procurement_approvalhistory_all_items_caready_sharepoint_com_self_approval",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_legacy_skip",
+      "target": "docs_media_powerautomate_fireshot_capture_013_blc_procurement_approvalhistory_all_items_caready_sharepoint_com_unused_stage",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "temuan_email_dan_hak_akses_evidence",
+      "target": "docs_media_powerautomate_fireshot_capture_014___blc_procurement___approvaldocs___all_documents____caready_sharepoint_com__approvaldocs",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "bsd_business",
+      "target": "docs_media_powerautomate_fireshot_capture_003_blc_procurement_beranda_caready_sharepoint_com_beranda",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "bsd_pr_po_pv",
+      "target": "docs_media_powerautomate_fireshot_capture_016___blc_procurement___pr_drafts_request_formulir_pr",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "bsd_pr_po_pv",
+      "target": "docs_media_powerautomate_fireshot_capture_018___blc_procurement___pr_drafts_request_po_form",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "bsd_pr_po_pv",
+      "target": "docs_media_powerautomate_fireshot_capture_007___blc_procurement___po_drafts___all_items____caready_sharepoint_com__po_drafts",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "bsd_av_rc",
+      "target": "docs_media_powerautomate_fireshot_capture_019___blc_procurement___av_drafts_request_av_form",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "bsd_av_rc",
+      "target": "docs_media_powerautomate_fireshot_capture_008___blc_procurement___av_drafts___all_items____caready_sharepoint_com__tampilan_daftar_av_drafts_sharepoint",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "bsd_av_rc",
+      "target": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_form",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "bsd_av_rc",
+      "target": "docs_media_powerautomate_fireshot_capture_010___blc_procurement___rc_drafts___all_items____caready_sharepoint_com__rc_drafts",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "bsd_historical_rb_approval",
+      "target": "docs_media_powerautomate_fireshot_capture_021___blc_procurement___rb_drafts_request_rb_form",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "bsd_historical_rb_approval",
+      "target": "docs_media_powerautomate_fireshot_capture_009___blc_procurement___rb_drafts___all_items____caready_sharepoint_com__rb_drafts_list",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "bsd_payment",
+      "target": "docs_media_powerautomate_fireshot_capture_011___blc_procurement___pv_drafts___all_items____caready_sharepoint_com__pv_drafts",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "bsd_payment",
+      "target": "docs_media_powerautomate_fireshot_capture_012_blc_procurement_pv_drafts_ringkasan_caready_sharepoint_com_ringkasan_pengajuan",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "readme_gambar_sumber",
+      "target": "docs_media_powerautomate_fireshot_capture_004___blc_procurement_notebook____caready_sharepoint_com__notebook",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\README.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "readme_gambar_sumber",
+      "target": "docs_media_powerautomate_fireshot_capture_005___blc_procurement___site_pages____caready_sharepoint_com__site_pages",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\README.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "readme_gambar_sumber",
+      "target": "docs_media_powerautomate_fireshot_capture_006___blc_procurement___site_pages___all_items____caready_sharepoint_com__daftar_sharepoint_kosong",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\README.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [],
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "coverage": {
+    "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\BSD.md": 71,
+    "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\README.md": 36,
+    "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\TEMUAN-EMAIL-DAN-HAK-AKSES.md": 82
+  }
+}

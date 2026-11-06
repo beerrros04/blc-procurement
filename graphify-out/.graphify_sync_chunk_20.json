@@ -1,0 +1,436 @@
+{
+  "nodes": [
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_form",
+      "label": "Formulir Realisasi Cash Advance (RC)",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "Keseluruhan formulir",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Formulir SharePoint berbahasa Indonesia dan Jepang untuk mencatat realisasi uang muka."
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_cadoc",
+      "label": "CADoc: pilih AV milik pemohon yang telah dibayar",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "1. Cash Advance",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Kolom CADoc bertanda wajib; keterangannya meminta pemohon memilih AV miliknya yang sudah dibayar."
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_title",
+      "label": "Judul RC opsional",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "1. Cash Advance",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Judul dapat dikosongkan untuk dibuat otomatis menurut keterangan formulir."
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_branch_budget",
+      "label": "Cabang dan jenis anggaran RC",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "1. Cash Advance",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Branch dan BudgetType bertanda wajib pada formulir."
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_purpose",
+      "label": "Tujuan penggunaan dana CA",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "1. Cash Advance",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Purpose bertanda wajib dan meminta rincian penggunaan dana cash advance."
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_result_type",
+      "label": "Pilihan hasil realisasi",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "2. Hasil realisasi",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "ResultType bertanda wajib dan menampilkan tiga pilihan hasil realisasi."
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_return_company",
+      "label": "Pengembalian sisa kepada perusahaan",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "2. Hasil realisasi",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Return to Caready menjelaskan sisa dana dikembalikan dan bukti transfer Return perlu dilampirkan."
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_return_employee",
+      "label": "Pengembalian kekurangan kepada karyawan",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "2. Hasil realisasi",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Return to Employee berarti biaya lebih besar dan pemohon mengisi rekening karyawan."
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_equal_ca",
+      "label": "Realisasi sama dengan cash advance",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "2. Hasil realisasi",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Sama dengan CA menunjukkan biaya setara dengan cash advance."
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_subtotal",
+      "label": "Subtotal biaya realisasi",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "3. Nilai realisasi",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "SubtotalAmount menunjukkan total biaya sesuai kuitansi atau invoice dan boleh kosong pada pilihan sama dengan CA."
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_other_cost_discount",
+      "label": "Biaya lain dan diskon realisasi",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "3. Nilai realisasi",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "OtherCosts dan DiscountAmount ditandai opsional."
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_payment_method",
+      "label": "Metode pembayaran untuk Return to Employee",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "4. Rekening karyawan",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Formulir menampilkan Transfer pada PaymentMethod dengan keterangan hanya untuk Return to Employee."
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_employee_bank",
+      "label": "Detail rekening karyawan untuk Return to Employee",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "4. Rekening karyawan",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Nama bank, nomor rekening, dan nama pemilik rekening dinyatakan wajib bila memilih Return to Employee."
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_first_approver",
+      "label": "Penyetuju tahap pertama adalah atasan langsung",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "5. Persetujuan",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Stage1Approver bertanda wajib, dengan keterangan penyetuju tahap satu adalah atasan langsung."
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_previous_register",
+      "label": "Referensi riwayat pengajuan ulang",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "5. Persetujuan",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "PreviousRegisterID digunakan untuk ID buku besar sebelumnya ketika mengajukan ulang."
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_submit_requested",
+      "label": "Permintaan mengajukan RC",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "6. Ajukan",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "SubmitRequested dapat diubah menjadi Ya untuk mengajukan setelah pengisian selesai."
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_attachments",
+      "label": "Lampiran RC",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "Lampiran",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Formulir menampilkan kontrol untuk menambahkan lampiran; kewajiban khusus disebut pada keterangan hasil tertentu."
+    }
+  ],
+  "edges": [
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_form",
+      "target": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_cadoc",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "Keseluruhan formulir",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_form",
+      "target": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_title",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "Keseluruhan formulir",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_form",
+      "target": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_branch_budget",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "Keseluruhan formulir",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_form",
+      "target": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_purpose",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "Keseluruhan formulir",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_form",
+      "target": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_result_type",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "Keseluruhan formulir",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_form",
+      "target": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_subtotal",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "Keseluruhan formulir",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_form",
+      "target": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_other_cost_discount",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "Keseluruhan formulir",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_form",
+      "target": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_payment_method",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "Keseluruhan formulir",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_form",
+      "target": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_employee_bank",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "Keseluruhan formulir",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_form",
+      "target": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_first_approver",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "Keseluruhan formulir",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_form",
+      "target": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_previous_register",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "Keseluruhan formulir",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_form",
+      "target": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_submit_requested",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "Keseluruhan formulir",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_form",
+      "target": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_attachments",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "Keseluruhan formulir",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_result_type",
+      "target": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_return_company",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "2. Hasil realisasi",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_result_type",
+      "target": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_return_employee",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "2. Hasil realisasi",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_result_type",
+      "target": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_equal_ca",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "2. Hasil realisasi",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_return_company",
+      "target": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_attachments",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "2. Hasil realisasi",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_return_employee",
+      "target": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_employee_bank",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "2. Hasil realisasi",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_return_employee",
+      "target": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_payment_method",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "2. Hasil realisasi",
+      "weight": 1
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_equal_ca",
+      "target": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_subtotal",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png",
+      "source_location": "2. Hasil realisasi",
+      "weight": 1
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_three_realization_outcomes",
+      "label": "Tiga pilihan hasil realisasi",
+      "nodes": [
+        "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_result_type",
+        "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_return_company",
+        "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_return_employee",
+        "docs_media_powerautomate_fireshot_capture_023___blc_procurement___rc_drafts_request_equal_ca"
+      ],
+      "relation": "form",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png"
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "coverage": {
+    "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png": 1767
+  },
+  "coverage_details": {
+    "width_px": 1840,
+    "height_px": 1767,
+    "inspected": "seluruh gambar"
+  }
+}

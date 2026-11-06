@@ -1,0 +1,212 @@
+{
+  "package.json": {
+    "mtime": 1793979101.0184746,
+    "seen": 1793979813.4777367,
+    "ast_hash": "2e5295c1673eded067a005db789b0dae",
+    "semantic_hash": "2e5295c1673eded067a005db789b0dae"
+  },
+  "src/draft.test.ts": {
+    "mtime": 1793980168.0083628,
+    "seen": 1794002502.7297518,
+    "ast_hash": "567085c36f74def441c86381b8982906",
+    "semantic_hash": "567085c36f74def441c86381b8982906"
+  },
+  "src/draft.ts": {
+    "mtime": 1793980198.0480485,
+    "seen": 1794002502.729754,
+    "ast_hash": "506a08bb012898a9234da0c86eb6c761",
+    "semantic_hash": "506a08bb012898a9234da0c86eb6c761"
+  },
+  "src/main.tsx": {
+    "mtime": 1793980198.0490563,
+    "seen": 1794002502.7297556,
+    "ast_hash": "10bc318fbed025cb4f6346816db0a24f",
+    "semantic_hash": "10bc318fbed025cb4f6346816db0a24f"
+  },
+  "tsconfig.json": {
+    "mtime": 1793979152.1555426,
+    "seen": 1793979813.4777496,
+    "ast_hash": "cb1393ebc06a43fcf3c73bf875ed2ed0",
+    "semantic_hash": "cb1393ebc06a43fcf3c73bf875ed2ed0"
+  },
+  "BSD.md": {
+    "mtime": 1794002998.3419929,
+    "seen": 1794004571.8258271,
+    "ast_hash": "09436c9cdd3f45eb1b826c64c0e15d0d",
+    "semantic_hash": "09436c9cdd3f45eb1b826c64c0e15d0d"
+  },
+  "DBD.md": {
+    "mtime": 1794002248.0114396,
+    "seen": 1794002502.7297611,
+    "ast_hash": "eb3b8296567dfc8f63c198c6213c4d02",
+    "semantic_hash": "eb3b8296567dfc8f63c198c6213c4d02"
+  },
+  "IPD.md": {
+    "mtime": 1794002339.6676931,
+    "seen": 1794002502.7297623,
+    "ast_hash": "c4592cf06d7d1314321c37329e78cff7",
+    "semantic_hash": "c4592cf06d7d1314321c37329e78cff7"
+  },
+  "PRD.md": {
+    "mtime": 1794002200.2329853,
+    "seen": 1794002502.7297635,
+    "ast_hash": "6ac473e8ed1a54433cbb2663126317dd",
+    "semantic_hash": "6ac473e8ed1a54433cbb2663126317dd"
+  },
+  "README.md": {
+    "mtime": 1794002998.3409958,
+    "seen": 1794004571.825829,
+    "ast_hash": "761b129d58d9f777dee4c92e3853b5dd",
+    "semantic_hash": "761b129d58d9f777dee4c92e3853b5dd"
+  },
+  "TDD.md": {
+    "mtime": 1794002339.666686,
+    "seen": 1794002502.7297664,
+    "ast_hash": "6e647ba63e85c63201d100c6843f0a5e",
+    "semantic_hash": "6e647ba63e85c63201d100c6843f0a5e"
+  },
+  "docs/superpowers/plans/2026-11-06-pr-draft.md": {
+    "mtime": 1793979073.3025634,
+    "seen": 1793979813.4777596,
+    "ast_hash": "448dbd39a2c9f7f2f19b00a958057a37",
+    "semantic_hash": "448dbd39a2c9f7f2f19b00a958057a37"
+  },
+  "index.html": {
+    "mtime": 1793979152.1555426,
+    "seen": 1793979813.4777608,
+    "ast_hash": "09fd55be767e0a18280a4b3e5668ddf9",
+    "semantic_hash": "09fd55be767e0a18280a4b3e5668ddf9"
+  },
+  "AGENTS.md": {
+    "mtime": 1793979609.83526,
+    "seen": 1793979813.477762,
+    "ast_hash": "d1fc669e2cfb49fc3127ef5c49252b70",
+    "semantic_hash": "d1fc669e2cfb49fc3127ef5c49252b70"
+  },
+  "src/draft-store.test.ts": {
+    "mtime": 1793980168.0071018,
+    "seen": 1794002502.729745,
+    "ast_hash": "344396fda55bb389ec141e26d2a50e2e",
+    "semantic_hash": "344396fda55bb389ec141e26d2a50e2e"
+  },
+  "src/draft-store.ts": {
+    "mtime": 1793980206.3419077,
+    "seen": 1794002502.729749,
+    "ast_hash": "22d2a9619b16049e985b799b7d596815",
+    "semantic_hash": "22d2a9619b16049e985b799b7d596815"
+  },
+  "TEMUAN-EMAIL-DAN-HAK-AKSES.md": {
+    "mtime": 1794002998.3425865,
+    "seen": 1794004571.8258307,
+    "ast_hash": "dc207f2ff43cef9d6f717375b20fb998",
+    "semantic_hash": "dc207f2ff43cef9d6f717375b20fb998"
+  },
+  "docs/media/Powerautomate/FireShot Capture 003 - BLC Procurement - Beranda - [caready.sharepoint.com].png": {
+    "mtime": 1793977041.013253,
+    "seen": 1794004571.8258328,
+    "ast_hash": "4a31c30c00e5817b638114d0473bf889",
+    "semantic_hash": "4a31c30c00e5817b638114d0473bf889"
+  },
+  "docs/media/Powerautomate/FireShot Capture 004 - BLC Procurement Notebook - [caready.sharepoint.com].png": {
+    "mtime": 1793977019.372293,
+    "seen": 1794004571.8258348,
+    "ast_hash": "29283da24bc90f997bd296a11201a9b3",
+    "semantic_hash": "29283da24bc90f997bd296a11201a9b3"
+  },
+  "docs/media/Powerautomate/FireShot Capture 005 - BLC Procurement - Site Pages - [caready.sharepoint.com].png": {
+    "mtime": 1793977061.8567255,
+    "seen": 1794004571.8258362,
+    "ast_hash": "04bdbf4072cb1efdf3cd5e8bd32ea321",
+    "semantic_hash": "04bdbf4072cb1efdf3cd5e8bd32ea321"
+  },
+  "docs/media/Powerautomate/FireShot Capture 006 - BLC Procurement - Site Pages - All Items - [caready.sharepoint.com].png": {
+    "mtime": 1793977095.4992049,
+    "seen": 1794004571.8258379,
+    "ast_hash": "5a3b2ad5a33be395f3a1f75b3b28edac",
+    "semantic_hash": "5a3b2ad5a33be395f3a1f75b3b28edac"
+  },
+  "docs/media/Powerautomate/FireShot Capture 007 - BLC Procurement - PO_Drafts - All Items - [caready.sharepoint.com].png": {
+    "mtime": 1793977116.7172213,
+    "seen": 1794004571.825839,
+    "ast_hash": "dbd5a91e1d70f9d877e045c566290a50",
+    "semantic_hash": "dbd5a91e1d70f9d877e045c566290a50"
+  },
+  "docs/media/Powerautomate/FireShot Capture 008 - BLC Procurement - AV_Drafts - All Items - [caready.sharepoint.com].png": {
+    "mtime": 1793977130.8262424,
+    "seen": 1794004571.8258412,
+    "ast_hash": "07cc58d77c850d23093203b8569726b9",
+    "semantic_hash": "07cc58d77c850d23093203b8569726b9"
+  },
+  "docs/media/Powerautomate/FireShot Capture 009 - BLC Procurement - RB_Drafts - All Items - [caready.sharepoint.com].png": {
+    "mtime": 1793977147.1389284,
+    "seen": 1794004571.8258424,
+    "ast_hash": "4b7c670e420a968d1f57db4458904b17",
+    "semantic_hash": "4b7c670e420a968d1f57db4458904b17"
+  },
+  "docs/media/Powerautomate/FireShot Capture 010 - BLC Procurement - RC_Drafts - All Items - [caready.sharepoint.com].png": {
+    "mtime": 1793977162.8654082,
+    "seen": 1794004571.8258438,
+    "ast_hash": "15e458bb87d98236d9f73928a5b334a4",
+    "semantic_hash": "15e458bb87d98236d9f73928a5b334a4"
+  },
+  "docs/media/Powerautomate/FireShot Capture 011 - BLC Procurement - PV_Drafts - All Items - [caready.sharepoint.com].png": {
+    "mtime": 1793977174.9640374,
+    "seen": 1794004571.825845,
+    "ast_hash": "23992dc209c9585cb56fa7f6fe190e6c",
+    "semantic_hash": "23992dc209c9585cb56fa7f6fe190e6c"
+  },
+  "docs/media/Powerautomate/FireShot Capture 012 - BLC Procurement - PV_Drafts - Ringkasan \u00b7 \u6982\u8981 - [caready.sharepoint.com].png": {
+    "mtime": 1793977236.9453316,
+    "seen": 1794004571.8258476,
+    "ast_hash": "2b8cfd15ef6585a5da96719281549b23",
+    "semantic_hash": "2b8cfd15ef6585a5da96719281549b23"
+  },
+  "docs/media/Powerautomate/FireShot Capture 013 - BLC Procurement - ApprovalHistory - All Items - [caready.sharepoint.com].png": {
+    "mtime": 1793977386.097362,
+    "seen": 1794004571.825849,
+    "ast_hash": "4c77fa907e6edb6c73b84470cd3e6078",
+    "semantic_hash": "4c77fa907e6edb6c73b84470cd3e6078"
+  },
+  "docs/media/Powerautomate/FireShot Capture 014 - BLC Procurement - ApprovalDocs - All Documents - [caready.sharepoint.com].png": {
+    "mtime": 1793977404.1780465,
+    "seen": 1794004571.8258507,
+    "ast_hash": "c0c8db80d0409f0c6ac3cbc9aace2c55",
+    "semantic_hash": "c0c8db80d0409f0c6ac3cbc9aace2c55"
+  },
+  "docs/media/Powerautomate/FireShot Capture 015 - Mail - Bernard Wilson - Outlook - [outlook.cloud.microsoft].png": {
+    "mtime": 1793977493.8111079,
+    "seen": 1794004571.825852,
+    "ast_hash": "be4e708008a50f2dd163f36bb22ba237",
+    "semantic_hash": "be4e708008a50f2dd163f36bb22ba237"
+  },
+  "docs/media/Powerautomate/FireShot Capture 016 - BLC Procurement - PR_Drafts Request.png": {
+    "mtime": 1793977524.8914804,
+    "seen": 1794004571.825853,
+    "ast_hash": "20010c577f88bdf4e872a57a55aade1a",
+    "semantic_hash": "20010c577f88bdf4e872a57a55aade1a"
+  },
+  "docs/media/Powerautomate/FireShot Capture 018 - BLC Procurement - PR_Drafts Request.png": {
+    "mtime": 1793977563.3781884,
+    "seen": 1794004571.8258548,
+    "ast_hash": "f00a069b6f8e14c42cb19c9fee699402",
+    "semantic_hash": "f00a069b6f8e14c42cb19c9fee699402"
+  },
+  "docs/media/Powerautomate/FireShot Capture 019 - BLC Procurement - AV_Drafts Request.png": {
+    "mtime": 1793977592.0683515,
+    "seen": 1794004571.825856,
+    "ast_hash": "0838a97c32867863db997695e37bf82b",
+    "semantic_hash": "0838a97c32867863db997695e37bf82b"
+  },
+  "docs/media/Powerautomate/FireShot Capture 021 - BLC Procurement - RB_Drafts Request.png": {
+    "mtime": 1793977626.1010306,
+    "seen": 1794004571.8258572,
+    "ast_hash": "752a0aa96f0ce0f64e209f84d1ddedc5",
+    "semantic_hash": "752a0aa96f0ce0f64e209f84d1ddedc5"
+  },
+  "docs/media/Powerautomate/FireShot Capture 023 - BLC Procurement - RC_Drafts Request.png": {
+    "mtime": 1793977673.6247294,
+    "seen": 1794004571.8258588,
+    "ast_hash": "7237c336c4b6b95bd0be1ff96b09582d",
+    "semantic_hash": "7237c336c4b6b95bd0be1ff96b09582d"
+  }
+}

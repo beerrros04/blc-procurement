@@ -1,0 +1,104 @@
+{
+  "package.json": {
+    "mtime": 1793979101.0184746,
+    "seen": 1793979813.4777367,
+    "ast_hash": "2e5295c1673eded067a005db789b0dae",
+    "semantic_hash": "2e5295c1673eded067a005db789b0dae"
+  },
+  "src/draft.test.ts": {
+    "mtime": 1793979073.3036392,
+    "seen": 1793979813.4777431,
+    "ast_hash": "3c82fa4b879e1ff0905325ad392f24e1",
+    "semantic_hash": "3c82fa4b879e1ff0905325ad392f24e1"
+  },
+  "src/draft.ts": {
+    "mtime": 1793979152.1565437,
+    "seen": 1793979813.477746,
+    "ast_hash": "41a7d5fdb8a1163e3300e8a8c397fd4f",
+    "semantic_hash": "41a7d5fdb8a1163e3300e8a8c397fd4f"
+  },
+  "src/main.tsx": {
+    "mtime": 1793980117.2859342,
+    "seen": 1793980124.2818792,
+    "ast_hash": "fbe0e656078932f44c3658707df6d2fa",
+    "semantic_hash": ""
+  },
+  "tsconfig.json": {
+    "mtime": 1793979152.1555426,
+    "seen": 1793979813.4777496,
+    "ast_hash": "cb1393ebc06a43fcf3c73bf875ed2ed0",
+    "semantic_hash": "cb1393ebc06a43fcf3c73bf875ed2ed0"
+  },
+  "BSD.md": {
+    "mtime": 1793979005.9260032,
+    "seen": 1793979813.4777508,
+    "ast_hash": "6fb084bc6ca1b02cbe536ee15e8537ee",
+    "semantic_hash": "6fb084bc6ca1b02cbe536ee15e8537ee"
+  },
+  "DBD.md": {
+    "mtime": 1793979005.927998,
+    "seen": 1793979813.4777522,
+    "ast_hash": "7ac59b00425ff0e2f7bdd96d35a45d23",
+    "semantic_hash": "7ac59b00425ff0e2f7bdd96d35a45d23"
+  },
+  "IPD.md": {
+    "mtime": 1793979005.928995,
+    "seen": 1793979813.4777536,
+    "ast_hash": "9d57f95bd2653834560294e9967042a1",
+    "semantic_hash": "9d57f95bd2653834560294e9967042a1"
+  },
+  "PRD.md": {
+    "mtime": 1793979005.9249861,
+    "seen": 1793979813.4777548,
+    "ast_hash": "011d5eaa2638b2d1d433ee43d3492f44",
+    "semantic_hash": "011d5eaa2638b2d1d433ee43d3492f44"
+  },
+  "README.md": {
+    "mtime": 1793979271.7838573,
+    "seen": 1793979813.4777565,
+    "ast_hash": "07c11d3e998e3af87c06d0b3e295d84e",
+    "semantic_hash": "07c11d3e998e3af87c06d0b3e295d84e"
+  },
+  "TDD.md": {
+    "mtime": 1793979005.9270005,
+    "seen": 1793979813.4777577,
+    "ast_hash": "cd86035e1197c35f1280e025a1490f85",
+    "semantic_hash": "cd86035e1197c35f1280e025a1490f85"
+  },
+  "docs/superpowers/plans/2026-11-06-pr-draft.md": {
+    "mtime": 1793979073.3025634,
+    "seen": 1793979813.4777596,
+    "ast_hash": "448dbd39a2c9f7f2f19b00a958057a37",
+    "semantic_hash": "448dbd39a2c9f7f2f19b00a958057a37"
+  },
+  "index.html": {
+    "mtime": 1793979152.1555426,
+    "seen": 1793979813.4777608,
+    "ast_hash": "09fd55be767e0a18280a4b3e5668ddf9",
+    "semantic_hash": "09fd55be767e0a18280a4b3e5668ddf9"
+  },
+  "AGENTS.md": {
+    "mtime": 1793979609.83526,
+    "seen": 1793979813.477762,
+    "ast_hash": "d1fc669e2cfb49fc3127ef5c49252b70",
+    "semantic_hash": "d1fc669e2cfb49fc3127ef5c49252b70"
+  },
+  "src/draft-store.test.ts": {
+    "mtime": 1793979983.7862637,
+    "seen": 1793980124.2818677,
+    "ast_hash": "92d02fd06ba2c1ff4a90184db93ea2f5",
+    "semantic_hash": ""
+  },
+  "src/draft-store.ts": {
+    "mtime": 1793980004.609699,
+    "seen": 1793980124.281871,
+    "ast_hash": "f9d9bfe5098054868b05edfb3975d348",
+    "semantic_hash": ""
+  },
+  "package-lock.json": {
+    "mtime": 1793979101.0409648,
+    "seen": 1793980124.2818987,
+    "ast_hash": "c5eaa22eb4c1bf4b2adbd5ba1394bb9e",
+    "semantic_hash": ""
+  }
+}

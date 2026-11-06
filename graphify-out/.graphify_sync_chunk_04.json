@@ -1,0 +1,72 @@
+{
+  "nodes": [
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_004___blc_procurement_notebook____caready_sharepoint_com__notebook",
+      "label": "BLC Procurement Notebook",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 004 - BLC Procurement Notebook - [caready.sharepoint.com].png",
+      "source_location": "header and left navigation",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_004___blc_procurement_notebook____caready_sharepoint_com__untitled_section",
+      "label": "Untitled Section pada notebook",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 004 - BLC Procurement Notebook - [caready.sharepoint.com].png",
+      "source_location": "section navigation",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_media_powerautomate_fireshot_capture_004___blc_procurement_notebook____caready_sharepoint_com__untitled_page",
+      "label": "Untitled Page pada notebook",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 004 - BLC Procurement Notebook - [caready.sharepoint.com].png",
+      "source_location": "page navigation and page area",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Area halaman yang tampak hanya menampilkan tanggal dan tidak ada isi catatan; ini tidak membuktikan notebook secara keseluruhan kosong."
+    }
+  ],
+  "edges": [
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_004___blc_procurement_notebook____caready_sharepoint_com__notebook",
+      "target": "docs_media_powerautomate_fireshot_capture_004___blc_procurement_notebook____caready_sharepoint_com__untitled_section",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 004 - BLC Procurement Notebook - [caready.sharepoint.com].png",
+      "source_location": "left navigation",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_media_powerautomate_fireshot_capture_004___blc_procurement_notebook____caready_sharepoint_com__untitled_section",
+      "target": "docs_media_powerautomate_fireshot_capture_004___blc_procurement_notebook____caready_sharepoint_com__untitled_page",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 004 - BLC Procurement Notebook - [caready.sharepoint.com].png",
+      "source_location": "section and page navigation",
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [],
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "coverage": {
+    "C:\\Users\\Bernard\\Documents\\personal's project\\BLC\\docs\\media\\Powerautomate\\FireShot Capture 004 - BLC Procurement Notebook - [caready.sharepoint.com].png": 912
+  },
+  "coverage_details": {
+    "width_px": 1920,
+    "height_px": 912,
+    "viewed_y_start": 0,
+    "viewed_y_end_exclusive": 912
+  }
+}
