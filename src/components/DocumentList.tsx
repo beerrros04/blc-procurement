@@ -148,9 +148,15 @@ export const DocumentList: React.FC<DocumentListProps> = ({
                 const isReviewable =
                   isApproverRole && (doc.status === 'SUBMITTED' || doc.status === 'IN_REVIEW');
 
+                // Kardinalitas 1 Induk : 1 PV — periksa apakah PV sudah dibuat sebelumnya
+                const hasExistingPv = documents.some(
+                  (d) => d.docType === 'PV' && (d as PVDocument).sourceDocId === doc.id
+                );
+
                 const canGeneratePv =
                   activeRole === 'KEUANGAN' &&
                   doc.status === 'APPROVED' &&
+                  !hasExistingPv &&
                   doc.docType !== 'PV' &&
                   (doc.docType !== 'RC' || doc.outcomeType === 'DEFICIT');
 

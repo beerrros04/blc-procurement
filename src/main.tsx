@@ -127,12 +127,16 @@ function App() {
     setNotice(`Pembayaran berhasil dicatat. Status PV & dokumen induk kini LUNAS (Paid).`);
   }
 
-  // Pre-filtered lists for inheritance
+  // Pre-filtered lists for inheritance with 1:1 cardinality
   const availablePrs = documents.filter(
     (d): d is PRDocument => d.docType === 'PR' && d.status === 'APPROVED'
   );
+  // Kardinalitas 1 AV : 1 RC — hanya tampilkan AV terbayar yang belum pernah dibuatkan RC
   const availableAvs = documents.filter(
-    (d): d is AVDocument => d.docType === 'AV' && d.status === 'PAID'
+    (d): d is AVDocument =>
+      d.docType === 'AV' &&
+      d.status === 'PAID' &&
+      !documents.some((rc) => rc.docType === 'RC' && (rc as RCDocument).parentAvId === d.id)
   );
 
   // Metrics

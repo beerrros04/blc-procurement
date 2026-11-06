@@ -141,7 +141,7 @@ describe('Document Store & Multi-Stage State Machine', () => {
     );
   });
 
-  it('generates Payment Voucher (PV) from approved PO and marks paid', () => {
+  it('generates Payment Voucher (PV) from approved PO with correct gross and net (no double PPh deduction)', () => {
     // Siapkan PO Approved
     const po = createEmptyDocument('PO', 'Cabang Jakarta') as PODocument;
     po.title = 'Pengadaan Kendaraan Operasional';
@@ -153,6 +153,7 @@ describe('Document Store & Multi-Stage State Machine', () => {
     po.ppnAmount = 2_200_000;
     po.pphRate = 0.02;
     po.pphAmount = 400_000;
+    // Total terutang = 20.000.000 + 2.200.000 - 400.000 = 21.800.000
     po.totalAmount = 21_800_000;
     po.paymentMethod = 'BANK_TRANSFER';
     po.bankDetails = {
@@ -178,9 +179,11 @@ describe('Document Store & Multi-Stage State Machine', () => {
     expect(pv.docType).toBe('PV');
     expect(pv.sourceDocId).toBe(po.id);
     expect(pv.vendorOrPayeeName).toBe('PT Otomotif Indonesia');
-    expect(pv.grossAmount).toBe(21_800_000);
+    // Gross invoice = subtotal (20M) + PPN (2.2M) = 22.2M
+    expect(pv.grossAmount).toBe(22_200_000);
     expect(pv.pphDeduction).toBe(400_000);
-    expect(pv.netAmountToPay).toBe(21_400_000);
+    // Net amount to pay = gross (22.2M) - PPh (400k) = 21.8M (sama dengan po.totalAmount)
+    expect(pv.netAmountToPay).toBe(21_800_000);
     expect(pv.paymentStatus).toBe('UNPAID');
 
     // Keuangan mencatat pembayaran
@@ -198,5 +201,51 @@ describe('Document Store & Multi-Stage State Machine', () => {
     const reloadedDocs = loadAllDocuments(storage);
     const updatedPo = reloadedDocs.find((d) => d.id === po.id);
     expect(updatedPo?.status).toBe('PAID');
+  });
+
+  it('prevents generating duplicate PV for the same parent document (1:1 Cardinality)', () => {
+    const po = createEmptyDocument('PO', 'Pusat') as PODocument;
+    po.title = 'Pengadaan Perangkat Server';
+    po.vendorName = 'PT IT Solutions';
+    po.totalAmount = 10_000_000;
+    saveDocument(storage, po);
+    submitDocument(storage, po.id, 'Staff');
+    approveDocumentStage(storage, po.id, 'ATASAN', 'Atasan', 'OK');
+    approveDocumentStage(storage, po.id, 'AYU', 'Ayu', 'OK');
+    approveDocumentStage(storage, po.id, 'BOD_HERY', 'Hery', 'OK');
+    approveDocumentStage(storage, po.id, 'BOD_HASHIMOTO', 'Hashimoto', 'OK');
+
+    // Buat PV pertama (sukses)
+    generatePvFromSource(storage, po.id, 'Keuangan');
+
+    // Percobaan membuat PV kedua untuk PO yang sama harus ditolak
+    expect(() => {
+      generatePvFromSource(storage, po.id, 'Keuangan');
+    }).toThrowError(/sudah dibuat/i);
+  });
+
+  it('resets downstream approval steps to WAITING upon document resubmission after rejection', () => {
+    const draft = createEmptyDocument('PR', 'Pusat');
+    draft.title = 'Pengadaan Meja';
+    saveDocument(storage, draft);
+    submitDocument(storage, draft.id, 'Pemohon');
+    approveDocumentStage(storage, draft.id, 'ATASAN', 'Atasan', 'OK');
+
+    // Ditolak oleh Bu Ayu di Tahap 2
+    rejectDocument(storage, draft.id, 'AYU', 'Bu Ayu', 'Anggaran belum sesuai');
+    const rejected = loadAllDocuments(storage).find((d) => d.id === draft.id)!;
+    expect(rejected.status).toBe('DRAFT');
+    expect(rejected.approvalSteps.ayu.status).toBe('REJECTED');
+
+    // Pemohon memperbaiki draf dan mengajukan ulang (resubmit)
+    const resubmitted = submitDocument(storage, draft.id, 'Pemohon');
+    expect(resubmitted.status).toBe('SUBMITTED');
+    expect(resubmitted.currentStage).toBe('ATASAN');
+    expect(resubmitted.approvalSteps.atasan.status).toBe('PENDING');
+    // Tahap 2 (Ayu) dan Tahap 3 (BOD) harus direset menjadi WAITING, bukan tetap REJECTED
+    expect(resubmitted.approvalSteps.ayu.status).toBe('WAITING');
+    expect(resubmitted.approvalSteps.ayu.decisionAt).toBeUndefined();
+    expect(resubmitted.approvalSteps.bod.heryStatus).toBe('WAITING');
+    expect(resubmitted.approvalSteps.bod.hashimotoStatus).toBe('WAITING');
   });
 });

@@ -202,7 +202,24 @@ export function submitDocument(
   const now = new Date().toISOString();
   doc.status = 'SUBMITTED';
   doc.currentStage = 'ATASAN';
+
+  // Tahap 1 aktif PENDING
   doc.approvalSteps.atasan.status = 'PENDING';
+  doc.approvalSteps.atasan.decisionAt = undefined;
+  doc.approvalSteps.atasan.comment = undefined;
+
+  // Reset tahapan hilir menjadi WAITING (bersihkan sisa status REJECTED dari siklus sebelumnya)
+  doc.approvalSteps.ayu.status = 'WAITING';
+  doc.approvalSteps.ayu.decisionAt = undefined;
+  doc.approvalSteps.ayu.comment = undefined;
+
+  doc.approvalSteps.bod.heryStatus = 'WAITING';
+  doc.approvalSteps.bod.heryDecisionAt = undefined;
+  doc.approvalSteps.bod.heryComment = undefined;
+  doc.approvalSteps.bod.hashimotoStatus = 'WAITING';
+  doc.approvalSteps.bod.hashimotoDecisionAt = undefined;
+  doc.approvalSteps.bod.hashimotoComment = undefined;
+
   doc.updatedAt = now;
 
   doc.auditLog.push({
@@ -346,6 +363,16 @@ export function generatePvFromSource(
     throw new Error('Payment Voucher hanya dapat dibuat dari dokumen yang telah disetujui (APPROVED).');
   }
 
+  // Kardinalitas 1:1 - Cegah pembuatan PV duplikat untuk induk yang sama
+  const existingPv = docs.find(
+    (d) => d.docType === 'PV' && (d as PVDocument).sourceDocId === sourceDocId
+  );
+  if (existingPv) {
+    throw new Error(
+      `Payment Voucher untuk dokumen ${source.docNumber} sudah dibuat (${existingPv.docNumber}).`
+    );
+  }
+
   let grossAmount = 0;
   let pphDeduction = 0;
   let payeeName = '';
@@ -354,10 +381,15 @@ export function generatePvFromSource(
 
   if (source.docType === 'PO') {
     const po = source as PODocument;
-    grossAmount = po.totalAmount;
+    // Nilai bruto invoice = Subtotal + Biaya Lain - Diskon + PPN (sebelum pemotongan PPh)
+    grossAmount = po.subtotal + po.otherCosts - po.discount + po.ppnAmount;
     pphDeduction = po.pphAmount;
     payeeName = po.vendorName;
-    bankDetails = po.bankDetails || { bankName: 'BCA', accountNumber: '00000000', accountHolder: po.vendorName };
+    bankDetails = po.bankDetails || {
+      bankName: 'BCA',
+      accountNumber: '00000000',
+      accountHolder: po.vendorName,
+    };
     sourceDocType = 'PO';
   } else if (source.docType === 'AV') {
     const av = source as AVDocument;

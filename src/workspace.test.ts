@@ -95,9 +95,11 @@ describe('End-to-End Operational Lifecycle Simulation', () => {
 
     // 3. Tim Keuangan menerbitkan Payment Voucher (PV) untuk PO
     const pvPo = generatePvFromSource(storage, approvedPo.id, 'Keuangan');
-    expect(pvPo.grossAmount).toBe(16_350_000);
+    // Gross invoice = 15.000.000 + 1.650.000 = 16.650.000
+    expect(pvPo.grossAmount).toBe(16_650_000);
     expect(pvPo.pphDeduction).toBe(300_000);
-    expect(pvPo.netAmountToPay).toBe(16_050_000);
+    // Net transfer = 16.650.000 - 300.000 = 16.350.000 (sama dengan po.totalAmount)
+    expect(pvPo.netAmountToPay).toBe(16_350_000);
     expect(pvPo.paymentStatus).toBe('UNPAID');
 
     // Keuangan mengeksekusi transfer dan mencatat pembayaran
