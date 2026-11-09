@@ -12,11 +12,10 @@ describe('document review drawer', () => {
     doc.approvalSteps.bod.heryStatus = 'APPROVED';
     doc.approvalSteps.bod.hashimotoStatus = 'PENDING';
     const html = renderToStaticMarkup(<ApprovalStepper document={doc} />);
-    expect(html).toContain('Hendra');
+    expect(html).toContain('Pak Hendra');
     expect(html).toContain('Ayu Martina');
     expect(html).toContain('Hery Sugiarto');
     expect(html).toContain('Koji Hashimoto');
-    expect(html).not.toContain('Pak Hendra');
     expect(html).not.toContain('approval-progress');
     expect(html).toContain('Disetujui');
     expect(html).toContain('Menunggu Persetujuan');

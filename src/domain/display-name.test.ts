@@ -13,7 +13,7 @@ describe('displayPersonName', () => {
 
   it('does not invent names for empty or generic role labels', () => {
     for (const input of [undefined, '', '  ', 'Atasan Langsung', 'Manajer Operasional', 'Staff Surabaya']) {
-      expect(displayPersonName(input)).toBe('Nama belum tersedia');
+      expect(displayPersonName(input)).toBe('Belum ditentukan');
     }
   });
 
@@ -23,6 +23,13 @@ describe('displayPersonName', () => {
     expect(displayPersonName('atasan@blc.co.id')).toBe('Pak Hendra');
     expect(displayPersonName(undefined, 'ayu@blc.co.id')).toBe('Ayu Martina');
     expect(displayPersonName('', 'pemohon@blc.co.id')).toBe('Dewi Lestari');
+    expect(displayPersonName(undefined, 'unknown@example.com')).toBe('Belum ditentukan');
+    expect(displayPersonName('Atasan Langsung', 'unknown@example.com')).toBe('Belum ditentukan');
+  });
+
+  it('respects a custom fallback when provided', () => {
+    expect(displayPersonName(undefined, undefined, 'Menunggu')).toBe('Menunggu');
+    expect(displayPersonName('Atasan Langsung', undefined, 'Menunggu')).toBe('Menunggu');
   });
 
   it('keeps unknown names intact without stripping meaningful text or guessing identities', () => {

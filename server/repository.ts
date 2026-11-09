@@ -139,6 +139,10 @@ export class ProcurementRepository {
       };
       this.flush();
     }
+    this.ensureIntegrity();
+  }
+
+  private ensureIntegrity(): void {
     const seedIds = new Set(INITIAL_SEED_DOCUMENTS.map((document) => document.id));
     let changed = false;
     for (const document of this.state.documents) {
@@ -147,9 +151,12 @@ export class ProcurementRepository {
         if (!document.ownerId) { document.ownerId = 'usr-pemohon-01'; changed = true; }
         if (!document.stage1ApproverEmail) { document.stage1ApproverEmail = 'atasan@blc.co.id'; changed = true; }
       }
-      if (document.stage1ApproverEmail && document.approvalSteps?.atasan?.assignedTo === 'Atasan Langsung') {
-        document.approvalSteps.atasan.assignedTo = resolveApproverName(document.stage1ApproverEmail);
-        changed = true;
+      if (document.stage1ApproverEmail && document.approvalSteps?.atasan) {
+        const resolved = resolveApproverName(document.stage1ApproverEmail);
+        if (document.approvalSteps.atasan.assignedTo !== resolved) {
+          document.approvalSteps.atasan.assignedTo = resolved;
+          changed = true;
+        }
       }
     }
     if (changed) this.flush();

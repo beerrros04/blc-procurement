@@ -66,7 +66,7 @@ export const ApprovalStepper: React.FC<ApprovalStepperProps> = ({ document }) =>
           <div className="step-circle">1</div>
           <div className="step-content">
             <div className="step-title-row">
-              <strong>{displayPersonName(atasan.assignedTo)}</strong>
+              <strong>{displayPersonName(atasan.assignedTo, document.stage1ApproverEmail)}</strong>
               <span className={`step-badge ${atasanBadge.className}`}>{atasanBadge.label}</span>
             </div>
             {atasan.decisionAt && (

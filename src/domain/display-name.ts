@@ -1,4 +1,4 @@
-const UNKNOWN_PERSON = 'Nama belum tersedia';
+export const UNKNOWN_PERSON = 'Belum ditentukan';
 
 const GENERIC_LABELS = new Set([
   'atasan langsung',
@@ -38,7 +38,11 @@ const KNOWN_EMAIL_NAMES: Record<string, string> = {
   'admin@blc.co.id': 'Admin Lokal',
 };
 
-export function displayPersonName(raw?: string, approverEmail?: string): string {
+export function displayPersonName(
+  raw?: string,
+  approverEmail?: string,
+  fallback = UNKNOWN_PERSON
+): string {
   const emailResolved = approverEmail ? KNOWN_EMAIL_NAMES[approverEmail.trim().toLowerCase()] : undefined;
 
   const value = raw?.trim();
@@ -47,13 +51,16 @@ export function displayPersonName(raw?: string, approverEmail?: string): string 
   }
 
   if (!value || GENERIC_LABELS.has(value.toLocaleLowerCase('id-ID'))) {
-    return emailResolved ?? UNKNOWN_PERSON;
+    return emailResolved ?? fallback;
   }
 
   const withoutKnownRole = value.replace(KNOWN_ROLE_SUFFIX, '').trim();
   const normalized = withoutKnownRole.toLocaleLowerCase('id-ID');
   if (!normalized || GENERIC_LABELS.has(normalized)) {
-    return emailResolved ?? UNKNOWN_PERSON;
+    return emailResolved ?? fallback;
+  }
+  if (emailResolved) {
+    return emailResolved;
   }
   return KNOWN_NAMES[normalized] ?? withoutKnownRole;
 }

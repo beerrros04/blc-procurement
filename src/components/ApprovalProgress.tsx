@@ -16,7 +16,7 @@ export function ApprovalProgress({ document, compact }: ApprovalProgressProps) {
   const bodStatus: StageDecision = approvals.includes('REJECTED') ? 'REJECTED'
     : count === 2 ? 'APPROVED' : approvals.includes('PENDING') || count > 0 ? 'PENDING' : 'WAITING';
   const steps: ProgressStage[] = [
-    ...(document.docType === 'PV' ? [] : [{ id: 'atasan', name: displayPersonName(atasan.assignedTo), status: atasan.status }]),
+    ...(document.docType === 'PV' ? [] : [{ id: 'atasan', name: displayPersonName(atasan.assignedTo, document.stage1ApproverEmail), status: atasan.status }]),
     { id: 'ayu', name: 'Ayu Martina', status: ayu.status },
     { id: 'bod', name: 'Hery Sugiarto & Koji Hashimoto', status: bodStatus, detail: bodStatus === 'PENDING' ? `${count}/2 disetujui` : undefined,
       participants: [

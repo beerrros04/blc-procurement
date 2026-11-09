@@ -33,7 +33,9 @@ describe('ApprovalProgress', () => {
   });
 
   it('shows the requested names without job titles', () => {
-    const html = renderToStaticMarkup(<ApprovalProgress document={INITIAL_SEED_DOCUMENTS[0]} />);
+    const doc = { ...structuredClone(INITIAL_SEED_DOCUMENTS[0]), stage1ApproverEmail: 'atasan@blc.co.id' };
+    const html = renderToStaticMarkup(<ApprovalProgress document={doc} />);
+    expect(html).toContain('Pak Hendra');
     expect(html).toContain('Ayu Martina');
     expect(html).toContain('Hery Sugiarto');
     expect(html).toContain('Koji Hashimoto');
@@ -83,11 +85,21 @@ describe('ApprovalProgress', () => {
   });
 
   it('renders compact mode with only visual dots and no verbose copy', () => {
-    const doc = structuredClone(INITIAL_SEED_DOCUMENTS[0]);
+    const doc = { ...structuredClone(INITIAL_SEED_DOCUMENTS[0]), stage1ApproverEmail: 'atasan@blc.co.id' };
     const html = renderToStaticMarkup(<ApprovalProgress document={doc} compact />);
     expect(html).not.toContain('approval-progress-copy');
+    expect(html).toContain('title="Pak Hendra: Belum dimulai"');
     expect(html).toContain('title="Ayu Martina: Belum dimulai"');
     expect(html).toContain('role="img"');
     expect(html).toContain('approval-progress-dot');
+  });
+
+  it('renders fallback Belum ditentukan when approver email and name are unassigned', () => {
+    const doc = structuredClone(INITIAL_SEED_DOCUMENTS[0]);
+    doc.approvalSteps.atasan.assignedTo = undefined;
+    doc.stage1ApproverEmail = undefined;
+    const html = renderToStaticMarkup(<ApprovalProgress document={doc} compact />);
+    expect(html).toContain('title="Belum ditentukan: Belum dimulai"');
+    expect(html).not.toContain('Nama belum tersedia');
   });
 });
