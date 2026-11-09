@@ -1,6 +1,6 @@
 ﻿import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { CircleCheck } from 'lucide-react'
+import { CircleCheck, Clock } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { StageDecision } from '@/types/document'
 import './progress-indicator.css'
@@ -13,9 +13,17 @@ export interface ProgressStage {
     participants?: { name: string; status: StageDecision }[]
 }
 
+export interface PaymentStatus {
+    isPaid: boolean
+    label: string
+    tone: 'success' | 'warning' | 'neutral'
+}
+
 export interface ProgressIndicatorProps {
     steps?: ProgressStage[]
     compact?: boolean
+    variant?: string
+    paymentStatus?: PaymentStatus
 }
 
 export const progressStatusLabels: Record<StageDecision, string> = {
@@ -29,7 +37,7 @@ export function completedProgress(statuses: StageDecision[]): number {
     return Math.max(0, completed - 1) / (statuses.length - 1) * 100
 }
 
-const ProgressIndicator = ({ steps, compact }: ProgressIndicatorProps) => {
+const ProgressIndicator = ({ steps, compact, variant, paymentStatus }: ProgressIndicatorProps) => {
     const [step, setStep] = useState(1)
     const [isExpanded, setIsExpanded] = useState(true)
 
@@ -51,7 +59,7 @@ const ProgressIndicator = ({ steps, compact }: ProgressIndicatorProps) => {
 
     if (steps) {
         return (
-            <div className={cn("approval-capsule", compact && "approval-capsule--compact")}>
+            <div className={cn("approval-capsule", compact && "approval-capsule--compact", variant && `approval-capsule--${variant}`)}>
                 <ol
                     className={cn(
                         "approval-progress approval-progress--capsule",
@@ -104,6 +112,20 @@ const ProgressIndicator = ({ steps, compact }: ProgressIndicatorProps) => {
                         )
                     })}
                 </ol>
+                {paymentStatus && (
+                    <>
+                        <span className="stepper-payment-divider" aria-hidden="true" />
+                        <div
+                            className={cn("stepper-payment-node", `is-${paymentStatus.tone}`)}
+                            role="img"
+                            tabIndex={0}
+                            title={`Pembayaran: ${paymentStatus.label}`}
+                            aria-label={`Pembayaran: ${paymentStatus.label}`}
+                        >
+                            {paymentStatus.tone === 'success' ? '✓' : paymentStatus.tone === 'warning' ? <Clock size={11} strokeWidth={2.5} aria-hidden="true" /> : ''}
+                        </div>
+                    </>
+                )}
             </div>
         )
     }

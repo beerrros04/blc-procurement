@@ -1,14 +1,15 @@
 import React from 'react';
-import type { BaseDocument, StageDecision } from '../types/document';
+import type { BaseDocument, PVDocument, StageDecision } from '../types/document';
 import { displayPersonName } from '../domain/display-name';
-import ProgressIndicator, { type ProgressStage } from './ui/progress-indicator';
+import ProgressIndicator, { type ProgressStage, type PaymentStatus } from './ui/progress-indicator';
 
 export interface ApprovalProgressProps {
   document: BaseDocument;
   compact?: boolean;
+  variant?: 'capsule' | 'inline' | string;
 }
 
-export function ApprovalProgress({ document, compact }: ApprovalProgressProps) {
+export function ApprovalProgress({ document, compact, variant }: ApprovalProgressProps) {
   if (document.docType === 'GR') return <span>Tidak memerlukan persetujuan</span>;
   const { atasan, ayu, bod } = document.approvalSteps;
   const approvals = [bod.heryStatus, bod.hashimotoStatus];
@@ -24,5 +25,13 @@ export function ApprovalProgress({ document, compact }: ApprovalProgressProps) {
         { name: 'Koji Hashimoto', status: bod.hashimotoStatus },
       ] },
   ];
-  return <ProgressIndicator steps={steps} compact={compact} />;
+
+  const isPaid = document.status === 'PAID' || (document.docType === 'PV' && (document as PVDocument).paymentStatus === 'PAID');
+  const paymentStatus: PaymentStatus = isPaid
+    ? { isPaid: true, label: 'Lunas', tone: 'success' }
+    : document.status === 'APPROVED'
+    ? { isPaid: false, label: 'Menunggu Pembayaran', tone: 'warning' }
+    : { isPaid: false, label: 'Belum Dibayar', tone: 'neutral' };
+
+  return <ProgressIndicator steps={steps} compact={compact} variant={variant} paymentStatus={paymentStatus} />;
 }

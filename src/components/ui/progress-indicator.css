@@ -1,14 +1,22 @@
 /* Progress Indicator & Approval Capsule Styles */
 .approval-capsule {
   position: relative;
+  display: flex;
+  align-items: flex-start;
   width: 100%;
   min-width: 225px;
 }
 
 .approval-capsule--compact {
+  align-items: center;
   width: 100%;
   min-width: 110px;
-  max-width: 160px;
+  max-width: 175px;
+}
+
+.approval-capsule .approval-progress {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .approval-progress {
@@ -152,4 +160,69 @@
 td[data-label="Persetujuan"] {
   vertical-align: middle;
   min-width: 130px;
+}
+
+/* Payment settlement divider & indicator node */
+.stepper-payment-divider {
+  width: 1px;
+  height: 16px;
+  background-color: var(--color-border, #e4e2dd);
+  margin: 0 8px;
+  flex-shrink: 0;
+  align-self: center;
+}
+
+.approval-capsule:not(.approval-capsule--compact) .stepper-payment-divider {
+  margin-top: 2px;
+  align-self: flex-start;
+}
+
+.stepper-payment-node {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  min-height: 20px;
+  max-width: 20px;
+  max-height: 20px;
+  box-sizing: border-box;
+  border-radius: var(--radius-full, 9999px);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  flex-shrink: 0;
+  user-select: none;
+  align-self: center;
+  transition: all 0.2s ease;
+}
+
+.approval-capsule:not(.approval-capsule--compact) .stepper-payment-node {
+  align-self: flex-start;
+}
+
+.stepper-payment-node:focus-visible {
+  outline: 2px solid #006cff;
+  outline-offset: 2px;
+}
+
+.stepper-payment-node.is-success {
+  background-color: #059669;
+  border: 1px solid #059669;
+  color: #ffffff;
+}
+
+.stepper-payment-node.is-warning {
+  background-color: #fffbeb;
+  border: 1.5px solid #d97706;
+  color: #d97706;
+}
+
+.stepper-payment-node.is-neutral {
+  background-color: #f8f7f4;
+  border: 1px solid #e4e2dd;
+  color: #9ca3af;
 }

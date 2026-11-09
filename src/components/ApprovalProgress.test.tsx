@@ -160,4 +160,32 @@ describe('ApprovalProgress', () => {
     expect(html).toContain('×');
     expect(html).toContain('title="Pak Hendra: Dikembalikan"');
   });
+
+  it('renders separated payment settlement indicator node with vertical divider', () => {
+    const doc = structuredClone(INITIAL_SEED_DOCUMENTS[0]);
+    doc.status = 'PAID';
+    const html = renderToStaticMarkup(<ApprovalProgress document={doc} variant="capsule" />);
+    expect(html).toContain('stepper-payment-divider');
+    expect(html).toContain('stepper-payment-node');
+    expect(html).toContain('Lunas');
+  });
+
+  it('renders waiting payment settlement indicator when document is pending approval', () => {
+    const doc = structuredClone(INITIAL_SEED_DOCUMENTS[0]);
+    doc.status = 'DRAFT';
+    const html = renderToStaticMarkup(<ApprovalProgress document={doc} variant="capsule" />);
+    expect(html).toContain('stepper-payment-divider');
+    expect(html).toContain('stepper-payment-node');
+    expect(html).toContain('Belum Dibayar');
+  });
+
+  it('renders warning payment settlement indicator when document is approved awaiting payment', () => {
+    const doc = structuredClone(INITIAL_SEED_DOCUMENTS[0]);
+    doc.status = 'APPROVED';
+    const html = renderToStaticMarkup(<ApprovalProgress document={doc} variant="capsule" />);
+    expect(html).toContain('stepper-payment-divider');
+    expect(html).toContain('stepper-payment-node');
+    expect(html).toContain('is-warning');
+    expect(html).toContain('Menunggu Pembayaran');
+  });
 });
