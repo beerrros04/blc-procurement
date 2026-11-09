@@ -322,7 +322,186 @@ export function Topbar({
   );
 }
 
-function App() {
+export function getUserInitials(name?: string): string {
+  if (!name) return 'U';
+  const clean = name.trim();
+  const parts = clean.split(/\s+/);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  return clean.slice(0, 2).toUpperCase();
+}
+
+export interface SidebarProps {
+  sidebarCollapsed: boolean;
+  onToggleCollapse: () => void;
+  mobileMenuOpen: boolean;
+  setMobileMenuOpen: (open: boolean) => void;
+  authUser: {
+    id: string;
+    name: string;
+    role: UserRole;
+    email?: string;
+  };
+  activeTab: WorkspaceTab;
+  setActiveTab: (tab: WorkspaceTab) => void;
+  documents: AnyDocument[];
+  onSignOut: () => void;
+}
+
+export function Sidebar({
+  sidebarCollapsed,
+  onToggleCollapse,
+  mobileMenuOpen,
+  setMobileMenuOpen,
+  authUser,
+  activeTab,
+  setActiveTab,
+  documents,
+  onSignOut,
+}: SidebarProps) {
+  const displayName = authUser.role === 'ADMIN' ? authUser.name : displayPersonName(authUser.name);
+  const initials = getUserInitials(displayName);
+
+  return (
+    <aside className={`sidebar ${sidebarCollapsed ? 'is-collapsed' : ''}`}>
+      <div className="server-status">Mode uji · Data tersimpan di server lokal</div>
+      <div className="brand">
+        <div className="brand-main">
+          <img
+            src="/logo.png"
+            alt="BLC Logo"
+            className="brand-logo"
+          />
+          <div className="brand-text">
+            <div className="brand-title">BLC Caready</div>
+            <div className="brand-subtitle">PROCUREMENT PRO</div>
+          </div>
+        </div>
+        <button
+          type="button"
+          className="sidebar-collapse-toggle"
+          aria-label={sidebarCollapsed ? 'Buka sidebar' : 'Lipat sidebar'}
+          aria-expanded={!sidebarCollapsed}
+          onClick={onToggleCollapse}
+          title={sidebarCollapsed ? 'Buka sidebar' : 'Lipat sidebar'}
+        >
+          <Menu size={18} aria-hidden="true" />
+        </button>
+      </div>
+
+      <button
+        type="button"
+        className="mobile-menu-toggle"
+        aria-label={mobileMenuOpen ? 'Tutup menu navigasi' : 'Buka menu navigasi'}
+        aria-expanded={mobileMenuOpen}
+        aria-controls="main-navigation"
+        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+      >
+        {mobileMenuOpen ? <X size={18} aria-hidden="true" /> : <Menu size={18} aria-hidden="true" />}
+        <span>{mobileMenuOpen ? 'Tutup menu navigasi' : 'Buka menu navigasi'}</span>
+      </button>
+      <div id="main-navigation" className={`sidebar-navigation ${mobileMenuOpen ? 'is-open' : ''}`}>
+        {/* Section: OPERATIONS (Elera Architecture per User Specification) */}
+        <div className="nav-label">OPERATIONS</div>
+        <nav aria-label="Menu Operations">
+          {getVisibleOperationsNav(authUser.role).map((item) => {
+            const Icon = item.icon;
+            const isActive =
+              (item.id === 'DASHBOARD' && activeTab === 'DASHBOARD') ||
+              (item.id === 'PENGAJUAN' && (activeTab === 'PENGAJUAN' || activeTab === 'BERANDA')) ||
+              (item.id === 'DOKUMEN' && (activeTab === 'ALL' || ['PR', 'PO', 'GR', 'AV', 'RB', 'RC', 'PV'].includes(activeTab)));
+            const badge =
+              item.id === 'DASHBOARD'
+                ? documents.filter((d) => d.status === 'IN_REVIEW').length
+                : item.id === 'DOKUMEN'
+                ? documents.length
+                : undefined;
+
+            return (
+              <a
+                key={item.id}
+                href={`#${item.id}`}
+                className={isActive ? 'nav-active' : ''}
+                aria-current={isActive ? 'page' : undefined}
+                title={item.label}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setActiveTab(item.tab);
+                  setMobileMenuOpen(false);
+                }}
+              >
+                <div className="nav-item-content">
+                  <Icon size={18} />
+                  <span className="nav-item-label">{item.label}</span>
+                </div>
+                {badge !== undefined && (
+                  <span className="s-count">{badge}</span>
+                )}
+              </a>
+            );
+          })}
+        </nav>
+
+        {/* Section: DOKUMEN & AUDIT */}
+        <div className="nav-label" style={{ marginTop: '18px' }}>
+          DOKUMEN & AUDIT
+        </div>
+        <nav aria-label="Register, Riwayat, dan Pustaka Dokumen">
+          {SHAREPOINT_NAV_ITEMS.map((item) => {
+            const Icon = item.icon;
+            const count = item.badgeCount ? item.badgeCount(documents) : 0;
+            const isActive = activeTab === item.id;
+            return (
+              <a
+                key={item.id}
+                href={`#${item.id}`}
+                className={isActive ? 'nav-active' : ''}
+                aria-current={isActive ? 'page' : undefined}
+                title={item.label}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setActiveTab(item.id);
+                  setMobileMenuOpen(false);
+                }}
+              >
+                <div className="nav-item-content">
+                  <Icon size={18} />
+                  <span className="nav-item-label">{item.label}</span>
+                </div>
+                <span className="s-count">{count}</span>
+              </a>
+            );
+          })}
+        </nav>
+      </div>
+
+      {/* Compact User Account Footer at Bottom of Sidebar */}
+      <div className="sidebar-account">
+        <div className="sidebar-user-row">
+          <div className="sidebar-user-avatar" aria-hidden="true" title={displayName}>
+            {initials}
+          </div>
+          <div className="sidebar-user-name">
+            {displayName}
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={onSignOut}
+          className="secondary sidebar-logout-btn"
+          title="Keluar"
+          aria-label="Keluar dari akun"
+        >
+          <LogOut size={13} aria-hidden="true" />
+          <span className="sidebar-logout-text">Keluar</span>
+        </button>
+      </div>
+    </aside>
+  );
+}
+
+export function App() {
   const [authUser, setAuthUser] = useState<AuthAccount | null>(() => {
     try {
       const saved = localStorage.getItem(AUTH_SESSION_KEY);
@@ -352,6 +531,7 @@ function App() {
   const [payingPv, setPayingPv] = useState<PVDocument | null>(null);
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   async function refreshDocs() {
     if (!hasApiToken()) return;
@@ -645,165 +825,17 @@ function App() {
       {/* =====================================================================
           BLC CAREAADY CORPORATE SIDEBAR
          ===================================================================== */}
-      <aside className="sidebar">
-        <div className="server-status" style={{ padding: '10px 22px 0', fontSize: '12px', color: '#5A6A85' }}>Mode uji · Data tersimpan di server lokal</div>
-        <div
-          className="brand"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            padding: '24px 22px 16px',
-          }}
-        >
-          <img
-            src="/logo.png"
-            alt="BLC Logo"
-            style={{
-              width: '42px',
-              height: '42px',
-              objectFit: 'contain',
-              borderRadius: '12px',
-              background: '#E51937',
-              padding: '4px',
-              boxShadow: '0 4px 12px rgba(229, 25, 55, 0.25)',
-            }}
-          />
-          <div>
-            <div
-              style={{
-                fontSize: '17px',
-                fontWeight: 900,
-                color: '#111C2D',
-                letterSpacing: '-0.01em',
-                lineHeight: 1.15,
-              }}
-            >
-              BLC Caready
-            </div>
-            <div
-              style={{
-                fontSize: '10.5px',
-                fontWeight: 800,
-                color: '#E51937',
-                letterSpacing: '0.08em',
-                marginTop: '2px',
-              }}
-            >
-              PROCUREMENT PRO
-            </div>
-          </div>
-        </div>
-
-        <button type="button" className="mobile-menu-toggle" aria-label={mobileMenuOpen ? 'Tutup menu navigasi' : 'Buka menu navigasi'} aria-expanded={mobileMenuOpen} aria-controls="main-navigation" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-          {mobileMenuOpen ? <X size={18} aria-hidden="true" /> : <Menu size={18} aria-hidden="true" />}
-          <span>{mobileMenuOpen ? 'Tutup menu navigasi' : 'Buka menu navigasi'}</span>
-        </button>
-        <div id="main-navigation" className={`sidebar-navigation ${mobileMenuOpen ? 'is-open' : ''}`}>
-        {/* Section: OPERATIONS (Elera Architecture per User Specification) */}
-        <div className="nav-label">OPERATIONS</div>
-        <nav aria-label="Menu Operations">
-          {getVisibleOperationsNav(authUser.role).map((item) => {
-            const Icon = item.icon;
-            const isActive =
-              (item.id === 'DASHBOARD' && activeTab === 'DASHBOARD') ||
-              (item.id === 'PENGAJUAN' && (activeTab === 'PENGAJUAN' || activeTab === 'BERANDA')) ||
-              (item.id === 'DOKUMEN' && (activeTab === 'ALL' || ['PR', 'PO', 'GR', 'AV', 'RB', 'RC', 'PV'].includes(activeTab)));
-            const badge =
-              item.id === 'DASHBOARD'
-                ? documents.filter((d) => d.status === 'IN_REVIEW').length
-                : item.id === 'DOKUMEN'
-                ? documents.length
-                : undefined;
-
-            return (
-              <a
-                key={item.id}
-                href={`#${item.id}`}
-                className={isActive ? 'nav-active' : ''}
-                aria-current={isActive ? 'page' : undefined}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setActiveTab(item.tab);
-                  setMobileMenuOpen(false);
-                }}
-                style={{ justifyContent: 'space-between' }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <Icon size={18} />
-                  <span>{item.label}</span>
-                </div>
-                {badge !== undefined && (
-                  <span className="s-count">{badge}</span>
-                )}
-              </a>
-            );
-          })}
-        </nav>
-
-        {/* Section: DOKUMEN & AUDIT */}
-        <div className="nav-label" style={{ marginTop: '18px' }}>
-          DOKUMEN & AUDIT
-        </div>
-        <nav aria-label="Register, Riwayat, dan Pustaka Dokumen">
-          {SHAREPOINT_NAV_ITEMS.map((item) => {
-            const Icon = item.icon;
-            const count = item.badgeCount ? item.badgeCount(documents) : 0;
-            const isActive = activeTab === item.id;
-            return (
-              <a
-                key={item.id}
-                href={`#${item.id}`}
-                className={isActive ? 'nav-active' : ''}
-                aria-current={isActive ? 'page' : undefined}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setActiveTab(item.id);
-                  setMobileMenuOpen(false);
-                }}
-                style={{ justifyContent: 'space-between' }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <Icon size={18} />
-                  <span>{item.label}</span>
-                </div>
-                <span className="s-count">{count}</span>
-              </a>
-            );
-          })}
-        </nav>
-
-        </div>
-
-        {/* Compact User Account Footer at Bottom of Sidebar */}
-        <div
-          className="sidebar-account"
-          style={{
-            marginTop: 'auto',
-            padding: '16px 18px',
-            borderTop: '1px solid var(--border-subtle)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '10px',
-          }}
-        >
-          <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: '13px', fontWeight: 800, color: '#111C2D', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {authUser.role === 'ADMIN' ? authUser.name : displayPersonName(authUser.name)}
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={handleSignOut}
-            className="secondary"
-            style={{ padding: '7px 12px', fontSize: '11.5px', borderRadius: '30px' }}
-            title="Keluar / Ganti Akun"
-          >
-            <LogOut size={13} /> Keluar
-          </button>
-        </div>
-      </aside>
+      <Sidebar
+        sidebarCollapsed={sidebarCollapsed}
+        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        mobileMenuOpen={mobileMenuOpen}
+        setMobileMenuOpen={setMobileMenuOpen}
+        authUser={authUser}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        documents={documents}
+        onSignOut={handleSignOut}
+      />
 
       {/* =====================================================================
           MAIN FLUID WORKSPACE

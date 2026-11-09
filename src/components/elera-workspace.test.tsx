@@ -52,4 +52,92 @@ describe('Elera workspace', () => {
     expect(html).not.toContain('border-radius:16px');
     expect(html).toContain('border-radius:var(--card-radius, 10px)');
   });
+
+  it('toggles collapsible sidebar with hamburger button and retains route icons', async () => {
+    const { Sidebar } = await import('../main');
+    const authUser = {
+      id: 'u1',
+      name: 'Ayu Martina',
+      role: 'ADMIN' as const,
+      email: 'ayu@blc.co.id',
+    };
+    const onToggle = vi.fn();
+
+    // 1. Expanded state
+    const expandedHtml = renderToStaticMarkup(
+      <Sidebar
+        sidebarCollapsed={false}
+        onToggleCollapse={onToggle}
+        mobileMenuOpen={false}
+        setMobileMenuOpen={noop}
+        authUser={authUser}
+        activeTab="ALL"
+        setActiveTab={noop}
+        documents={[]}
+        onSignOut={noop}
+      />
+    );
+    expect(expandedHtml).toContain('class="sidebar "');
+    expect(expandedHtml).not.toContain('is-collapsed');
+    expect(expandedHtml).toContain('aria-label="Lipat sidebar"');
+    expect(expandedHtml).toContain('aria-expanded="true"');
+    expect(expandedHtml).toContain('BLC Caready');
+    expect(expandedHtml).toContain('PROCUREMENT PRO');
+    expect(expandedHtml).toContain('title="Dashboard"');
+    expect(expandedHtml).toContain('title="Pengajuan"');
+    expect(expandedHtml).toContain('title="Dokumen"');
+    expect(expandedHtml).toContain('title="Approval Register"');
+
+    // 2. Collapsed state
+    const collapsedHtml = renderToStaticMarkup(
+      <Sidebar
+        sidebarCollapsed={true}
+        onToggleCollapse={onToggle}
+        mobileMenuOpen={false}
+        setMobileMenuOpen={noop}
+        authUser={authUser}
+        activeTab="ALL"
+        setActiveTab={noop}
+        documents={[]}
+        onSignOut={noop}
+      />
+    );
+    expect(collapsedHtml).toContain('sidebar is-collapsed');
+    expect(collapsedHtml).toContain('aria-label="Buka sidebar"');
+    expect(collapsedHtml).toContain('aria-expanded="false"');
+    // Verify brand logo and route icon anchors retained with title tooltips
+    expect(collapsedHtml).toContain('alt="BLC Logo"');
+    expect(collapsedHtml).toContain('title="Dashboard"');
+    expect(collapsedHtml).toContain('title="Pengajuan"');
+    expect(collapsedHtml).toContain('title="Dokumen"');
+    expect(collapsedHtml).toContain('title="Approval Register"');
+    expect(collapsedHtml).toContain('title="Approval History"');
+    expect(collapsedHtml).toContain('title="Approval Docs"');
+    // Verify compact avatar and logout title
+    expect(collapsedHtml).toContain('sidebar-user-avatar');
+    expect(collapsedHtml).toContain('AM');
+    expect(collapsedHtml).toContain('title="Keluar"');
+
+    // 3. Verify clicking hamburger invokes onToggleCollapse
+    const tree = Sidebar({
+      sidebarCollapsed: false,
+      onToggleCollapse: onToggle,
+      mobileMenuOpen: false,
+      setMobileMenuOpen: noop,
+      authUser,
+      activeTab: 'ALL',
+      setActiveTab: noop,
+      documents: [],
+      onSignOut: noop,
+    });
+    const brandDiv = tree.props.children.find(
+      (c: any) => c && c.props && c.props.className === 'brand'
+    );
+    const toggleBtn = brandDiv?.props.children.find(
+      (c: any) => c && c.props && c.props.className === 'sidebar-collapse-toggle'
+    );
+    expect(toggleBtn).toBeDefined();
+    toggleBtn.props.onClick();
+    expect(onToggle).toHaveBeenCalledTimes(1);
+  });
 });
