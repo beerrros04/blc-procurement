@@ -20,6 +20,7 @@ import { openAttachment } from '../api';
 import { branchOptions } from '../domain/branches';
 import { displayPersonName } from '../domain/display-name';
 import { ApprovalProgress } from './ApprovalProgress';
+import { StatusBadge } from './ui/StatusBadge';
 import './document-lists.css';
 
 const rupiah = new Intl.NumberFormat('id-ID', {
@@ -261,14 +262,17 @@ export const ApprovalRegisterView: React.FC<ApprovalRegisterViewProps> = ({
             placeholder="Cari nomor dokumen, judul, cabang..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            className="control-height-md"
             style={{
               width: '100%',
-              padding: '9px 14px 9px 38px',
+              height: '36px',
+              padding: '0 14px 0 38px',
               fontSize: '13px',
               borderRadius: '30px',
               border: '1px solid var(--border-medium)',
               background: '#F8FAFD',
               color: '#111C2D',
+              boxSizing: 'border-box',
             }}
           />
         </div>
@@ -296,7 +300,7 @@ export const ApprovalRegisterView: React.FC<ApprovalRegisterViewProps> = ({
             <option value="ALL">Semua tindak lanjut</option><option value="MENUNGGU">Menunggu</option><option value="MENUNGGU_PV">Menunggu PV</option><option value="JADWAL_PEMBAYARAN">Jadwal Pembayaran</option><option value="UNPAID">Belum Dibayar</option><option value="PAID">Lunas</option><option value="AV_TANPA_PO">AV Tanpa PO</option><option value="CA_BELUM_REALISASI">CA Belum Direalisasikan</option>
           </select>
         </label>
-        <button type="button" className="secondary" onClick={() => { setSearch(''); setTypeFilter('ALL'); setBranchFilter('ALL'); setProgressFilter('ALL'); setPaymentFilter('ALL'); }}>Atur ulang</button>
+        <button type="button" className="secondary control-height-md" onClick={() => { setSearch(''); setTypeFilter('ALL'); setBranchFilter('ALL'); setProgressFilter('ALL'); setPaymentFilter('ALL'); }}>Atur ulang</button>
       </div>
       <p className="register-filter-summary" role="status">{filtered.length} dari {documents.length} dokumen ditampilkan</p>
 
@@ -307,8 +311,8 @@ export const ApprovalRegisterView: React.FC<ApprovalRegisterViewProps> = ({
             <tr>
               <th>Nomor & Judul</th>
               <th>Cabang</th>
-              <th>Total Pengajuan</th>
-              <th title="Nilai neto yang direncanakan; status aktual ada pada kolom Pembayaran">Dibayarkan <span className="register-column-note">(neto)</span></th>
+              <th scope="col" className="th-nominal text-right" style={{ textAlign: 'right' }}>Total Pengajuan</th>
+              <th scope="col" className="th-nominal text-right" style={{ textAlign: 'right' }} title="Nilai neto yang direncanakan; status aktual ada pada kolom Pembayaran">Dibayarkan <span className="register-column-note">(neto)</span></th>
               <th>Tahap</th>
               <th>Status</th>
               <th>Pembayaran</th>
@@ -322,7 +326,6 @@ export const ApprovalRegisterView: React.FC<ApprovalRegisterViewProps> = ({
             {filtered.map((doc) => {
               const visual = getDocTypeVisual(doc.docType);
               const DocIcon = visual.icon;
-              const badge = getStatusBadge(doc.status);
               const totalAmt = getDocAmount(doc);
               const netPayableAmt = getNetPayableAmount(doc);
               const isPvPaid = doc.docType === 'PV' && doc.paymentStatus === 'PAID';
@@ -394,37 +397,35 @@ export const ApprovalRegisterView: React.FC<ApprovalRegisterViewProps> = ({
                       {doc.branch}
                     </span>
                   </td>
-                  <td data-label="Total Pengajuan" style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, color: '#111C2D' }}>
+                  <td
+                    data-label="Total Pengajuan"
+                    className="col-nominal text-right tabular-nums tabular-currency font-mono"
+                    style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontWeight: 800,
+                      color: '#111C2D',
+                      textAlign: 'right',
+                      fontVariantNumeric: 'tabular-nums',
+                    }}
+                  >
                     {rupiah.format(totalAmt)}
                   </td>
                   <td
                     data-label="Dibayarkan"
+                    className="col-nominal text-right tabular-nums tabular-currency font-mono"
                     style={{
                       fontFamily: 'var(--font-mono)',
                       fontWeight: 800,
                       color: netPayableAmt > 0 ? '#008A7A' : 'var(--text-muted, #4B5563)',
+                      textAlign: 'right',
+                      fontVariantNumeric: 'tabular-nums',
                     }}
                   >
                     {rupiah.format(netPayableAmt)}
                   </td>
                   <td data-label="Tahap"><ApprovalProgress document={doc} compact /></td>
                   <td data-label="Status">
-                    <span
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        padding: '4px 10px',
-                        borderRadius: '999px',
-                        fontSize: '11px',
-                        fontWeight: 800,
-                        background: badge.bg,
-                        color: badge.color,
-                        border: `1px solid ${badge.border}`,
-                      }}
-                    >
-                      {badge.label}
-                    </span>
+                    <StatusBadge status={doc.status} />
                   </td>
                   <td data-label="Pembayaran">
                     {doc.docType === 'PV' ? (
@@ -602,14 +603,17 @@ export const ApprovalHistoryView: React.FC<ApprovalHistoryViewProps> = ({
             placeholder="Cari dokumen, pejabat, komentar..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            className="control-height-md"
             style={{
               width: '100%',
-              padding: '9px 14px 9px 38px',
+              height: '36px',
+              padding: '0 14px 0 38px',
               fontSize: '13px',
               borderRadius: '30px',
               border: '1px solid var(--border-medium)',
               background: '#F8FAFD',
               color: '#111C2D',
+              boxSizing: 'border-box',
             }}
           />
         </div>
@@ -656,8 +660,12 @@ export const ApprovalHistoryView: React.FC<ApprovalHistoryViewProps> = ({
               key={f.id}
               type="button"
               onClick={() => setActionFilter(f.id)}
+              className="control-height-md"
               style={{
-                padding: '6px 14px',
+                height: '36px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                padding: '0 14px',
                 fontSize: '12px',
                 fontWeight: 700,
                 borderRadius: '30px',
@@ -665,6 +673,7 @@ export const ApprovalHistoryView: React.FC<ApprovalHistoryViewProps> = ({
                 border: `1px solid ${active ? '#E51937' : 'var(--border-subtle)'}`,
                 background: active ? '#E51937' : '#F8FAFD',
                 color: active ? '#FFFFFF' : 'var(--text-secondary, #374151)',
+                boxSizing: 'border-box',
               }}
             >
               {f.label}
@@ -674,7 +683,7 @@ export const ApprovalHistoryView: React.FC<ApprovalHistoryViewProps> = ({
       </div>
 
       <div className="table-wrap">
-        <table className="document-table register-table">
+        <table className="document-table register-table" data-density="compact">
           <thead>
             <tr>
               <th>Waktu</th>
@@ -688,26 +697,18 @@ export const ApprovalHistoryView: React.FC<ApprovalHistoryViewProps> = ({
           </thead>
           <tbody>
             {filteredRows.map((row) => {
-              let badgeBg = '#F0F5F9';
-              let badgeColor = '#5A6A85';
-              let IconComp = Clock;
-
-              if (row.actionType === 'APPROVE' || row.actionType === 'PAYMENT') {
-                badgeBg = '#E6FFFA';
-                badgeColor = '#008A7A';
-                IconComp = CheckCircle2;
-              } else if (row.actionType === 'REJECT') {
-                badgeBg = '#FDF2F4';
-                badgeColor = '#C8132D';
-                IconComp = XCircle;
-              } else if (row.actionType === 'SUBMIT') {
-                badgeBg = '#E5F3FB';
-                badgeColor = '#0085DB';
-              }
-
               return (
                 <tr key={row.id}>
-                  <td data-label="Waktu" style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--text-muted, #4B5563)' }}>
+                  <td
+                    data-label="Waktu"
+                    className="tabular-nums font-mono"
+                    style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '12px',
+                      color: 'var(--text-muted, #4B5563)',
+                      fontVariantNumeric: 'tabular-nums',
+                    }}
+                  >
                     {formatDateTime(row.timestamp)}
                   </td>
                   <td data-label="Dokumen">
@@ -718,22 +719,19 @@ export const ApprovalHistoryView: React.FC<ApprovalHistoryViewProps> = ({
                   </td>
                   <td data-label="Tahap" style={{ fontWeight: 700, color: '#111C2D' }}>{row.stageLabel}</td>
                   <td data-label="Keputusan">
-                    <span
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '5px',
-                        padding: '4px 10px',
-                        borderRadius: '999px',
-                        fontSize: '11px',
-                        fontWeight: 800,
-                        background: badgeBg,
-                        color: badgeColor,
-                      }}
-                    >
-                      <IconComp size={13} />
-                      {row.actionBadge}
-                    </span>
+                    <StatusBadge
+                      status={
+                        row.actionType === 'PAYMENT'
+                          ? 'PAID'
+                          : row.actionType === 'APPROVE'
+                          ? 'APPROVED'
+                          : row.actionType === 'REJECT'
+                          ? 'REJECTED'
+                          : row.actionType === 'SUBMIT'
+                          ? 'SUBMITTED'
+                          : 'DRAFT'
+                      }
+                    />
                   </td>
                   <td data-label="Pejabat" style={{ fontWeight: 800, color: '#111C2D' }}>{displayPersonName(row.actor)}</td>
                   <td data-label="Catatan" style={{ color: 'var(--text-secondary, #374151)', maxWidth: '280px' }}>{row.comment}</td>
@@ -863,14 +861,17 @@ export const ApprovalDocsView: React.FC<ApprovalDocsViewProps> = ({
             placeholder="Cari nama berkas, nomor dokumen..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            className="control-height-md"
             style={{
               width: '100%',
-              padding: '9px 14px 9px 38px',
+              height: '36px',
+              padding: '0 14px 0 38px',
               fontSize: '13px',
               borderRadius: '30px',
               border: '1px solid var(--border-medium)',
               background: '#F8FAFD',
               color: '#111C2D',
+              boxSizing: 'border-box',
             }}
           />
         </div>
@@ -918,8 +919,12 @@ export const ApprovalDocsView: React.FC<ApprovalDocsViewProps> = ({
               key={c.id}
               type="button"
               onClick={() => setCategoryFilter(c.id)}
+              className="control-height-md"
               style={{
-                padding: '6px 14px',
+                height: '36px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                padding: '0 14px',
                 fontSize: '12px',
                 fontWeight: 700,
                 borderRadius: '30px',
@@ -927,6 +932,7 @@ export const ApprovalDocsView: React.FC<ApprovalDocsViewProps> = ({
                 border: `1px solid ${active ? '#E51937' : 'var(--border-subtle)'}`,
                 background: active ? '#E51937' : '#F8FAFD',
                 color: active ? '#FFFFFF' : 'var(--text-secondary, #374151)',
+                boxSizing: 'border-box',
               }}
             >
               {c.label}
@@ -944,7 +950,7 @@ export const ApprovalDocsView: React.FC<ApprovalDocsViewProps> = ({
               <th>Dokumen Induk</th>
               <th>Cabang</th>
               <th>Pemohon</th>
-              <th>Nominal</th>
+              <th scope="col" className="th-nominal text-right" style={{ textAlign: 'right' }}>Nominal</th>
               <th style={{ textAlign: 'right' }}>Tindakan</th>
             </tr>
           </thead>
@@ -1001,11 +1007,30 @@ export const ApprovalDocsView: React.FC<ApprovalDocsViewProps> = ({
                   </td>
                   <td data-label="Cabang" style={{ fontWeight: 700, color: 'var(--text-secondary, #374151)' }}>{doc.branch}</td>
                   <td data-label="Pemohon" style={{ fontWeight: 700, color: 'var(--text-secondary, #374151)' }}>{getDocApplicant(doc)}</td>
-                  <td data-label="Nominal" style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, color: '#111C2D' }}>
+                  <td
+                    data-label="Nominal"
+                    className="col-nominal text-right tabular-nums tabular-currency font-mono"
+                    style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontWeight: 800,
+                      color: '#111C2D',
+                      textAlign: 'right',
+                      fontVariantNumeric: 'tabular-nums',
+                    }}
+                  >
                     {rupiah.format(getDocAmount(doc))}
                   </td>
                   <td data-label="Tindakan" style={{ textAlign: 'right' }}>
                     <div style={{ display: 'inline-flex', gap: '6px', alignItems: 'center' }}>
+                      <button
+                        type="button"
+                        className="secondary"
+                        style={{ padding: '6px 12px', fontSize: '12px', borderRadius: 'var(--btn-radius, 8px)' }}
+                        onClick={() => onOpenDetail(doc)}
+                        aria-label={`Buka detail ${doc.docNumber}`}
+                      >
+                        <Eye size={13} /> Lihat
+                      </button>
                       <button
                         type="button"
                         onClick={() => void openAttachment(item.attachmentId).catch(() => setFileError('Lampiran tidak dapat dibuka.'))}
@@ -1019,15 +1044,6 @@ export const ApprovalDocsView: React.FC<ApprovalDocsViewProps> = ({
                         aria-label={`Unduh ${item.fileName}`}
                       >
                         <ExternalLink size={13} /> Unduh
-                      </button>
-                      <button
-                        type="button"
-                        className="secondary"
-                        style={{ padding: '6px 12px', fontSize: '12px', borderRadius: 'var(--btn-radius, 8px)' }}
-                        onClick={() => onOpenDetail(doc)}
-                        aria-label={`Buka detail ${doc.docNumber}`}
-                      >
-                        <Eye size={13} /> Detail
                       </button>
                     </div>
                   </td>

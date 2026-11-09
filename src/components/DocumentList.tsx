@@ -21,23 +21,25 @@ import {
 import type { AnyDocument, DocType, PVDocument, UserRole } from '../types/document';
 import { paymentLabel } from '../domain/payment-label';
 import { ApprovalProgress } from './ApprovalProgress';
+import { StatusBadge } from './ui/StatusBadge';
 import './document-lists.css';
 
 export interface DocumentListProps {
   documents: AnyDocument[];
-  activeTab: DocType | 'ALL';
-  activeRole: UserRole;
-  activeUserId: string;
+  activeTab?: DocType | 'ALL';
+  activeRole?: UserRole;
+  activeUserId?: string;
   activeUserEmail?: string;
-  onOpenDetail: (doc: AnyDocument) => void;
-  onEditDoc: (doc: AnyDocument) => void;
-  onSubmitDoc: (docId: string) => void;
-  onGeneratePv: (docId: string) => void;
-  onPayPv: (pv: PVDocument) => void;
-  onCreateRelated: (doc: AnyDocument) => void;
-  onConfirmRc: (id: string) => void;
+  onOpenDetail?: (doc: AnyDocument) => void;
+  onEditDoc?: (doc: AnyDocument) => void;
+  onSubmitDoc?: (docId: string) => void;
+  onGeneratePv?: (docId: string) => void;
+  onPayPv?: (pv: PVDocument) => void;
+  onCreateRelated?: (doc: AnyDocument) => void;
+  onConfirmRc?: (id: string) => void;
   onOpenExport?: () => void;
   onSelectTab?: (tab: DocType | 'ALL') => void;
+  onSelect?: (doc: AnyDocument) => void;
   title?: string;
   ownerOnly?: boolean;
 }
@@ -83,24 +85,6 @@ function getDocTypeVisual(docType: DocType) {
       return { icon: Scale, bg: '#F1F5F9', color: '#1E293B', label: 'Realization AV' };
     case 'PV':
       return { icon: CreditCard, bg: '#F1F5F9', color: '#1E293B', label: 'Payment Voucher' };
-  }
-}
-
-function getStatusBadge(status: string) {
-  switch (status) {
-    case 'APPROVED':
-      return { label: 'Disetujui', color: '#065F46', bg: '#ECFDF5', border: '#A7F3D0' };
-    case 'PAID':
-      return { label: 'Lunas', color: '#1E40AF', bg: '#EFF6FF', border: '#BFDBFE' };
-    case 'REJECTED':
-      return { label: 'Ditolak (Revisi)', color: '#991B1B', bg: '#FEF2F2', border: '#FECACA' };
-    case 'SUBMITTED':
-      return { label: 'Diajukan', color: '#92400E', bg: '#FFFBEB', border: '#FDE68A' };
-    case 'IN_REVIEW':
-      return { label: 'Sedang Ditinjau', color: '#B45309', bg: '#FFFBEB', border: '#FDE68A' };
-    case 'DRAFT':
-    default:
-      return { label: 'Draf', color: '#374151', bg: '#F3F4F6', border: '#E5E7EB' };
   }
 }
 
@@ -164,22 +148,24 @@ function requiresRoleAction(doc: AnyDocument, activeRole: UserRole, allDocs: Any
 
 export const DocumentList: React.FC<DocumentListProps> = ({
   documents,
-  activeTab,
-  activeRole,
-  activeUserId,
+  activeTab = 'ALL',
+  activeRole = 'PEMOHON',
+  activeUserId = '',
   activeUserEmail,
-  onOpenDetail,
-  onEditDoc,
-  onSubmitDoc,
-  onGeneratePv,
-  onPayPv,
-  onCreateRelated,
-  onConfirmRc,
+  onOpenDetail = () => {},
+  onEditDoc = () => {},
+  onSubmitDoc = () => {},
+  onGeneratePv = () => {},
+  onPayPv = () => {},
+  onCreateRelated = () => {},
+  onConfirmRc = () => {},
   onOpenExport,
   onSelectTab,
+  onSelect,
   title,
   ownerOnly = false,
 }) => {
+  const handleDetail = onSelect || onOpenDetail;
   const [search, setSearch] = useState('');
   const [selectedBranch, setSelectedBranch] = useState<string>('ALL');
   const [onlyMyActions, setOnlyMyActions] = useState(false);
@@ -264,14 +250,17 @@ export const DocumentList: React.FC<DocumentListProps> = ({
               placeholder="Cari nomor, judul, tujuan, cabang..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              className="control-height-md"
               style={{
                 width: '100%',
-                padding: '9px 14px 9px 38px',
+                height: '36px',
+                padding: '0 14px 0 38px',
                 fontSize: '13px',
                 borderRadius: '30px',
                 border: '1px solid var(--border-medium)',
                 background: '#F8FAFD',
                 color: '#111C2D',
+                boxSizing: 'border-box',
               }}
             />
           </div>
@@ -279,15 +268,18 @@ export const DocumentList: React.FC<DocumentListProps> = ({
           {onOpenExport && (
             <button
               type="button"
-              className="secondary"
+              className="secondary control-height-md"
               onClick={onOpenExport}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '6px',
-                padding: '9px 16px',
+                height: '36px',
+                padding: '0 16px',
                 fontSize: '13px',
                 borderRadius: '30px',
+                boxSizing: 'border-box',
               }}
             >
               <Download size={15} />
@@ -354,8 +346,12 @@ export const DocumentList: React.FC<DocumentListProps> = ({
               key={b}
               type="button"
               onClick={() => setSelectedBranch(b)}
+              className="control-height-md"
               style={{
-                padding: '6px 14px',
+                height: '36px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                padding: '0 14px',
                 fontSize: '12px',
                 fontWeight: 700,
                 borderRadius: '30px',
@@ -364,6 +360,7 @@ export const DocumentList: React.FC<DocumentListProps> = ({
                 background: isSelected ? '#E51937' : '#F8FAFD',
                 color: isSelected ? '#FFFFFF' : '#5A6A85',
                 boxShadow: isSelected ? '0 3px 10px rgba(229, 25, 55, 0.2)' : 'none',
+                boxSizing: 'border-box',
               }}
             >
               {b === 'ALL' ? 'Semua Cabang' : b}
@@ -375,9 +372,13 @@ export const DocumentList: React.FC<DocumentListProps> = ({
           type="button"
           aria-pressed={onlyMyActions}
           onClick={() => setOnlyMyActions((v) => !v)}
+          className="control-height-md"
           style={{
             marginLeft: 'auto',
-            padding: '6px 14px',
+            height: '36px',
+            display: 'inline-flex',
+            alignItems: 'center',
+            padding: '0 14px',
             fontSize: '12px',
             fontWeight: 700,
             borderRadius: '30px',
@@ -385,6 +386,7 @@ export const DocumentList: React.FC<DocumentListProps> = ({
             border: `1px solid ${onlyMyActions ? '#E51937' : 'var(--border-subtle)'}`,
             background: onlyMyActions ? '#E51937' : '#FFF5F7',
             color: onlyMyActions ? '#FFFFFF' : '#E51937',
+            boxSizing: 'border-box',
           }}
         >
           Menunggu Tindakan Saya
@@ -424,7 +426,7 @@ export const DocumentList: React.FC<DocumentListProps> = ({
               <tr>
                 <th scope="col">Dokumen & Pengajuan</th>
                 <th scope="col">Cabang</th>
-              <th scope="col" style={{ textAlign: 'right' }}>Nominal (IDR)</th>
+                <th scope="col" className="th-nominal text-right" style={{ textAlign: 'right' }}>Nominal (IDR)</th>
                 <th scope="col">Status</th>
                 <th scope="col">Alur Persetujuan (3 Tahap)</th>
                 <th
@@ -445,9 +447,6 @@ export const DocumentList: React.FC<DocumentListProps> = ({
             <tbody>
               {filtered.map((doc) => {
                 const lastDecision = [...doc.auditLog].reverse().find((entry) => entry.action === 'REJECT' || entry.action === 'SUBMIT');
-                const badge = doc.status === 'DRAFT' && lastDecision?.action === 'REJECT'
-                  ? { label: 'Perlu revisi', color: '#9a5800', bg: '#fff4e3', border: '#f5d49f' }
-                  : getStatusBadge(doc.status);
                 const visual = getDocTypeVisual(doc.docType);
                 const DocIcon = visual.icon;
                 const amount = getDocAmount(doc);
@@ -482,7 +481,7 @@ export const DocumentList: React.FC<DocumentListProps> = ({
                       <button
                         type="button"
                         style={{ display: 'flex', alignItems: 'center', gap: '14px', background: 'transparent', border: 0, padding: 0, cursor: 'pointer', textAlign: 'left', font: 'inherit' }}
-                        onClick={() => onOpenDetail(doc)}
+                        onClick={() => handleDetail(doc)}
                         aria-label={`Buka detail ${doc.docNumber}: ${doc.title}`}
                       >
                         <div
@@ -558,7 +557,9 @@ export const DocumentList: React.FC<DocumentListProps> = ({
                     </td>
 
                     {/* Nominal */}
-                    <td data-label="Nominal"
+                    <td
+                      data-label="Nominal"
+                      className="col-nominal text-right tabular-nums tabular-currency font-mono"
                       style={{
                         fontSize: '14px',
                         fontWeight: 800,
@@ -572,30 +573,13 @@ export const DocumentList: React.FC<DocumentListProps> = ({
 
                     {/* Status Pill */}
                     <td data-label="Status">
-                      <span
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          padding: '5px 12px',
-                          borderRadius: '999px',
-                          fontSize: '11.5px',
-                          fontWeight: 800,
-                          background: badge.bg,
-                          color: badge.color,
-                          border: `1px solid ${badge.border}`,
-                        }}
-                      >
-                        <span
-                          style={{
-                            width: '6px',
-                            height: '6px',
-                            borderRadius: '50%',
-                            background: badge.color,
-                          }}
-                        />
-                        {badge.label}
-                      </span>
+                      <StatusBadge
+                        status={
+                          doc.status === 'DRAFT' && lastDecision?.action === 'REJECT'
+                            ? 'REVISION'
+                            : doc.status
+                        }
+                      />
                       {paymentLabel(doc, documents) && (
                         <div style={{ marginTop: '6px', fontSize: '11px', color: '#5A6A85' }}>
                           Pembayaran: {paymentLabel(doc, documents)}
@@ -635,7 +619,7 @@ export const DocumentList: React.FC<DocumentListProps> = ({
                             fontSize: '12px',
                             borderRadius: 'var(--btn-radius)',
                           }}
-                          onClick={() => onOpenDetail(doc)}
+                          onClick={() => handleDetail(doc)}
                           aria-label={`Lihat detail ${doc.docNumber}`}
                         >
                           <Eye size={13} />
@@ -734,7 +718,7 @@ export const DocumentList: React.FC<DocumentListProps> = ({
                               borderRadius: 'var(--btn-radius)',
                               boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
                             }}
-                            onClick={() => onOpenDetail(doc)}
+                            onClick={() => handleDetail(doc)}
                             aria-label={`Tinjau pengajuan ${doc.docNumber}`}
                           >
                             <CheckCircle2 size={13} />

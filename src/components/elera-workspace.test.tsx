@@ -1,3 +1,4 @@
+import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
 import { BentoMetrics } from './BentoMetrics';
@@ -5,6 +6,29 @@ import { DocumentList } from './DocumentList';
 import { DocumentDetailModal } from './DocumentDetailModal';
 import { StaffBeranda } from './StaffBeranda';
 import { createEmptyDocument } from '../store/document-store';
+import { INITIAL_SEED_DOCUMENTS } from '../store/seed-data';
+
+function render(element: React.ReactElement) {
+  const html = renderToStaticMarkup(element);
+  return {
+    html,
+    container: {
+      querySelectorAll: (selector: string) => {
+        const classNames: string[] = [];
+        const tdRegex = /<td\s+[^>]*class=["']([^"']*)["'][^>]*>/gi;
+        let match;
+        while ((match = tdRegex.exec(html)) !== null) {
+          const className = match[1];
+          const parts = selector.split(',').map((s) => s.trim().replace(/^td\./, ''));
+          if (parts.some((cls) => className.split(/\s+/).includes(cls))) {
+            classNames.push(className);
+          }
+        }
+        return classNames.map((className) => ({ className }));
+      },
+    },
+  };
+}
 
 const noop = vi.fn();
 const actions = {
@@ -13,6 +37,15 @@ const actions = {
 };
 
 describe('Elera workspace', () => {
+  it('ensures currency nominal columns have text-right and tabular-nums styling', () => {
+    const { container } = render(<DocumentList documents={INITIAL_SEED_DOCUMENTS} onSelect={() => {}} />);
+    const currencyCells = container.querySelectorAll('td.col-nominal, td.tabular-currency');
+    expect(currencyCells.length).toBeGreaterThan(0);
+    currencyCells.forEach((cell) => {
+      expect(cell.className).toMatch(/text-right|col-nominal/);
+    });
+  });
+
   it('shows a connected summary with amounts in tabular figures', () => {
     const html = renderToStaticMarkup(<BentoMetrics documents={[]} activeRole="ADMIN" />);
     expect(html).toContain('stats-strip');
