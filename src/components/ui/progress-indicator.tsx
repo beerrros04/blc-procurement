@@ -1,5 +1,5 @@
 ﻿import React, { useState } from 'react'
-import { motion, useReducedMotion } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { CircleCheck } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { StageDecision } from '@/types/document'
@@ -32,7 +32,6 @@ export function completedProgress(statuses: StageDecision[]): number {
 const ProgressIndicator = ({ steps, compact }: ProgressIndicatorProps) => {
     const [step, setStep] = useState(1)
     const [isExpanded, setIsExpanded] = useState(true)
-    const reduceMotion = useReducedMotion()
 
     const handleContinue = () => {
         if (step < 3) {
@@ -53,39 +52,58 @@ const ProgressIndicator = ({ steps, compact }: ProgressIndicatorProps) => {
     if (steps) {
         return (
             <div className={cn("approval-capsule", compact && "approval-capsule--compact")}>
-            <div className="approval-capsule-track" aria-hidden="true" style={{ right: `calc(${100 / steps.length}% - 10px)` }}>
-                <motion.div className="approval-capsule-fill" initial={false}
-                    animate={{ width: `${completedProgress(steps.map((stage) => stage.status))}%` }}
-                    transition={reduceMotion ? { duration: 0 } : { duration: 0.25 }} />
-            </div>
-            <ol className={cn("approval-progress approval-progress--capsule", compact && "approval-progress--compact")} aria-label="Progres persetujuan">
-                {steps.map((stage) => {
-                    const statusText = stage.detail || progressStatusLabels[stage.status]
-                    const dotLabel = `${stage.name}: ${statusText}`
-                    return (
-                        <li key={stage.id} className={`approval-progress-step is-${stage.status.toLowerCase()}`}>
-                            <span
-                                className="approval-progress-dot"
-                                role={compact ? "img" : undefined}
-                                aria-hidden={compact ? undefined : "true"}
-                                title={compact ? dotLabel : undefined}
-                                aria-label={compact ? dotLabel : undefined}
+                <ol
+                    className={cn(
+                        "approval-progress approval-progress--capsule",
+                        compact && "approval-progress--compact"
+                    )}
+                    aria-label="Progres persetujuan"
+                >
+                    {steps.map((stage, index) => {
+                        const isLast = index === steps.length - 1
+                        const statusText = stage.detail || progressStatusLabels[stage.status]
+                        const dotLabel = `${stage.name}: ${statusText}`
+                        return (
+                            <li
+                                key={stage.id}
+                                className={cn(
+                                    "approval-progress-step",
+                                    `is-${stage.status.toLowerCase()}`,
+                                    isLast && "approval-progress-step--last"
+                                )}
                             >
-                                {stage.status === 'APPROVED' ? '✓' : stage.status === 'REJECTED' ? '×' : ''}
-                            </span>
-                            {!compact && (
-                                <span className="approval-progress-copy">
-                                    <strong style={{ overflowWrap: 'anywhere' }}>{stage.name}</strong>
-                                    <small>{stage.detail || progressStatusLabels[stage.status]}</small>
-                                    {stage.participants?.map((person) => (
-                                        <small key={person.name}>{person.name}: {progressStatusLabels[person.status]}</small>
-                                    ))}
+                                <span
+                                    className="approval-progress-dot"
+                                    role="img"
+                                    tabIndex={0}
+                                    title={dotLabel}
+                                    aria-label={dotLabel}
+                                >
+                                    {stage.status === 'APPROVED' ? '✓' : stage.status === 'REJECTED' ? '×' : ''}
                                 </span>
-                            )}
-                        </li>
-                    )
-                })}
-            </ol>
+                                {!compact && (
+                                    <span className="approval-progress-copy">
+                                        <strong style={{ overflowWrap: 'anywhere' }}>{stage.name}</strong>
+                                        <small>{stage.detail || progressStatusLabels[stage.status]}</small>
+                                        {stage.participants?.map((person) => (
+                                            <small key={person.name}>{person.name}: {progressStatusLabels[person.status]}</small>
+                                        ))}
+                                    </span>
+                                )}
+                                {!isLast && (
+                                    <span
+                                        className={cn(
+                                            "step-connector",
+                                            "approval-progress-connector",
+                                            stage.status === 'APPROVED' && "is-approved"
+                                        )}
+                                        aria-hidden="true"
+                                    />
+                                )}
+                            </li>
+                        )
+                    })}
+                </ol>
             </div>
         )
     }

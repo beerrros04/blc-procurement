@@ -96,10 +96,68 @@ describe('ApprovalProgress', () => {
 
   it('renders fallback Belum ditentukan when approver email and name are unassigned', () => {
     const doc = structuredClone(INITIAL_SEED_DOCUMENTS[0]);
-    doc.approvalSteps.atasan.assignedTo = undefined;
+    doc.approvalSteps.atasan.assignedTo = undefined as unknown as string;
     doc.stage1ApproverEmail = undefined;
     const html = renderToStaticMarkup(<ApprovalProgress document={doc} compact />);
     expect(html).toContain('title="Belum ditentukan: Belum dimulai"');
     expect(html).not.toContain('Nama belum tersedia');
+  });
+
+  it('renders continuous flex connectors between steps and marks approved segments active', () => {
+    const doc = { ...structuredClone(INITIAL_SEED_DOCUMENTS[0]), stage1ApproverEmail: 'atasan@blc.co.id' };
+    doc.approvalSteps.atasan.status = 'APPROVED';
+    doc.approvalSteps.ayu.status = 'PENDING';
+    doc.approvalSteps.bod.heryStatus = 'WAITING';
+    doc.approvalSteps.bod.hashimotoStatus = 'WAITING';
+
+    const html = renderToStaticMarkup(<ApprovalProgress document={doc} compact />);
+
+    // Must have 3 step dots
+    const dotMatches = html.match(/approval-progress-dot/g);
+    expect(dotMatches).toHaveLength(3);
+
+    // Must have 2 connectors (between 1 & 2, and 2 & 3)
+    const connectorMatches = html.match(/step-connector/g);
+    expect(connectorMatches).toHaveLength(2);
+
+    // First connector is approved (emerald)
+    expect(html).toContain('step-connector approval-progress-connector is-approved');
+
+    // Each dot has accessible attributes: role="img", tabIndex=0, aria-label, title
+    expect(html).toContain('role="img" tabindex="0"');
+    expect(html).toContain('title="Pak Hendra: Disetujui"');
+    expect(html).toContain('aria-label="Pak Hendra: Disetujui"');
+    expect(html).toContain('title="Ayu Martina: Menunggu"');
+
+    // Contains approved checkmark ✓ and last step has no trailing connector
+    expect(html).toContain('✓');
+    expect(html).toContain('approval-progress-step--last');
+  });
+
+  it('renders 2-step pipeline for PV documents with exactly one connector', () => {
+    const doc = { ...structuredClone(INITIAL_SEED_DOCUMENTS[0]), docType: 'PV' as const };
+    doc.approvalSteps.ayu.status = 'APPROVED';
+    doc.approvalSteps.bod.heryStatus = 'APPROVED';
+    doc.approvalSteps.bod.hashimotoStatus = 'APPROVED';
+
+    const html = renderToStaticMarkup(<ApprovalProgress document={doc} compact />);
+
+    // PV only has Ayu and BOD
+    const dotMatches = html.match(/approval-progress-dot/g);
+    expect(dotMatches).toHaveLength(2);
+
+    const connectorMatches = html.match(/step-connector/g);
+    expect(connectorMatches).toHaveLength(1);
+    expect(html).toContain('step-connector approval-progress-connector is-approved');
+  });
+
+  it('renders rejection mark × inside rejected step dot', () => {
+    const doc = { ...structuredClone(INITIAL_SEED_DOCUMENTS[0]), stage1ApproverEmail: 'atasan@blc.co.id' };
+    doc.approvalSteps.atasan.status = 'REJECTED';
+
+    const html = renderToStaticMarkup(<ApprovalProgress document={doc} compact />);
+    expect(html).toContain('is-rejected');
+    expect(html).toContain('×');
+    expect(html).toContain('title="Pak Hendra: Dikembalikan"');
   });
 });

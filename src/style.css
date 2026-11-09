@@ -1464,15 +1464,30 @@ input[aria-invalid=true] {
 .metrics-grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
 .document-table th:last-child, .document-table td:last-child { position: sticky; right: 0; z-index: 1; background: #fff; box-shadow: -5px 0 8px -8px #53657d; }
 .document-table th:last-child { background: #f8fafd; z-index: 2; }
+.document-table td[data-label="Persetujuan"], td[data-label="Persetujuan"] { vertical-align: middle; min-width: 130px; }
 .analytics-grid { grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr) !important; }
-.approval-progress { display: flex; align-items: flex-start; gap: 0; margin: 0; padding: 0; list-style: none; min-width: 225px; }
+.approval-capsule { position: relative; width: 100%; min-width: 225px; }
+.approval-capsule--compact { width: 100%; min-width: 110px; max-width: 160px; }
+.approval-progress { display: flex; align-items: flex-start; gap: 0; margin: 0; padding: 0; list-style: none; min-width: 225px; width: 100%; }
 .approval-progress-step { position: relative; display: flex; flex: 1; flex-direction: column; align-items: flex-start; gap: 6px; color: #65758e; min-width: 0; }
-.approval-progress-step:not(:last-child)::before { content: ''; position: absolute; top: 9px; left: 19px; right: 0; height: 2px; background: #dce5ef; }
-.approval-progress-step.is-approved:not(:last-child)::before { background: #12a893; }
-.approval-progress-dot { position: relative; z-index: 1; display: grid; place-items: center; width: 20px; height: 20px; border: 2px solid #b9c8da; border-radius: 50%; background: #fff; color: white; font-size: 12px; font-weight: 700; }
-.is-approved .approval-progress-dot { background: #079982; border-color: #079982; }
-.is-pending .approval-progress-dot { border: 6px solid #e51937; }
-.is-rejected .approval-progress-dot { background: #b42332; border-color: #b42332; }
+.approval-progress:not(.approval-progress--compact) .step-connector,
+.approval-progress:not(.approval-progress--compact) .approval-progress-connector { position: absolute; top: 9px; left: 26px; right: 6px; height: 2.5px; border-radius: 2px; background: #e2e8f0; }
+.approval-progress:not(.approval-progress--compact) .step-connector.is-approved,
+.approval-progress:not(.approval-progress--compact) .approval-progress-connector.is-approved { background: #079982; }
+.approval-progress--capsule .approval-progress-step:not(:last-child)::before { display: none; }
+.approval-progress--compact { display: flex; align-items: center; width: 100%; min-width: 0; }
+.approval-progress--compact .approval-progress-step { display: flex; flex-direction: row; align-items: center; flex: 1 1 0%; min-width: 0; }
+.approval-progress--compact .approval-progress-step:last-child,
+.approval-progress--compact .approval-progress-step--last { flex: 0 0 auto; }
+.approval-progress--compact .approval-progress-copy { display: none !important; }
+.step-connector, .approval-progress-connector { flex: 1 1 0%; height: 2.5px; border-radius: 2px; background-color: #e2e8f0; margin: 0 6px; min-width: 8px; align-self: center; transition: background-color 0.2s ease; }
+.step-connector.is-approved, .approval-progress-connector.is-approved, .approval-progress-step.is-approved > .step-connector, .approval-progress-step.is-approved > .approval-progress-connector { background-color: #079982; }
+.approval-progress-dot { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; min-width: 20px; min-height: 20px; max-width: 20px; max-height: 20px; box-sizing: border-box; border: 2px solid #cbd5e1; border-radius: 50%; background: #fff; color: white; font-size: 11px; font-weight: 700; line-height: 1; flex-shrink: 0; }
+.approval-progress-dot:focus-visible { outline: 2px solid #006cff; outline-offset: 2px; }
+.approval-progress-step.is-approved .approval-progress-dot, .is-approved .approval-progress-dot { background: #079982; border-color: #079982; color: #fff; }
+.approval-progress-step.is-pending .approval-progress-dot, .is-pending .approval-progress-dot { background: #fff; border: 3px solid #e51937; color: #e51937; }
+.approval-progress-step.is-waiting .approval-progress-dot, .is-waiting .approval-progress-dot { background: #fff; border: 2px solid #cbd5e1; color: transparent; }
+.approval-progress-step.is-rejected .approval-progress-dot, .is-rejected .approval-progress-dot { background: #b42332; border-color: #b42332; color: #fff; }
 .approval-progress-copy strong, .approval-progress-copy small { display: block; line-height: 1.3; }
 .approval-progress-copy strong { color: #243650; font-size: 11px; }
 .approval-progress-copy small { font-size: 10px; margin-top: 2px; }
