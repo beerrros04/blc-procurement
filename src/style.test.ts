@@ -14,6 +14,13 @@ describe('Elera Design Tokens in style.css', () => {
     expect(css).toContain('.s-drawer');
     expect(css).toContain('.s-icon-chip');
     expect(css).toContain('.s-action-caready');
+    expect(css).toContain('--pill-radius: 9999px;');
+    expect(css).toContain('.step-badge');
+    expect(css).toContain('.step-badge.status-waiting');
+    expect(css).toContain('.step-badge.status-pending');
+    expect(css).toContain('.step-badge.status-approved');
+    expect(css).toContain('.step-badge.status-rejected');
+    expect(css).toContain('.bod-reviewer-head');
   });
 
   it('fulfills WCAG AA text contrast, print media rules, and selective reduced motion', () => {

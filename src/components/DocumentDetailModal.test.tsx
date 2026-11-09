@@ -61,4 +61,54 @@ describe('document review drawer', () => {
     await runDecision(() => Promise.resolve(), onClose);
     expect(onClose).toHaveBeenCalledOnce();
   });
+
+  describe('ApprovalStepper status badge consistency', () => {
+    it('renders all 4 step-badge status variants (approved, rejected, pending, waiting) across all reviewers', () => {
+      const doc = createEmptyDocument('PO');
+      doc.approvalSteps.atasan.assignedTo = 'Pak Hendra (Atasan Langsung)';
+      doc.approvalSteps.atasan.status = 'APPROVED';
+      doc.approvalSteps.ayu.status = 'REJECTED';
+      doc.approvalSteps.bod.heryStatus = 'PENDING';
+      doc.approvalSteps.bod.hashimotoStatus = 'WAITING';
+
+      const html = renderToStaticMarkup(<ApprovalStepper document={doc} />);
+
+      // Verify all 4 step-badge classes and text labels render
+      expect(html).toContain('class="step-badge status-approved">Disetujui<');
+      expect(html).toContain('class="step-badge status-rejected">Ditolak<');
+      expect(html).toContain('class="step-badge status-pending">Menunggu Persetujuan<');
+      expect(html).toContain('class="step-badge status-waiting">Menunggu Giliran<');
+
+      // Verify each reviewer node pairs correctly with their status badge
+      expect(html).toMatch(/Pak Hendra[\s\S]*?class="step-badge status-approved">Disetujui/);
+      expect(html).toMatch(/Ayu Martina[\s\S]*?class="step-badge status-rejected">Ditolak/);
+      expect(html).toMatch(/Hery Sugiarto[\s\S]*?class="step-badge status-pending">Menunggu Persetujuan/);
+      expect(html).toMatch(/Koji Hashimoto[\s\S]*?class="step-badge status-waiting">Menunggu Giliran/);
+    });
+
+    it('renders default waiting pill badges (status-waiting) when steps are awaiting turn', () => {
+      const doc = createEmptyDocument('PR');
+      doc.approvalSteps.atasan.status = 'WAITING';
+      doc.approvalSteps.ayu.status = 'WAITING';
+      doc.approvalSteps.bod.heryStatus = 'WAITING';
+      doc.approvalSteps.bod.hashimotoStatus = 'WAITING';
+
+      const html = renderToStaticMarkup(<ApprovalStepper document={doc} />);
+      const waitingMatches = html.match(/class="step-badge status-waiting"/g);
+      expect(waitingMatches).toHaveLength(4);
+      expect(html).toContain('Menunggu Giliran');
+    });
+
+    it('renders step-badge inside bod-reviewer cards with proper structure', () => {
+      const doc = createEmptyDocument('PR');
+      doc.approvalSteps.bod.heryStatus = 'APPROVED';
+      doc.approvalSteps.bod.hashimotoStatus = 'REJECTED';
+
+      const html = renderToStaticMarkup(<ApprovalStepper document={doc} />);
+      expect(html).toContain('class="bod-reviewer"');
+      expect(html).toContain('class="bod-reviewer-head"');
+      expect(html).toMatch(/<div class="bod-reviewer-head"><strong>Hery Sugiarto<\/strong><span class="step-badge status-approved">Disetujui<\/span><\/div>/);
+      expect(html).toMatch(/<div class="bod-reviewer-head"><strong>Koji Hashimoto<\/strong><span class="step-badge status-rejected">Ditolak<\/span><\/div>/);
+    });
+  });
 });
