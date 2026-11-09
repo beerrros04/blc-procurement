@@ -132,6 +132,7 @@
 
   /* 7. Typography Scale */
   --text-xs: 0.75rem;    /* 12px */
+  --text-label-size: 0.75rem; /* 12px */
   --text-sm: 0.8125rem;  /* 13px */
   --text-base: 0.875rem; /* 14px */
   --text-md: 1rem;       /* 16px */
@@ -733,6 +734,291 @@ p {
   background: var(--canvas-bg);
   border-color: var(--text-muted);
   color: var(--text-primary);
+}
+
+/* ==========================================================================
+   ENTERPRISE BUTTON SYSTEM (Section 4.5 / 5.3)
+   ========================================================================== */
+.btn-primary,
+.btn-secondary,
+.btn-outlined,
+.btn-ghost,
+.btn-destructive,
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  border-radius: var(--radius-md, 8px);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--duration-fast, 150ms) var(--easing-standard, cubic-bezier(0.2, 0, 0, 1)),
+              border-color var(--duration-fast, 150ms) var(--easing-standard, cubic-bezier(0.2, 0, 0, 1)),
+              color var(--duration-fast, 150ms) var(--easing-standard, cubic-bezier(0.2, 0, 0, 1)),
+              box-shadow var(--duration-fast, 150ms) var(--easing-standard, cubic-bezier(0.2, 0, 0, 1));
+}
+
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible,
+.btn-outlined:focus-visible,
+.btn-ghost:focus-visible,
+.btn-destructive:focus-visible,
+.btn-icon:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px #2563EB;
+}
+
+.btn-primary:disabled,
+.btn-secondary:disabled,
+.btn-outlined:disabled,
+.btn-ghost:disabled,
+.btn-destructive:disabled,
+.btn-icon:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Button Variants */
+.btn-primary {
+  background-color: var(--palette-primary-600, #DC2626);
+  border: 1px solid var(--palette-primary-600, #DC2626);
+  color: #FFFFFF;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--palette-primary-700, #B91C1C);
+  border-color: var(--palette-primary-700, #B91C1C);
+}
+
+.btn-secondary {
+  background-color: var(--btn-charcoal, #191c1a);
+  border: 1px solid var(--btn-charcoal, #191c1a);
+  color: #FFFFFF;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--btn-charcoal-hover, #2D312E);
+  border-color: var(--btn-charcoal-hover, #2D312E);
+}
+
+.btn-outlined {
+  background-color: #FFFFFF;
+  border: 1px solid var(--palette-neutral-200, #E4E2DD);
+  color: var(--palette-neutral-900, #111827);
+}
+
+.btn-outlined:hover:not(:disabled) {
+  background-color: var(--palette-neutral-50, #F9FAFB);
+  border-color: var(--palette-neutral-300, #D1D5DB);
+}
+
+.btn-ghost {
+  background-color: transparent;
+  border: 1px solid transparent;
+  color: var(--palette-neutral-600, #4B5563);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background-color: var(--palette-neutral-100, #F4F3EF);
+  color: var(--palette-neutral-900, #111827);
+}
+
+.btn-destructive {
+  background-color: var(--palette-error-600, #E11D48);
+  border: 1px solid var(--palette-error-600, #E11D48);
+  color: #FFFFFF;
+}
+
+.btn-destructive:hover:not(:disabled) {
+  background-color: var(--palette-error-700, #BE123C);
+  border-color: var(--palette-error-700, #BE123C);
+}
+
+.btn-icon {
+  padding: 0;
+  background-color: transparent;
+  border: 1px solid transparent;
+  color: var(--palette-neutral-600, #4B5563);
+}
+
+.btn-icon:hover:not(:disabled) {
+  background-color: var(--palette-neutral-100, #F4F3EF);
+  color: var(--palette-neutral-900, #111827);
+}
+
+/* Button Sizes */
+.btn-sm {
+  height: 32px;
+  padding: 0 12px;
+  font-size: var(--text-xs, 12px);
+  border-radius: var(--radius-sm, 6px);
+}
+
+.btn-icon.btn-sm {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+}
+
+.btn-md {
+  height: 36px;
+  padding: 0 16px;
+  font-size: var(--text-sm, 13px);
+  border-radius: var(--radius-md, 8px);
+}
+
+.btn-icon.btn-md {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+}
+
+.btn-lg {
+  height: 44px;
+  padding: 0 20px;
+  font-size: var(--text-base, 14px);
+  border-radius: var(--radius-md, 8px);
+}
+
+.btn-icon.btn-lg {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+}
+
+/* ==========================================================================
+   ENTERPRISE STATUS BADGE & FILTER CHIP (Section 4.5 / 5.3)
+   ========================================================================== */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 24px;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-label-size);
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.status-badge .status-badge-icon,
+.status-badge svg {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+.status-badge.status-approved {
+  background-color: var(--palette-success-50, #ECFDF5);
+  color: var(--palette-success-700, #047857);
+  border: 1px solid var(--palette-success-200, #A7F3D0);
+}
+
+.status-badge.status-paid {
+  background-color: var(--palette-info-50, #EFF6FF);
+  color: var(--palette-info-700, #1D4ED8);
+  border: 1px solid var(--palette-info-200, #BFDBFE);
+}
+
+.status-badge.status-rejected {
+  background-color: var(--palette-error-50, #FFF1F2);
+  color: var(--palette-error-700, #BE123C);
+  border: 1px solid var(--palette-error-200, #FECDD3);
+}
+
+.status-badge.status-revision {
+  background-color: var(--palette-error-50, #FFF1F2);
+  color: var(--palette-error-700, #BE123C);
+  border: 1px solid var(--palette-error-200, #FECDD3);
+}
+
+.status-badge.status-in_review {
+  background-color: var(--palette-warning-50, #FFFBEB);
+  color: var(--palette-warning-700, #B45309);
+  border: 1px solid var(--palette-warning-200, #FDE68A);
+}
+
+.status-badge.status-submitted {
+  background-color: #FEF3C7;
+  color: #92400E;
+  border: 1px solid #FDE68A;
+}
+
+.status-badge.status-draft {
+  background-color: var(--palette-neutral-100, #F4F3EF);
+  color: var(--palette-neutral-600, #4B5563);
+  border: 1px solid var(--palette-neutral-200, #E4E2DD);
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: var(--radius-full, 9999px);
+  font-size: var(--text-sm, 13px);
+  font-weight: 500;
+  line-height: 1;
+  background-color: #FFFFFF;
+  border: 1px solid var(--palette-neutral-200, #E4E2DD);
+  color: var(--palette-neutral-600, #4B5563);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  transition: background-color var(--duration-fast, 150ms) var(--easing-standard, cubic-bezier(0.2, 0, 0, 1)),
+              border-color var(--duration-fast, 150ms) var(--easing-standard, cubic-bezier(0.2, 0, 0, 1)),
+              color var(--duration-fast, 150ms) var(--easing-standard, cubic-bezier(0.2, 0, 0, 1));
+}
+
+.filter-chip:hover:not(.active):not(:disabled) {
+  background-color: var(--palette-neutral-50, #F9FAFB);
+  border-color: var(--palette-neutral-300, #D1D5DB);
+  color: var(--palette-neutral-900, #111827);
+}
+
+.filter-chip:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px #2563EB;
+}
+
+.filter-chip.active {
+  background-color: var(--palette-primary-600, #DC2626);
+  border-color: var(--palette-primary-600, #DC2626);
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+.filter-chip:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.filter-chip-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: var(--radius-full, 9999px);
+  font-size: 11px;
+  font-weight: 600;
+  background-color: rgba(0, 0, 0, 0.08);
+  color: inherit;
+  line-height: 1;
+}
+
+.filter-chip.active .filter-chip-count {
+  background-color: rgba(255, 255, 255, 0.25);
+  color: #FFFFFF;
 }
 
 /* ==========================================================================

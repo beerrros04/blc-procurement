@@ -45,4 +45,24 @@ describe('Elera Design Tokens in style.css', () => {
     expect(css).toContain('@media print');
     expect(css).not.toContain('*, *::before, *::after {\n    animation-duration: 0.01ms !important;');
   });
+
+  it('defines status badge, filter chip, and button size classes', () => {
+    const css = readFileSync(resolve(__dirname, 'style.css'), 'utf-8');
+    expect(css).toContain('.status-badge');
+    expect(css).toContain('.status-badge.status-approved');
+    expect(css).toContain('.status-badge.status-paid');
+    expect(css).toContain('.status-badge.status-rejected');
+    expect(css).toContain('.status-badge.status-in_review');
+    expect(css).toContain('.status-badge.status-submitted');
+    expect(css).toContain('.status-badge.status-draft');
+    expect(css).toContain('.filter-chip');
+    expect(css).toContain('.btn-sm');
+    expect(css).toContain('.btn-md');
+    expect(css).toContain('.btn-lg');
+    expect(css).toContain('.btn-primary');
+    expect(css).toContain('.btn-secondary');
+    expect(css).toContain('.btn-outlined');
+    expect(css).toContain('.btn-ghost');
+    expect(css).toContain('.btn-destructive');
+  });
 });
