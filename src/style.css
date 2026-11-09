@@ -12,6 +12,137 @@
    ========================================================================== */
 
 :root {
+  /* ==========================================================================
+     Enterprise Design Tokens (Section 9.1)
+     ========================================================================== */
+
+  /* 1. Primitive Palettes */
+  /* Primary Crimson */
+  --palette-primary-50: #FEF2F2;
+  --palette-primary-100: #FEE2E2;
+  --palette-primary-200: #FECACA;
+  --palette-primary-300: #FCA5A5;
+  --palette-primary-400: #F87171;
+  --palette-primary-500: #EF4444;
+  --palette-primary-600: #DC2626;
+  --palette-primary-700: #B91C1C;
+  --palette-primary-800: #991B1B;
+  --palette-primary-900: #7F1D1D;
+
+  /* Neutral Slate */
+  --palette-neutral-0: #FFFFFF;
+  --palette-neutral-50: #F9FAFB;
+  --palette-neutral-100: #F4F3EF;
+  --palette-neutral-200: #E4E2DD;
+  --palette-neutral-300: #D1D5DB;
+  --palette-neutral-400: #9CA3AF;
+  --palette-neutral-500: #6B7280;
+  --palette-neutral-600: #4B5563;
+  --palette-neutral-700: #374151;
+  --palette-neutral-800: #1F2937;
+  --palette-neutral-900: #111827;
+
+  /* Semantic Palettes: Success */
+  --palette-success-50: #ECFDF5;
+  --palette-success-100: #D1FAE5;
+  --palette-success-200: #A7F3D0;
+  --palette-success-500: #10B981;
+  --palette-success-600: #059669;
+  --palette-success-700: #047857;
+
+  /* Semantic Palettes: Warning */
+  --palette-warning-50: #FFFBEB;
+  --palette-warning-100: #FEF3C7;
+  --palette-warning-200: #FDE68A;
+  --palette-warning-500: #F59E0B;
+  --palette-warning-600: #D97706;
+  --palette-warning-700: #B45309;
+
+  /* Semantic Palettes: Error */
+  --palette-error-50: #FFF1F2;
+  --palette-error-100: #FFE4E6;
+  --palette-error-200: #FECDD3;
+  --palette-error-500: #F43F5E;
+  --palette-error-600: #E11D48;
+  --palette-error-700: #BE123C;
+
+  /* Semantic Palettes: Info */
+  --palette-info-50: #EFF6FF;
+  --palette-info-100: #DBEAFE;
+  --palette-info-200: #BFDBFE;
+  --palette-info-500: #3B82F6;
+  --palette-info-600: #2563EB;
+  --palette-info-700: #1D4ED8;
+
+  /* 2. Semantic Color Variables */
+  --color-primary: var(--palette-primary-600);
+  --color-primary-hover: var(--palette-primary-700);
+  --color-primary-active: var(--palette-primary-800);
+  --color-primary-subtle: var(--palette-primary-50);
+  --color-background: var(--palette-neutral-100);
+  --color-surface: var(--palette-neutral-0);
+  --color-surface-elevated: var(--palette-neutral-0);
+  --color-surface-container: #F8F7F4;
+  --color-border: var(--palette-neutral-200);
+  --color-border-strong: var(--palette-neutral-400);
+  --color-text-primary: var(--palette-neutral-900);
+  --color-text-secondary: var(--palette-neutral-600);
+  --color-text-muted: var(--palette-neutral-500);
+
+  /* 3. Spacing Scale (4px increments) */
+  --space-0-5: 0.125rem; /* 2px */
+  --space-1: 0.25rem;   /* 4px */
+  --space-1-5: 0.375rem; /* 6px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-2-5: 0.625rem; /* 10px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-3-5: 0.875rem; /* 14px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.25rem;   /* 20px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-8: 2rem;      /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+
+  /* 4. Radius Scale */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* 5. Elevation Hierarchy */
+  --elevation-0: none;
+  --elevation-1: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  --elevation-2: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  --elevation-3: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+  --elevation-4: 0 20px 25px -5px rgba(0, 0, 0, 0.10), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+  /* 6. Corporate Motion Tokens */
+  --duration-instant: 100ms;
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-moderate: 320ms;
+  --duration-error: 350ms;
+  --easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --easing-enter: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --easing-exit: cubic-bezier(0.3, 0, 1, 1);
+
+  /* 7. Typography Scale */
+  --text-xs: 0.75rem;    /* 12px */
+  --text-sm: 0.8125rem;  /* 13px */
+  --text-base: 0.875rem; /* 14px */
+  --text-md: 1rem;       /* 16px */
+  --text-lg: 1.125rem;   /* 18px */
+  --text-xl: 1.25rem;    /* 20px */
+  --text-2xl: 1.5rem;    /* 24px */
+  --text-3xl: 1.875rem;  /* 30px */
+
+  /* ==========================================================================
+     Backward Compatibility & Caready Aliases
+     ========================================================================== */
   /* Canvas Background (Warm Architectural Canvas per Elera) */
   --canvas-bg: #f6f5f3;
   --canvas-body: #f6f5f3;
@@ -1472,6 +1603,13 @@ input[aria-invalid=true] {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-instant: 0.01ms;
+    --duration-fast: 0.01ms;
+    --duration-normal: 0.01ms;
+    --duration-moderate: 0.01ms;
+    --duration-error: 0.01ms;
+  }
   * {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
