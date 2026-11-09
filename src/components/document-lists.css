@@ -76,7 +76,13 @@
   padding-bottom: 8px;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 767px) {
+  .document-table, .document-table tbody, .document-table tr, .document-table td { display: block; width: 100%; }
+  .document-table thead { display: none; }
+  .document-table tr { padding: 12px 0; border-bottom: 1px solid var(--border-subtle); }
+  .document-table td { padding: 7px 12px; border: 0; white-space: normal; text-align: left !important; overflow-wrap: anywhere; }
+  .document-table td:not(:first-child)::before { content: attr(data-label); display: block; margin-bottom: 4px; color: var(--text-secondary); font-size: 12px; font-weight: 700; }
+  .document-table th:last-child, .document-table td:last-child { position: static; box-shadow: none; }
   .register-filters label { min-width: 120px; flex-basis: calc(50% - 12px); }
   .register-filters button { min-height: 36px; height: 36px; }
   .document-table td[data-label="Dokumen"] button { max-width: 100%; }

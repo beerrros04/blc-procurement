@@ -50,6 +50,13 @@ describe('StatusBadge Component', () => {
     expect(renderToStaticMarkup(<StatusBadge status="draft" />)).toContain('status-draft');
   });
 
+  it('distinguishes waiting, disbursed, and inactive from other statuses', () => {
+    expect(renderToStaticMarkup(<StatusBadge status="menunggu" />)).toContain('status-waiting');
+    expect(renderToStaticMarkup(<StatusBadge status="dibayarkan" />)).toContain('Dibayarkan');
+    expect(renderToStaticMarkup(<StatusBadge status="dibayarkan" />)).toContain('status-disbursed');
+    expect(renderToStaticMarkup(<StatusBadge status="inactive" />)).toContain('Nonaktif');
+  });
+
   it('hides icon when showIcon is false', () => {
     const html = renderToStaticMarkup(<StatusBadge status="APPROVED" showIcon={false} />);
     expect(html).not.toContain('<svg');

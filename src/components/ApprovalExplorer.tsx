@@ -21,6 +21,7 @@ import { branchOptions } from '../domain/branches';
 import { displayPersonName } from '../domain/display-name';
 import { ApprovalProgress } from './ApprovalProgress';
 import { StatusBadge } from './ui/StatusBadge';
+import { FilterChip } from './ui/FilterChip';
 import './document-lists.css';
 
 const rupiah = new Intl.NumberFormat('id-ID', {
@@ -653,33 +654,11 @@ export const ApprovalHistoryView: React.FC<ApprovalHistoryViewProps> = ({
             { id: 'SUBMIT', label: 'Diajukan' },
             { id: 'PAYMENT', label: 'Dibayarkan' },
           ] as const
-        ).map((f) => {
-          const active = actionFilter === f.id;
-          return (
-            <button
-              key={f.id}
-              type="button"
-              onClick={() => setActionFilter(f.id)}
-              className="control-height-md"
-              style={{
-                height: '36px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                padding: '0 14px',
-                fontSize: '12px',
-                fontWeight: 700,
-                borderRadius: '30px',
-                cursor: 'pointer',
-                border: `1px solid ${active ? '#E51937' : 'var(--border-subtle)'}`,
-                background: active ? '#E51937' : '#F8FAFD',
-                color: active ? '#FFFFFF' : 'var(--text-secondary, #374151)',
-                boxSizing: 'border-box',
-              }}
-            >
+        ).map((f) => (
+            <FilterChip key={f.id} active={actionFilter === f.id} onClick={() => setActionFilter(f.id)}>
               {f.label}
-            </button>
-          );
-        })}
+            </FilterChip>
+        ))}
       </div>
 
       <div className="table-wrap">
@@ -696,6 +675,7 @@ export const ApprovalHistoryView: React.FC<ApprovalHistoryViewProps> = ({
             </tr>
           </thead>
           <tbody>
+            {filteredRows.length === 0 && <tr><td colSpan={7}>Tidak ada riwayat yang sesuai dengan pencarian atau filter. {(search || actionFilter !== 'ALL') && <button type="button" className="secondary" onClick={() => { setSearch(''); setActionFilter('ALL'); }}>Atur ulang filter</button>}</td></tr>}
             {filteredRows.map((row) => {
               return (
                 <tr key={row.id}>
@@ -912,33 +892,11 @@ export const ApprovalDocsView: React.FC<ApprovalDocsViewProps> = ({
             { id: 'PAYMENT_PROOF', label: 'Bukti Transfer' },
             { id: 'REFUND_PROOF', label: 'Bukti Pengembalian' },
           ] as const
-        ).map((c) => {
-          const active = categoryFilter === c.id;
-          return (
-            <button
-              key={c.id}
-              type="button"
-              onClick={() => setCategoryFilter(c.id)}
-              className="control-height-md"
-              style={{
-                height: '36px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                padding: '0 14px',
-                fontSize: '12px',
-                fontWeight: 700,
-                borderRadius: '30px',
-                cursor: 'pointer',
-                border: `1px solid ${active ? '#E51937' : 'var(--border-subtle)'}`,
-                background: active ? '#E51937' : '#F8FAFD',
-                color: active ? '#FFFFFF' : 'var(--text-secondary, #374151)',
-                boxSizing: 'border-box',
-              }}
-            >
+        ).map((c) => (
+            <FilterChip key={c.id} active={categoryFilter === c.id} onClick={() => setCategoryFilter(c.id)}>
               {c.label}
-            </button>
-          );
-        })}
+            </FilterChip>
+        ))}
       </div>
 
       <div className="table-wrap">
@@ -946,6 +904,7 @@ export const ApprovalDocsView: React.FC<ApprovalDocsViewProps> = ({
           <thead>
             <tr>
               <th>Nama Berkas</th>
+              <th>Metadata Berkas</th>
               <th>Kategori</th>
               <th>Dokumen Induk</th>
               <th>Cabang</th>
@@ -955,6 +914,7 @@ export const ApprovalDocsView: React.FC<ApprovalDocsViewProps> = ({
             </tr>
           </thead>
           <tbody>
+            {filteredItems.length === 0 && <tr><td colSpan={8}>Tidak ada berkas yang sesuai dengan pencarian atau filter. {(search || categoryFilter !== 'ALL') && <button type="button" className="secondary" onClick={() => { setSearch(''); setCategoryFilter('ALL'); }}>Atur ulang filter</button>}</td></tr>}
             {filteredItems.map((item) => {
               const doc = item.parentDoc;
               const catLabel = CATEGORY_LABELS[item.category] || item.category;
@@ -979,11 +939,11 @@ export const ApprovalDocsView: React.FC<ApprovalDocsViewProps> = ({
                       </div>
                       <div>
                         <strong style={{ fontSize: '13px', color: '#111C2D' }}>{item.fileName}</strong>
-                        <div style={{ fontSize: '11px', color: 'var(--text-muted, #4B5563)', fontFamily: 'var(--font-mono)' }}>
-                          {Math.round(item.sizeBytes / 1024)} KB • {formatDateShort(item.uploadedAt)}
-                        </div>
                       </div>
                     </div>
+                  </td>
+                  <td data-label="Metadata Berkas" className="tabular-nums">
+                    {Math.round(item.sizeBytes / 1024)} KB · {formatDateShort(item.uploadedAt)}
                   </td>
                   <td data-label="Kategori">
                     <span

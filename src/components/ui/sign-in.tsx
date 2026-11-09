@@ -6,6 +6,7 @@ export interface SignInPageProps {
   description?: React.ReactNode;
   heroImageSrc?: string;
   errorMessage?: string;
+  isLoading?: boolean;
   quickAccounts?: Array<{
     label: string;
     email: string;
@@ -22,6 +23,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({
   description = 'Sistem Otorisasi Pengadaan & Verifikasi Keuangan Lintas Cabang',
   heroImageSrc = '/logo.png',
   errorMessage,
+  isLoading = false,
   quickAccounts = [],
   onQuickSelect,
   onSignIn,
@@ -187,9 +189,11 @@ export const SignInPage: React.FC<SignInPageProps> = ({
 
           <button
             type="submit"
+            disabled={isLoading}
+            aria-busy={isLoading}
             className="w-full rounded-xl bg-[#E51937] py-3.5 font-bold text-white text-sm hover:bg-[#B81428] transition-colors shadow-sm cursor-pointer mt-4"
           >
-            Masuk ke Ruang Kerja <span aria-hidden="true">&rarr;</span>
+            {isLoading ? 'Sedang masuk...' : <>Masuk ke Ruang Kerja <span aria-hidden="true">&rarr;</span></>}
           </button>
         </form>
 

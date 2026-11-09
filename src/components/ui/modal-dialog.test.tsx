@@ -27,4 +27,14 @@ describe('ModalDialog accessible container', () => {
     );
     expect(html).toBe('');
   });
+
+  it('disables form controls and announces saving while busy', () => {
+    const html = renderToStaticMarkup(
+      <ModalDialog isOpen onClose={vi.fn()} title="Formulir" busy>
+        <button type="submit">Simpan</button>
+      </ModalDialog>
+    );
+    expect(html).toContain('Menyimpan dokumen...');
+    expect(html).toContain('<fieldset disabled="" aria-busy="true"');
+  });
 });

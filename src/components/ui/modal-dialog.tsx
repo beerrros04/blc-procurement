@@ -8,6 +8,7 @@ export interface ModalDialogProps {
   ariaLabel?: string;
   maxWidth?: string;
   errorMessage?: string;
+  busy?: boolean;
   children: React.ReactNode;
 }
 
@@ -18,6 +19,7 @@ export const ModalDialog: React.FC<ModalDialogProps> = ({
   ariaLabel,
   maxWidth = 'min(640px, 100%)',
   errorMessage,
+  busy = false,
   children,
 }) => {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
@@ -39,7 +41,7 @@ export const ModalDialog: React.FC<ModalDialogProps> = ({
     }
 
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') {
+      if (event.key === 'Escape' && !busy) {
         event.preventDefault();
         onClose();
         return;
@@ -79,7 +81,7 @@ export const ModalDialog: React.FC<ModalDialogProps> = ({
       }
       previouslyFocusedElement.current?.focus();
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, busy]);
 
   if (!isOpen) return null;
 
@@ -91,13 +93,13 @@ export const ModalDialog: React.FC<ModalDialogProps> = ({
       aria-modal="true"
       aria-label={ariaLabel || title}
       onClick={(e) => {
-        if (e.target === e.currentTarget) {
+        if (!busy && e.target === e.currentTarget) {
           onClose();
         }
       }}
       onCancel={(e) => {
         e.preventDefault();
-        onClose();
+        if (!busy) onClose();
       }}
     >
       <section className="drawer" style={{ width: maxWidth }}>
@@ -109,6 +111,7 @@ export const ModalDialog: React.FC<ModalDialogProps> = ({
             className="close"
             aria-label="Tutup formulir"
             type="button"
+            disabled={busy}
             onClick={onClose}
           >
             <X size={18} />
@@ -119,7 +122,10 @@ export const ModalDialog: React.FC<ModalDialogProps> = ({
             {errorMessage}
           </div>
         )}
-        {children}
+        {busy && <div className="notice" role="status">Menyimpan dokumen...</div>}
+        <fieldset disabled={busy} aria-busy={busy} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
+          {children}
+        </fieldset>
       </section>
     </dialog>
   );

@@ -7,6 +7,7 @@ import {
   Clock,
   FileEdit,
   RotateCcw,
+  MinusCircle,
   LucideIcon,
 } from 'lucide-react';
 import type { DocumentStatus as DomainDocumentStatus } from '../../types/document';
@@ -41,12 +42,17 @@ export function getStatusConfig(status: StatusBadgeValue): StatusConfig {
 
     case 'paid':
     case 'lunas':
-    case 'dibayarkan':
       return {
         key: 'paid',
         label: 'Lunas',
         icon: CreditCard,
       };
+
+    case 'dibayarkan':
+      return { key: 'disbursed', label: 'Dibayarkan', icon: CreditCard };
+
+    case 'inactive':
+      return { key: 'inactive', label: 'Nonaktif', icon: MinusCircle };
 
     case 'rejected':
     case 'ditolak':
@@ -85,7 +91,7 @@ export function getStatusConfig(status: StatusBadgeValue): StatusConfig {
     case 'waiting':
     case 'pending':
       return {
-        key: 'submitted',
+        key: 'waiting',
         label: 'Menunggu',
         icon: Clock,
       };

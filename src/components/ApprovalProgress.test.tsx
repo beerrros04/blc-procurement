@@ -92,6 +92,15 @@ describe('ApprovalProgress', () => {
     expect(html).toContain('title="Ayu Martina: Belum dimulai"');
     expect(html).toContain('role="img"');
     expect(html).toContain('approval-progress-dot');
+    expect(html).toContain('Belum dimulai');
+  });
+
+  it('shows the active stage in compact mode without hover', () => {
+    const doc = structuredClone(INITIAL_SEED_DOCUMENTS[0]);
+    doc.approvalSteps.atasan.status = 'APPROVED';
+    doc.approvalSteps.ayu.status = 'PENDING';
+    const html = renderToStaticMarkup(<ApprovalProgress document={doc} compact />);
+    expect(html).toContain('Tahap 2/3 · Ayu Martina: Menunggu');
   });
 
   it('renders fallback Belum ditentukan when approver email and name are unassigned', () => {

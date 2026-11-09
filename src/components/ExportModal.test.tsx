@@ -18,5 +18,7 @@ describe('ExportModal Component', () => {
     expect(html).toContain('Batal');
     expect(html).toContain('Export File');
     expect(html).toContain('Cakupan Ekspor');
+    expect(html).toContain('aria-modal="true"');
+    expect(html).toContain('aria-label="Export Laporan"');
   });
 });

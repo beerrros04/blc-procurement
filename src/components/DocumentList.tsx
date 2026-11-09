@@ -22,6 +22,7 @@ import type { AnyDocument, DocType, PVDocument, UserRole } from '../types/docume
 import { paymentLabel } from '../domain/payment-label';
 import { ApprovalProgress } from './ApprovalProgress';
 import { StatusBadge } from './ui/StatusBadge';
+import { FilterChip } from './ui/FilterChip';
 import './document-lists.css';
 
 export interface DocumentListProps {
@@ -339,58 +340,19 @@ export const DocumentList: React.FC<DocumentListProps> = ({
           <Filter size={13} />
           Cabang:
         </span>
-        {branches.map((b) => {
-          const isSelected = selectedBranch === b;
-          return (
-            <button
-              key={b}
-              type="button"
-              onClick={() => setSelectedBranch(b)}
-              className="control-height-md"
-              style={{
-                height: '36px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                padding: '0 14px',
-                fontSize: '12px',
-                fontWeight: 700,
-                borderRadius: '30px',
-                cursor: 'pointer',
-                border: `1px solid ${isSelected ? '#E51937' : 'var(--border-subtle)'}`,
-                background: isSelected ? '#E51937' : '#F8FAFD',
-                color: isSelected ? '#FFFFFF' : '#5A6A85',
-                boxShadow: isSelected ? '0 3px 10px rgba(229, 25, 55, 0.2)' : 'none',
-                boxSizing: 'border-box',
-              }}
-            >
+        {branches.map((b) => (
+            <FilterChip key={b} active={selectedBranch === b} onClick={() => setSelectedBranch(b)}>
               {b === 'ALL' ? 'Semua Cabang' : b}
-            </button>
-          );
-        })}
+            </FilterChip>
+        ))}
 
-        <button
-          type="button"
-          aria-pressed={onlyMyActions}
+        <FilterChip
+          active={onlyMyActions}
           onClick={() => setOnlyMyActions((v) => !v)}
-          className="control-height-md"
-          style={{
-            marginLeft: 'auto',
-            height: '36px',
-            display: 'inline-flex',
-            alignItems: 'center',
-            padding: '0 14px',
-            fontSize: '12px',
-            fontWeight: 700,
-            borderRadius: '30px',
-            cursor: 'pointer',
-            border: `1px solid ${onlyMyActions ? '#E51937' : 'var(--border-subtle)'}`,
-            background: onlyMyActions ? '#E51937' : '#FFF5F7',
-            color: onlyMyActions ? '#FFFFFF' : '#E51937',
-            boxSizing: 'border-box',
-          }}
+          style={{ marginLeft: 'auto' }}
         >
           Menunggu Tindakan Saya
-        </button>
+        </FilterChip>
       </div>}
 
       {filtered.length === 0 ? (
@@ -418,6 +380,11 @@ export const DocumentList: React.FC<DocumentListProps> = ({
               ? 'Coba sesuaikan kata kunci pencarian atau pilih cabang lain.'
               : activeRole === 'PEMOHON' ? 'Gunakan tombol pembuatan dokumen di atas untuk membuat pengajuan baru.' : 'Tidak ada dokumen untuk ditampilkan.'}
           </p>
+          {(search || selectedBranch !== 'ALL' || onlyMyActions || ownType !== 'ALL' || ownStatus !== 'ALL' || activeTab !== 'ALL') && (
+            <button type="button" className="secondary" onClick={() => { setSearch(''); setSelectedBranch('ALL'); setOnlyMyActions(false); setOwnType('ALL'); setOwnStatus('ALL'); onSelectTab?.('ALL'); }}>
+              Atur ulang filter
+            </button>
+          )}
         </div>
       ) : (
         <div className="table-wrap">

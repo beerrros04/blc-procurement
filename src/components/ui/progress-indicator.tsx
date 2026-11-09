@@ -58,7 +58,12 @@ const ProgressIndicator = ({ steps, compact, variant, paymentStatus }: ProgressI
     }
 
     if (steps) {
+        const currentIndex = steps.findIndex((stage) => stage.status === 'REJECTED' || stage.status === 'PENDING')
+        const summary = currentIndex >= 0
+            ? `Tahap ${currentIndex + 1}/${steps.length} · ${steps[currentIndex].name}: ${progressStatusLabels[steps[currentIndex].status]}`
+            : steps.every((stage) => stage.status === 'APPROVED') ? 'Persetujuan selesai' : 'Belum dimulai'
         return (
+            <div className="approval-progress-wrapper">
             <div className={cn("approval-capsule", compact && "approval-capsule--compact", variant && `approval-capsule--${variant}`)}>
                 <ol
                     className={cn(
@@ -126,6 +131,8 @@ const ProgressIndicator = ({ steps, compact, variant, paymentStatus }: ProgressI
                         </div>
                     </>
                 )}
+            </div>
+            {compact && <small className="approval-progress-summary">{summary}</small>}
             </div>
         )
     }

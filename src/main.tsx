@@ -1,6 +1,6 @@
-import { StrictMode, useEffect, useState } from 'react';
+import { StrictMode, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, MotionConfig } from 'framer-motion';
 import {
   Banknote,
   BookOpen,
@@ -596,14 +596,20 @@ export function App() {
     return null;
   });
   const [loginError, setLoginError] = useState<string>('');
+  const [loginLoading, setLoginLoading] = useState(false);
+  const loginInFlight = useRef(false);
 
   const [documents, setDocuments] = useState<AnyDocument[]>([]);
+  const [documentsLoading, setDocumentsLoading] = useState(() => hasApiToken());
+  const [documentsError, setDocumentsError] = useState('');
 
   const [activeTab, setActiveTab] = useState<WorkspaceTab>(() => {
     return authUser ? getInitialWorkspaceTab(authUser.role) : 'PENGAJUAN';
   });
   const [notice, setNotice] = useState<string>('');
   const [formError, setFormError] = useState('');
+  const [savingDocument, setSavingDocument] = useState(false);
+  const saveInFlight = useRef(false);
 
   // Modals state
   const [activeFormType, setActiveFormType] = useState<DocType | null>(null);
@@ -617,8 +623,10 @@ export function App() {
 
   async function refreshDocs() {
     if (!hasApiToken()) return;
-    try { const result = await api<{ documents: AnyDocument[] }>('/documents'); setDocuments(result.documents); }
-    catch (error) { setNotice(error instanceof Error ? error.message : 'Gagal memuat data server.'); }
+    setDocumentsLoading(true);
+    try { const result = await api<{ documents: AnyDocument[] }>('/documents'); setDocuments(result.documents); setDocumentsError(''); }
+    catch (error) { setDocumentsError(error instanceof Error ? error.message : 'Gagal memuat data server.'); }
+    finally { setDocumentsLoading(false); }
   }
 
   useEffect(() => {
@@ -635,11 +643,16 @@ export function App() {
   }, []);
 
   async function completeLogin(account: AuthAccount, password: string) {
+    if (loginInFlight.current) return;
+    loginInFlight.current = true;
+    setLoginLoading(true);
     try {
       const result = await api<{ token: string; user: { id: string } }>('/auth/login', 'POST', { email: account.email, password });
       setApiToken(result.token);
       account = { ...account, id: result.user.id };
     } catch (error) { setLoginError(error instanceof Error ? error.message : 'Server tidak tersedia.'); return; }
+    finally { loginInFlight.current = false; setLoginLoading(false); }
+    setDocumentsLoading(true);
     setAuthUser(account);
     localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(account));
     setLoginError('');
@@ -678,6 +691,8 @@ export function App() {
     localStorage.removeItem(AUTH_SESSION_KEY);
     clearApiToken();
     setDocuments([]);
+    setDocumentsLoading(false);
+    setDocumentsError('');
     setNotice('');
   }
 
@@ -688,6 +703,7 @@ export function App() {
         description="Masuk menggunakan akun korporat Anda untuk pengajuan permohonan atau otorisasi berjenjang."
         heroImageSrc="/logo.png"
         errorMessage={loginError}
+        isLoading={loginLoading}
         quickAccounts={CORPORATE_ACCOUNTS.map((a) => ({
           label: a.role === 'ADMIN' ? a.name : displayPersonName(a.name),
           email: a.email,
@@ -756,6 +772,9 @@ export function App() {
   }
 
   async function handleSaveDoc(doc: AnyDocument, andSubmit = false) {
+    if (saveInFlight.current) return;
+    saveInFlight.current = true;
+    setSavingDocument(true);
     setFormError('');
     try {
       const exists = documents.some((item) => item.id === doc.id);
@@ -783,6 +802,7 @@ export function App() {
       setActiveFormType(null);
       setEditingDoc(null);
     } catch (error) { setFormError(error instanceof Error ? error.message : 'Gagal menyimpan draf.'); }
+    finally { saveInFlight.current = false; setSavingDocument(false); }
   }
 
   async function handleSubmitDoc(docId: string, version?: number, docType?: string) {
@@ -944,6 +964,9 @@ export function App() {
             onSwitchAccount={handleSwitchAccount}
           />
 
+          {documentsLoading && <div className="notice" role="status">Memuat dokumen...</div>}
+          {documentsError && <div className="notice error-notice" role="alert">{documentsError} <button type="button" className="secondary" onClick={() => void refreshDocs()}>Coba lagi</button></div>}
+
           {notice && (
             <div
               className="notice"
@@ -970,6 +993,7 @@ export function App() {
             </div>
           )}
 
+          {(!(documentsLoading || documentsError) || documents.length > 0) && <>
           {/* VIEW 0: EXECUTIVE DASHBOARD COCKPIT (Admin, GM, BoD) */}
           {activeTab === 'DASHBOARD' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -1132,6 +1156,7 @@ export function App() {
               />
             </>
           )}
+          </>}
         </div>
       </main>
 
@@ -1141,6 +1166,7 @@ export function App() {
           isOpen={true}
           title="Formulir Draf PR"
           errorMessage={formError}
+          busy={savingDocument}
           onClose={() => {
             setActiveFormType(null);
             setEditingDoc(null);
@@ -1163,6 +1189,7 @@ export function App() {
           title="Formulir Draf PO"
           maxWidth="min(680px, 100%)"
           errorMessage={formError}
+          busy={savingDocument}
           onClose={() => {
             setActiveFormType(null);
             setEditingDoc(null);
@@ -1185,6 +1212,7 @@ export function App() {
           isOpen={true}
           title="Formulir Draf AV"
           errorMessage={formError}
+          busy={savingDocument}
           onClose={() => {
             setActiveFormType(null);
             setEditingDoc(null);
@@ -1207,6 +1235,7 @@ export function App() {
           isOpen={true}
           title="Formulir Draf RB"
           errorMessage={formError}
+          busy={savingDocument}
           onClose={() => {
             setActiveFormType(null);
             setEditingDoc(null);
@@ -1229,6 +1258,7 @@ export function App() {
           title="Formulir Draf RC"
           maxWidth="min(640px, 100%)"
           errorMessage={formError}
+          busy={savingDocument}
           onClose={() => {
             setActiveFormType(null);
             setEditingDoc(null);
@@ -1252,6 +1282,7 @@ export function App() {
           title="Formulir Laporan Penerimaan (GR)"
           maxWidth="min(640px, 100%)"
           errorMessage={formError}
+          busy={savingDocument}
           onClose={() => {
             setActiveFormType(null);
             setEditingDoc(null);
@@ -1351,7 +1382,7 @@ const rootEl = typeof document !== 'undefined' ? document.getElementById('root')
 if (rootEl) {
   createRoot(rootEl).render(
     <StrictMode>
-      <App />
+      <MotionConfig reducedMotion="user"><App /></MotionConfig>
     </StrictMode>
   );
 }

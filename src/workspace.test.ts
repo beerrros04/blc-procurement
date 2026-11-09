@@ -442,4 +442,12 @@ describe('Task 5: End-to-End Role Integration, Tagged Approver Selection, and Di
     expect(signInHtml).toContain('Keuangan: Verifikasi, penerbitan PV, dan pembayaran');
     expect(signInHtml).toContain('Administrator: Akses penuh seluruh modul dan sistem');
   });
+
+  it('indicates and disables sign-in while a request is pending', async () => {
+    const { SignInPage } = await import('./components/ui/sign-in');
+    const html = renderToStaticMarkup(createElement(SignInPage, { isLoading: true }));
+    expect(html).toContain('aria-busy="true"');
+    expect(html).toContain('disabled=""');
+    expect(html).toContain('Sedang masuk...');
+  });
 });

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Download, FileSpreadsheet, FileText, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { modalMotionVariants } from '../lib/motion';
@@ -81,6 +81,26 @@ function extractFinanceExportFields(d: AnyDocument) {
 
 export const ExportModal: React.FC<ExportModalProps> = ({ documents, onClose }) => {
   const [format, setFormat] = useState<'CSV' | 'PDF'>('CSV');
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
+
+  useEffect(() => {
+    const previous = document.activeElement as HTMLElement | null;
+    const dialog = dialogRef.current;
+    const controls = () => Array.from(dialog?.querySelectorAll<HTMLElement>('button:not(:disabled), input:not(:disabled)') ?? []);
+    controls()[0]?.focus();
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') { event.preventDefault(); closeRef.current(); return; }
+      if (event.key !== 'Tab') return;
+      const items = controls();
+      if (!items.length) { event.preventDefault(); return; }
+      if (event.shiftKey && document.activeElement === items[0]) { event.preventDefault(); items[items.length - 1].focus(); }
+      else if (!event.shiftKey && document.activeElement === items[items.length - 1]) { event.preventDefault(); items[0].focus(); }
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => { window.removeEventListener('keydown', handleKeyDown); previous?.focus(); };
+  }, []);
 
   const totalEstimatedValue = documents.reduce((acc, d) => {
     const fin = extractFinanceExportFields(d);
@@ -141,8 +161,11 @@ export const ExportModal: React.FC<ExportModalProps> = ({ documents, onClose }) 
 
   return (
     <dialog
+      ref={dialogRef}
       className="modal"
       open
+      aria-modal="true"
+      aria-label="Export Laporan"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -327,7 +350,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ documents, onClose }) 
             )}
           </div>
           <div style={{ fontSize: '12px', color: '#5A6A85' }}>
-            {documents.length} dokumen • Filter: Semua Status • Estimasi: ~240 KB
+            Filter: Semua Status
           </div>
         </div>
 
