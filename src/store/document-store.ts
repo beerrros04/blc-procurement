@@ -3,6 +3,7 @@ import type {
   ApprovalStage,
   AVDocument,
   DocType,
+  GRDocument,
   PODocument,
   PRDocument,
   PVDocument,
@@ -134,6 +135,15 @@ export function createEmptyDocument(type: DocType, branch: string = 'Bekasi'): A
         activityCompletedDate: '',
         submissionDeadline: '',
       } as RCDocument;
+    case 'GR':
+      return {
+        ...base,
+        docType: 'GR',
+        parentPoId: '',
+        receiptType: 'GOODS',
+        receivedDate: new Date().toISOString().slice(0, 10),
+        itemCondition: 'BAIK',
+      } as GRDocument;
     case 'PV':
       return {
         ...base,

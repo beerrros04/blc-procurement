@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import type { AVDocument, PODocument } from '../../types/document';
 import { calculatePoTotal } from '../../domain/calculations';
+import { OFFICIAL_BRANCHES } from '../../domain/branches';
+import { formatCurrencyInput, parseCurrencyInput } from '../../lib/currency-format';
 import { TaxFields } from './TaxFields';
 import { readAttachment } from '../../lib/read-attachment';
 
@@ -13,16 +15,20 @@ export interface FormAVProps {
 
 export const FormAV: React.FC<FormAVProps> = ({ initialDoc, availablePos, onSave, onClose }) => {
   const [doc, setDoc] = useState<AVDocument>(initialDoc);
-  const [amountStr, setAmountStr] = useState<string>(String(initialDoc.subtotal ?? (initialDoc.amount || '')));
+  const [amountStr, setAmountStr] = useState<string>(formatCurrencyInput(initialDoc.subtotal ?? initialDoc.amount));
   const [error, setError] = useState<string>('');
 
-  const amount = Number(amountStr) || 0;
+  const amount = parseCurrencyInput(amountStr);
   const calc = calculatePoTotal({ subtotal: amount, otherCosts: doc.otherCosts, discount: doc.discount, ppnRate: doc.ppnRate ?? 0, pphRate: doc.pphRate ?? 0 });
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!doc.title.trim()) {
       setError('Judul pengajuan uang muka (AV) wajib diisi.');
+      return;
+    }
+    if (!doc.branch.trim()) {
+      setError('Cabang wajib dipilih.');
       return;
     }
     if (!doc.activityDate) {
@@ -39,6 +45,15 @@ export const FormAV: React.FC<FormAVProps> = ({ initialDoc, availablePos, onSave
     }
     if (amount <= 0) {
       setError('Nominal uang muka harus lebih besar dari Rp 0.');
+      return;
+    }
+    if (calc.totalAmount > 50_000_000) {
+      setError('Nilai total uang muka melebihi batas sistem Rp 50.000.000.');
+      return;
+    }
+    const parentPo = doc.parentPoId ? availablePos.find((item) => item.id === doc.parentPoId) : undefined;
+    if (parentPo && calc.totalAmount > parentPo.totalAmount) {
+      setError(`Nominal uang muka (Rp ${calc.totalAmount.toLocaleString('id-ID')}) tidak boleh melebihi total PO terkait (Rp ${parentPo.totalAmount.toLocaleString('id-ID')}).`);
       return;
     }
     if (doc.disbursementMethod === 'TRANSFER') {
@@ -64,10 +79,18 @@ export const FormAV: React.FC<FormAVProps> = ({ initialDoc, availablePos, onSave
         <label htmlFor="av-parent-po">PO terkait (jika ada)</label>
         <select id="av-parent-po" value={doc.parentPoId ?? ''} onChange={(e) => {
           const po = availablePos.find((item) => item.id === e.target.value);
-          setDoc({ ...doc, parentPoId: po?.id, branch: po?.branch ?? doc.branch, purpose: doc.purpose || po?.purpose || '', budgetType: doc.budgetType || po?.budgetType, vendorName: doc.vendorName || po?.vendorName });
+          setDoc({
+            ...doc,
+            parentPoId: po?.id,
+            branch: po?.branch ?? doc.branch,
+            purpose: doc.purpose || po?.purpose || '',
+            budgetType: doc.budgetType || po?.budgetType,
+            vendorName: doc.vendorName || po?.vendorName,
+            stage1ApproverEmail: doc.stage1ApproverEmail || po?.stage1ApproverEmail,
+          });
         }}>
           <option value="">Tanpa PO</option>
-          {availablePos.map((po) => <option key={po.id} value={po.id}>{po.docNumber} — {po.title}</option>)}
+          {availablePos.map((po) => <option key={po.id} value={po.id}>{po.docNumber} : {po.title} (Rp {po.totalAmount.toLocaleString('id-ID')})</option>)}
         </select>
 
         <label htmlFor="av-title">Judul Pengajuan Uang Muka <span>*</span></label>
@@ -81,13 +104,21 @@ export const FormAV: React.FC<FormAVProps> = ({ initialDoc, availablePos, onSave
         <div className="form-grid-2">
           <div>
             <label htmlFor="av-branch">Cabang <span>*</span></label>
-            <input
+            <select
               id="av-branch"
-              list="branch-options"
               value={doc.branch}
               onChange={(e) => setDoc({ ...doc, branch: e.target.value })}
-              placeholder="Contoh: Semarang"
-            />
+            >
+              <option value="">-- Pilih Cabang --</option>
+              {OFFICIAL_BRANCHES.map((b) => (
+                <option key={b} value={b}>
+                  {b}{b === 'Bekasi' ? ' (Pusat)' : ''}
+                </option>
+              ))}
+              {doc.branch && !OFFICIAL_BRANCHES.includes(doc.branch as any) && (
+                <option value={doc.branch}>{doc.branch}</option>
+              )}
+            </select>
           </div>
           <div>
             <label htmlFor="av-disbursement">Metode Pencairan <span>*</span></label>
@@ -138,14 +169,32 @@ export const FormAV: React.FC<FormAVProps> = ({ initialDoc, availablePos, onSave
             id="av-amount"
             inputMode="numeric"
             value={amountStr}
-            onChange={(e) => setAmountStr(e.target.value)}
+            onChange={(e) => setAmountStr(formatCurrencyInput(e.target.value))}
             placeholder="0"
           />
         </div>
 
         <div className="form-grid-2">
-          <div><label htmlFor="av-other">Biaya lain</label><input id="av-other" type="number" min="0" value={doc.otherCosts ?? 0} onChange={(e) => setDoc({ ...doc, otherCosts: Number(e.target.value) })} /></div>
-          <div><label htmlFor="av-discount">Diskon</label><input id="av-discount" type="number" min="0" value={doc.discount ?? 0} onChange={(e) => setDoc({ ...doc, discount: Number(e.target.value) })} /></div>
+          <div>
+            <label htmlFor="av-other">Biaya lain</label>
+            <input
+              id="av-other"
+              inputMode="numeric"
+              value={formatCurrencyInput(doc.otherCosts ?? 0)}
+              onChange={(e) => setDoc({ ...doc, otherCosts: parseCurrencyInput(e.target.value) })}
+              placeholder="0"
+            />
+          </div>
+          <div>
+            <label htmlFor="av-discount">Diskon</label>
+            <input
+              id="av-discount"
+              inputMode="numeric"
+              value={formatCurrencyInput(doc.discount ?? 0)}
+              onChange={(e) => setDoc({ ...doc, discount: parseCurrencyInput(e.target.value) })}
+              placeholder="0"
+            />
+          </div>
         </div>
         <TaxFields prefix="av" values={doc} onChange={(values) => setDoc({ ...doc, ...values })} />
         <p className="help">PPN Rp {calc.ppnAmount.toLocaleString('id-ID')} · PPh Rp {calc.pphAmount.toLocaleString('id-ID')} · Perkiraan total Rp {calc.totalAmount.toLocaleString('id-ID')}</p>

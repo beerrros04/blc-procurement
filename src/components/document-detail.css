@@ -1,0 +1,66 @@
+.detail-overlay .s-drawer {
+  min-width: 0;
+}
+
+.detail-overlay .form-body {
+  min-width: 0;
+  min-height: 0;
+  overflow-x: auto;
+}
+
+.detail-overlay .stepper-section {
+  padding: 18px;
+}
+
+.detail-overlay .stepper-header {
+  align-items: flex-start;
+}
+
+.detail-overlay .step-title-row,
+.detail-overlay .bod-reviewer-head {
+  flex-wrap: wrap;
+  gap: 6px 12px;
+}
+
+.detail-overlay .step-content,
+.detail-overlay .bod-reviewer,
+.detail-overlay .form-summary-row > *,
+.detail-overlay .audit-item > * {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.detail-overlay .bod-parallel-box {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.detail-overlay .form-summary-row {
+  gap: 12px;
+}
+
+.detail-overlay .form-summary-row button {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.detail-overlay .decision-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+  justify-content: flex-end;
+}
+
+@media (max-width: 600px) {
+  .detail-overlay .stepper-section { padding: 14px; }
+  .detail-overlay .step-node { padding: 12px; }
+  .detail-overlay .form-summary-row { flex-wrap: wrap; }
+  .detail-overlay .form-summary-row > * { flex: 1 1 100%; }
+  .detail-overlay .decision-actions > button { flex: 1 1 100%; min-height: 44px; }
+}
+
+@media (max-height: 400px) {
+  .detail-overlay .s-drawer { display: block; overflow-y: auto; }
+  .detail-overlay .form-body { overflow: visible; }
+}

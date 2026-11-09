@@ -8,7 +8,7 @@ import {
   Scale,
   ShoppingBag,
 } from 'lucide-react';
-import type { AnyDocument, DocType, PVDocument } from '../types/document';
+import type { AnyDocument, DocType, PVDocument, UserRole } from '../types/document';
 import { DocumentList } from './DocumentList';
 
 export interface StaffBerandaProps {
@@ -16,6 +16,7 @@ export interface StaffBerandaProps {
   userId: string;
   userEmail: string;
   userBranch: string;
+  activeRole: UserRole;
   documents: AnyDocument[];
   onCreateDoc: (type: DocType) => void;
   onOpenDetail: (doc: AnyDocument) => void;
@@ -32,7 +33,9 @@ export interface StaffBerandaProps {
 export const StaffBeranda: React.FC<StaffBerandaProps> = ({
   userName,
   userId,
+  userEmail,
   userBranch,
+  activeRole,
   documents,
   onCreateDoc,
   onOpenDetail,
@@ -71,47 +74,55 @@ export const StaffBeranda: React.FC<StaffBerandaProps> = ({
       code: 'PO',
       title: 'Purchase Order',
       icon: ShoppingBag,
-      accent: '#0085DB',
-      bg: '#E5F3FB',
+      accent: '#1E293B',
+      bg: '#F1F5F9',
+    },
+    {
+      id: 'GR',
+      code: 'GR',
+      title: 'Laporan Penerimaan',
+      icon: FileText,
+      accent: '#065F46',
+      bg: '#ECFDF5',
     },
     {
       id: 'AV',
       code: 'AV',
       title: 'Cash Advance',
       icon: Banknote,
-      accent: '#FFAE1F',
-      bg: '#FEF5E5',
+      accent: '#1E293B',
+      bg: '#F1F5F9',
     },
     {
       id: 'RB',
       code: 'RB',
       title: 'Reimbursement',
       icon: Receipt,
-      accent: '#8763DA',
-      bg: '#F2ECF9',
+      accent: '#1E293B',
+      bg: '#F1F5F9',
     },
     {
       id: 'RC',
       code: 'RC',
       title: 'Realisasi Uang Muka',
       icon: Scale,
-      accent: '#00CEB6',
-      bg: '#E6FFFA',
+      accent: '#1E293B',
+      bg: '#F1F5F9',
     },
     {
       id: 'REGISTER',
       code: 'REG',
       title: 'Approval Register',
       icon: BookOpen,
-      accent: '#5A6A85',
-      bg: '#F0F5F9',
+      accent: '#4B5563',
+      bg: '#F3F4F6',
     },
   ];
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* =====================================================================
-          ROW 1: SPIKE PRO WELCOMING HERO FOR STAFF
+          ROW 1: OPERATIONAL WORKSPACE HERO FOR STAFF
          ===================================================================== */}
       <section
         aria-label="Beranda Caready"
@@ -124,11 +135,11 @@ export const StaffBeranda: React.FC<StaffBerandaProps> = ({
         {/* Welcome Card */}
         <div
           style={{
-            background: 'linear-gradient(135deg, #FFFFFF 0%, #FFF5F7 100%)',
+            background: '#FFFFFF',
             borderRadius: 'var(--card-radius)',
             padding: '24px',
             boxShadow: 'var(--shadow-card)',
-            border: '1px solid #FBCFE8',
+            border: '1px solid #E2E8F0',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
@@ -141,18 +152,19 @@ export const StaffBeranda: React.FC<StaffBerandaProps> = ({
               src="/logo.png"
               alt="Caready Logo"
               style={{
-                width: '54px',
-                height: '54px',
-                borderRadius: '14px',
+                width: '48px',
+                height: '48px',
+                borderRadius: '8px',
                 background: '#E51937',
                 padding: '6px',
                 objectFit: 'contain',
-                boxShadow: '0 4px 12px rgba(229, 25, 55, 0.25)',
               }}
             />
             <div>
-              <div className="eyebrow">BERANDA CAREADY · CABANG {userBranch.toUpperCase()}</div>
-              <h1 style={{ fontSize: '21px', fontWeight: 900, color: '#111C2D', margin: '4px 0 0 0' }}>
+              <div className="eyebrow" style={{ color: '#4B5563', fontSize: '11px', fontWeight: 700 }}>
+                BERANDA CAREADY · CABANG {userBranch.toUpperCase()}
+              </div>
+              <h1 style={{ fontSize: '20px', fontWeight: 800, color: '#111827', margin: '4px 0 0 0' }}>
                 Selamat Datang, {userName}
               </h1>
             </div>
@@ -160,35 +172,36 @@ export const StaffBeranda: React.FC<StaffBerandaProps> = ({
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
             <div>
-              <div style={{ fontSize: '20px', fontWeight: 900, color: '#E51937', fontFamily: 'var(--font-mono)' }}>
+              <div style={{ fontSize: '20px', fontWeight: 800, color: '#991B1B' }}>
                 {draftCount}
               </div>
-              <div style={{ fontSize: '11px', fontWeight: 700, color: '#5A6A85' }}>Draf / Revisi</div>
+              <div style={{ fontSize: '11px', fontWeight: 600, color: '#4B5563' }}>Draf / Revisi</div>
             </div>
-            <div style={{ width: '1px', height: '28px', background: '#EAEFF4' }} />
+            <div style={{ width: '1px', height: '28px', background: '#E2E8F0' }} />
             <div>
-              <div style={{ fontSize: '20px', fontWeight: 900, color: '#111C2D', fontFamily: 'var(--font-mono)' }}>
+              <div style={{ fontSize: '20px', fontWeight: 800, color: '#92400E' }}>
                 {inReviewCount}
               </div>
-              <div style={{ fontSize: '11px', fontWeight: 700, color: '#5A6A85' }}>Ditinjau</div>
+              <div style={{ fontSize: '11px', fontWeight: 600, color: '#4B5563' }}>Ditinjau</div>
             </div>
-            <div style={{ width: '1px', height: '28px', background: '#EAEFF4' }} />
+            <div style={{ width: '1px', height: '28px', background: '#E2E8F0' }} />
             <div>
-              <div style={{ fontSize: '20px', fontWeight: 900, color: '#008A7A', fontFamily: 'var(--font-mono)' }}>
+              <div style={{ fontSize: '20px', fontWeight: 800, color: '#065F46' }}>
                 {approvedCount}
               </div>
-              <div style={{ fontSize: '11px', fontWeight: 700, color: '#5A6A85' }}>Disetujui</div>
+              <div style={{ fontSize: '11px', fontWeight: 600, color: '#4B5563' }}>Disetujui / Lunas</div>
             </div>
           </div>
         </div>
 
         {/* Quick Create Action Card */}
-        <div
+        {activeRole === 'PEMOHON' && <div
           style={{
             background: '#FFFFFF',
             borderRadius: 'var(--card-radius)',
             padding: '24px',
             boxShadow: 'var(--shadow-card)',
+            border: '1px solid #E2E8F0',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
@@ -196,7 +209,7 @@ export const StaffBeranda: React.FC<StaffBerandaProps> = ({
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h3 style={{ fontSize: '15px', fontWeight: 900, color: '#111C2D', margin: 0 }}>
+            <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#111827', margin: 0 }}>
               Ajukan Permohonan Baru
             </h3>
           </div>
@@ -221,35 +234,36 @@ export const StaffBeranda: React.FC<StaffBerandaProps> = ({
                     display: 'flex',
                     alignItems: 'center',
                     gap: '10px',
-                    padding: '10px 12px',
-                    borderRadius: '14px',
-                    border: '1px solid var(--border-subtle)',
-                    background: '#F8FAFD',
+                    padding: '16px',
+                    borderRadius: 'var(--card-radius, 10px)',
+                    border: '1px solid var(--border-clean)',
+                    background: '#FFFFFF',
                     textAlign: 'left',
                     cursor: 'pointer',
                   }}
+                  aria-label={item.id === 'REGISTER' ? 'Buka Approval Register' : `Buat dokumen baru ${item.title}`}
                 >
                   <div
                     style={{
-                      width: '36px',
-                      height: '36px',
+                      width: '34px',
+                      height: '34px',
                       borderRadius: '10px',
                       background: item.bg,
                       color: item.accent,
                       display: 'grid',
                       placeItems: 'center',
                       flexShrink: 0,
+                      border: '1px solid #E2E8F0',
                     }}
                   >
-                    <Icon size={18} />
+                    <Icon size={16} />
                   </div>
                   <div style={{ minWidth: 0 }}>
                     <div
                       style={{
                         fontSize: '11px',
-                        fontWeight: 900,
+                        fontWeight: 800,
                         color: item.accent,
-                        fontFamily: 'var(--font-mono)',
                       }}
                     >
                       {item.id === 'REGISTER' ? 'REGISTER' : `+ Buat ${item.code}`}
@@ -257,8 +271,8 @@ export const StaffBeranda: React.FC<StaffBerandaProps> = ({
                     <div
                       style={{
                         fontSize: '12px',
-                        fontWeight: 800,
-                        color: '#111C2D',
+                        fontWeight: 700,
+                        color: '#111827',
                         lineHeight: 1.3,
                       }}
                     >
@@ -269,17 +283,20 @@ export const StaffBeranda: React.FC<StaffBerandaProps> = ({
               );
             })}
           </div>
-        </div>
+        </div>}
       </section>
 
       {/* =====================================================================
-          ROW 2: SPIKE PRO TRANSACTION TABLE (SAME DESIGN SYSTEM AS MAIN LIST)
+          ROW 2: OPERATIONAL TRANSACTION TABLE
          ===================================================================== */}
       <DocumentList
         documents={documents}
+        title="Daftar Pengajuan Saya"
+        ownerOnly
         activeTab="ALL"
-        activeRole="PEMOHON"
+        activeRole={activeRole}
         activeUserId={userId}
+        activeUserEmail={userEmail}
         onOpenDetail={onOpenDetail}
         onEditDoc={onEditDoc}
         onSubmitDoc={onSubmitDoc}

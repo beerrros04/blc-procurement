@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import type { RBDocument } from '../../types/document';
 import { readAttachment } from '../../lib/read-attachment';
 import { calculatePoTotal } from '../../domain/calculations';
+import { OFFICIAL_BRANCHES } from '../../domain/branches';
+import { formatCurrencyInput, parseCurrencyInput } from '../../lib/currency-format';
 import { TaxFields } from './TaxFields';
 
 export interface FormRBProps {
@@ -18,15 +20,15 @@ const rupiah = new Intl.NumberFormat('id-ID', {
 
 export const FormRB: React.FC<FormRBProps> = ({ initialDoc, onSave, onClose }) => {
   const [doc, setDoc] = useState<RBDocument>(initialDoc);
-  const [subtotalStr, setSubtotalStr] = useState<string>(String(initialDoc.subtotal || ''));
-  const [otherCostsStr, setOtherCostsStr] = useState<string>(String(initialDoc.otherCosts || '0'));
-  const [discountStr, setDiscountStr] = useState<string>(String(initialDoc.discount || '0'));
+  const [subtotalStr, setSubtotalStr] = useState<string>(formatCurrencyInput(initialDoc.subtotal));
+  const [otherCostsStr, setOtherCostsStr] = useState<string>(formatCurrencyInput(initialDoc.otherCosts || 0));
+  const [discountStr, setDiscountStr] = useState<string>(formatCurrencyInput(initialDoc.discount || 0));
   const [attachmentCount, setAttachmentCount] = useState<number>(initialDoc.attachmentCount || 1);
   const [error, setError] = useState<string>('');
 
-  const subtotal = Number(subtotalStr) || 0;
-  const otherCosts = Number(otherCostsStr) || 0;
-  const discount = Number(discountStr) || 0;
+  const subtotal = parseCurrencyInput(subtotalStr);
+  const otherCosts = parseCurrencyInput(otherCostsStr);
+  const discount = parseCurrencyInput(discountStr);
   const calc = calculatePoTotal({ subtotal, otherCosts, discount, ppnRate: doc.ppnRate ?? 0, pphRate: doc.pphRate ?? 0 });
   const total = calc.totalAmount;
 
@@ -36,12 +38,20 @@ export const FormRB: React.FC<FormRBProps> = ({ initialDoc, onSave, onClose }) =
       setError('Judul klaim penggantian biaya (RB) wajib diisi.');
       return;
     }
+    if (!doc.branch.trim()) {
+      setError('Cabang wajib dipilih.');
+      return;
+    }
     if (!doc.transactionDate) {
       setError('Tanggal transaksi kuitansi/struk wajib diisi.');
       return;
     }
     if (total <= 0) {
       setError('Nominal klaim reimbursement harus lebih besar dari Rp 0.');
+      return;
+    }
+    if (total > 50_000_000) {
+      setError('Nominal klaim reimbursement melebihi batas sistem Rp 50.000.000.');
       return;
     }
     if (attachmentCount < 1) {
@@ -97,13 +107,21 @@ export const FormRB: React.FC<FormRBProps> = ({ initialDoc, onSave, onClose }) =
         <div className="form-grid-3">
           <div>
             <label htmlFor="rb-branch">Cabang <span>*</span></label>
-            <input
+            <select
               id="rb-branch"
-              list="branch-options"
               value={doc.branch}
               onChange={(e) => setDoc({ ...doc, branch: e.target.value })}
-              placeholder="Contoh: Surabaya"
-            />
+            >
+              <option value="">-- Pilih Cabang --</option>
+              {OFFICIAL_BRANCHES.map((b) => (
+                <option key={b} value={b}>
+                  {b}{b === 'Bekasi' ? ' (Pusat)' : ''}
+                </option>
+              ))}
+              {doc.branch && !OFFICIAL_BRANCHES.includes(doc.branch as any) && (
+                <option value={doc.branch}>{doc.branch}</option>
+              )}
+            </select>
           </div>
           <div>
             <label htmlFor="rb-category">Kategori Biaya <span>*</span></label>
@@ -137,7 +155,7 @@ export const FormRB: React.FC<FormRBProps> = ({ initialDoc, onSave, onClose }) =
               id="rb-subtotal"
               inputMode="numeric"
               value={subtotalStr}
-              onChange={(e) => setSubtotalStr(e.target.value)}
+              onChange={(e) => setSubtotalStr(formatCurrencyInput(e.target.value))}
               placeholder="0"
             />
           </div>
@@ -147,7 +165,7 @@ export const FormRB: React.FC<FormRBProps> = ({ initialDoc, onSave, onClose }) =
               id="rb-other"
               inputMode="numeric"
               value={otherCostsStr}
-              onChange={(e) => setOtherCostsStr(e.target.value)}
+              onChange={(e) => setOtherCostsStr(formatCurrencyInput(e.target.value))}
               placeholder="0"
             />
           </div>
@@ -157,7 +175,7 @@ export const FormRB: React.FC<FormRBProps> = ({ initialDoc, onSave, onClose }) =
               id="rb-discount"
               inputMode="numeric"
               value={discountStr}
-              onChange={(e) => setDiscountStr(e.target.value)}
+              onChange={(e) => setDiscountStr(formatCurrencyInput(e.target.value))}
               placeholder="0"
             />
           </div>

@@ -1,49 +1,81 @@
-import React, { useState } from 'react'
-import { motion } from 'framer-motion'
+﻿import React, { useState } from 'react'
+import { motion, useReducedMotion } from 'framer-motion'
 import { CircleCheck } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import type { StageDecision } from '@/types/document'
+import './progress-indicator.css'
 
-export interface ProgressIndicatorProps {
-    currentStep?: number
-    onStepChange?: (step: number) => void
-    showControls?: boolean
+export interface ProgressStage {
+    id: string
+    name: string
+    status: StageDecision
+    detail?: string
+    participants?: { name: string; status: StageDecision }[]
 }
 
-const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({
-    currentStep,
-    onStepChange,
-    showControls = true,
-}) => {
-    const [internalStep, setInternalStep] = useState(currentStep ?? 1)
-    const [isExpanded, setIsExpanded] = useState(true)
+export const progressStatusLabels: Record<StageDecision, string> = {
+    WAITING: 'Belum dimulai', PENDING: 'Menunggu', APPROVED: 'Disetujui', REJECTED: 'Dikembalikan',
+}
 
-    const step = currentStep !== undefined ? currentStep : internalStep
+export function completedProgress(statuses: StageDecision[]): number {
+    if (statuses.length < 2) return 0
+    const firstIncomplete = statuses.findIndex((status) => status !== 'APPROVED')
+    const completed = firstIncomplete === -1 ? statuses.length : firstIncomplete
+    return Math.max(0, completed - 1) / (statuses.length - 1) * 100
+}
+
+const ProgressIndicator = ({ steps }: { steps?: ProgressStage[] }) => {
+    const [step, setStep] = useState(1)
+    const [isExpanded, setIsExpanded] = useState(true)
+    const reduceMotion = useReducedMotion()
 
     const handleContinue = () => {
         if (step < 3) {
-            const next = step + 1
-            if (currentStep === undefined) setInternalStep(next)
-            onStepChange?.(next)
+            setStep(step + 1)
             setIsExpanded(false)
         }
     }
 
     const handleBack = () => {
-        if (step === 2) {
+        if (step == 2) {
             setIsExpanded(true)
         }
         if (step > 1) {
-            const prev = step - 1
-            if (currentStep === undefined) setInternalStep(prev)
-            onStepChange?.(prev)
+            setStep(step - 1)
         }
     }
 
+    if (steps) {
+        return (
+            <div className="approval-capsule">
+            <div className="approval-capsule-track" aria-hidden="true" style={{ right: `calc(${100 / steps.length}% - 10px)` }}>
+                <motion.div className="approval-capsule-fill" initial={false}
+                    animate={{ width: `${completedProgress(steps.map((stage) => stage.status))}%` }}
+                    transition={reduceMotion ? { duration: 0 } : { duration: 0.25 }} />
+            </div>
+            <ol className="approval-progress approval-progress--capsule" aria-label="Progres persetujuan">
+                {steps.map((stage) => (
+                    <li key={stage.id} className={`approval-progress-step is-${stage.status.toLowerCase()}`}>
+                        <span className="approval-progress-dot" aria-hidden="true">
+                            {stage.status === 'APPROVED' ? '✓' : stage.status === 'REJECTED' ? '×' : ''}
+                        </span>
+                        <span className="approval-progress-copy">
+                            <strong style={{ overflowWrap: 'anywhere' }}>{stage.name}</strong>
+                            <small>{stage.detail || progressStatusLabels[stage.status]}</small>
+                            {stage.participants?.map((person) => (
+                                <small key={person.name}>{person.name}: {progressStatusLabels[person.status]}</small>
+                            ))}
+                        </span>
+                    </li>
+                ))}
+            </ol>
+            </div>
+        )
+    }
+
     return (
-        <div className="flex flex-col items-center justify-center gap-6">
-
-            <div className="flex items-center gap-6 relative py-2">
-
+        <div className="flex flex-col items-center justify-center gap-8">
+            <div className="flex items-center gap-6 relative">
                 {[1, 2, 3].map((dot) => (
                     <div
                         key={dot}
@@ -53,7 +85,6 @@ const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({
                         )}
                     />
                 ))}
-
                 {/* Green progress overlay */}
                 <motion.div
                     initial={{ width: '12px', height: "24px", x: 0 }}
@@ -61,7 +92,7 @@ const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({
                         width: step === 1 ? '24px' : step === 2 ? '60px' : '96px',
                         x: 0
                     }}
-                    className="absolute -left-[8px] top-1/2 -translate-y-1/2 h-3 bg-green-500 rounded-full"
+                    className="absolute -left-[8px] -top-[8px] -translate-y-1/2 h-3 bg-green-500 rounded-full"
                     transition={{
                         type: "spring",
                         stiffness: 300,
@@ -72,68 +103,64 @@ const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({
                     }}
                 />
             </div>
-
             {/* Buttons container */}
-            {showControls && (
-                <div className="w-full max-w-sm">
-                    <motion.div
-                        className="flex items-center gap-1"
-                        animate={{
-                            justifyContent: isExpanded ? 'stretch' : 'space-between'
-                        }}
-
-                    >
-                        {!isExpanded && (
-                            <motion.button
-                                initial={{ opacity: 0, width: 0, scale: 0.8 }}
-                                animate={{ opacity: 1, width: "64px", scale: 1 }}
-                                transition={{
-                                    type: "spring",
-                                    stiffness: 400,
-                                    damping: 15,
-                                    mass: 0.8,
-                                    bounce: 0.25,
-                                    duration: 0.6,
-                                    opacity: { duration: 0.2 }
-                                }}
-                                onClick={handleBack}
-                                className="px-4 py-3 text-black flex items-center justify-center   bg-gray-100  font-semibold rounded-full hover:bg-gray-50 hover:border transition-colors flex-1 w-16 text-sm"
-                            >
-                                Back
-                            </motion.button>
-                        )}
+            <div className="w-full max-w-sm">
+                <motion.div
+                    className="flex items-center gap-1"
+                    animate={{
+                        justifyContent: isExpanded ? 'stretch' : 'space-between'
+                    }}
+                >
+                    {!isExpanded && (
                         <motion.button
-                            onClick={handleContinue}
-                            animate={{
-                                flex: isExpanded ? 1 : 'inherit',
+                            initial={{ opacity: 0, width: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, width: "64px", scale: 1 }}
+                            transition={{
+                                type: "spring",
+                                stiffness: 400,
+                                damping: 15,
+                                mass: 0.8,
+                                bounce: 0.25,
+                                duration: 0.6,
+                                opacity: { duration: 0.2 }
                             }}
-                            className={cn(
-                                "px-4 py-3 rounded-full text-white bg-[#006cff]   transition-colors flex-1 w-56",
-                                !isExpanded && 'w-44'
-                            )}
+                            onClick={handleBack}
+                            className="px-4 py-3 text-black flex items-center justify-center   bg-gray-100  font-semibold rounded-full hover:bg-gray-50 hover:border transition-colors flex-1 w-16 text-sm"
                         >
-                            <div className="flex items-center font-[600] justify-center gap-2 text-sm">
-                                {step === 3 && (
-                                    <motion.div
-                                        initial={{ scale: 0, opacity: 0 }}
-                                        animate={{ scale: 1, opacity: 1 }}
-                                        transition={{
-                                            type: "spring",
-                                            stiffness: 500,
-                                            damping: 15,
-                                            mass: 0.5,
-                                            bounce: 0.4
-                                        }}
-                                    >
-                                        <CircleCheck size={16} />
-                                    </motion.div>
-                                )}
-                                {step === 3 ? 'Finish' : 'Continue'}
-                            </div>
+                            Back
                         </motion.button>
-                    </motion.div>
-                </div>
-            )}
+                    )}
+                    <motion.button
+                        onClick={handleContinue}
+                        animate={{
+                            flex: isExpanded ? 1 : 'inherit',
+                        }}
+                        className={cn(
+                            "px-4 py-3 rounded-full text-white bg-[#006cff]   transition-colors flex-1 w-56",
+                            !isExpanded && 'w-44'
+                        )}
+                    >
+                        <div className="flex items-center font-[600] justify-center gap-2 text-sm">
+                            {step === 3 && (
+                                <motion.div
+                                    initial={{ scale: 0, opacity: 0 }}
+                                    animate={{ scale: 1, opacity: 1 }}
+                                    transition={{
+                                        type: "spring",
+                                        stiffness: 500,
+                                        damping: 15,
+                                        mass: 0.5,
+                                        bounce: 0.4
+                                    }}
+                                >
+                                    <CircleCheck size={16} />
+                                </motion.div>
+                            )}
+                            {step === 3 ? 'Finish' : 'Continue'}
+                        </div>
+                    </motion.button>
+                </motion.div>
+            </div>
         </div>
     )
 }

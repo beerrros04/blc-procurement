@@ -1,6 +1,18 @@
+export const OFFICIAL_BRANCHES = [
+  'Bekasi',
+  'Cibinong',
+  'Medan',
+  'Surabaya',
+  'Pekanbaru',
+  'Makassar',
+  'Samarinda',
+] as const;
+
+export type OfficialBranch = (typeof OFFICIAL_BRANCHES)[number];
+
 export function branchOptions(existing: string[] = []): string[] {
   return Array.from(new Set([
-    'Bekasi', 'Semarang', 'Medan', 'Makassar', 'Surabaya',
-    'Pekanbaru', 'Palembang', 'Cibinong', ...existing.filter(Boolean),
+    ...OFFICIAL_BRANCHES,
+    ...existing.filter(Boolean),
   ]));
 }

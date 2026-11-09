@@ -21,10 +21,13 @@ describe('payment labels', () => {
   it('does not imply a voucher is needed for a PR or a surplus realization', () => {
     const pr = createEmptyDocument('PR', 'Pusat');
     pr.status = 'APPROVED';
+    const gr = createEmptyDocument('GR', 'Pusat');
+    gr.status = 'APPROVED';
     const rc = createEmptyDocument('RC', 'Pusat') as RCDocument;
     rc.status = 'APPROVED';
     rc.outcomeType = 'SURPLUS';
     expect(paymentLabel(pr, [])).toBeNull();
+    expect(paymentLabel(gr, [])).toBeNull();
     expect(paymentLabel(rc, [])).toBeNull();
   });
 });

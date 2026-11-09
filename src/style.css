@@ -1,149 +1,115 @@
-@import url('https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@keyframes fadeSlideIn {
-  to {
-    opacity: 1;
-    filter: blur(0px);
-    transform: translateY(0px);
-  }
-}
-
-@keyframes slideRightIn {
-  to {
-    opacity: 1;
-    filter: blur(0px);
-    transform: translateX(0px);
-  }
-}
-
-@keyframes testimonialIn {
-  to {
-    opacity: 1;
-    filter: blur(0px);
-    transform: translateY(0px) scale(1);
-  }
-}
-
-.animate-element {
-  opacity: 0;
-  filter: blur(4px);
-  transform: translateY(12px);
-  animation: fadeSlideIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.animate-slide-right {
-  opacity: 0;
-  filter: blur(6px);
-  transform: translateX(24px);
-  animation: slideRightIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.animate-testimonial {
-  opacity: 0;
-  filter: blur(4px);
-  transform: translateY(16px) scale(0.96);
-  animation: testimonialIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.animate-delay-100 { animation-delay: 0.08s; }
-.animate-delay-200 { animation-delay: 0.14s; }
-.animate-delay-300 { animation-delay: 0.2s; }
-.animate-delay-400 { animation-delay: 0.26s; }
-.animate-delay-500 { animation-delay: 0.32s; }
-.animate-delay-600 { animation-delay: 0.38s; }
-.animate-delay-700 { animation-delay: 0.44s; }
-.animate-delay-800 { animation-delay: 0.5s; }
-.animate-delay-900 { animation-delay: 0.56s; }
-.animate-delay-1000 { animation-delay: 0.62s; }
-.animate-delay-1200 { animation-delay: 0.72s; }
-.animate-delay-1400 { animation-delay: 0.82s; }
-
 /* ==========================================================================
-   SPIKE NEXT.JS PRO ARCHITECTURE × BLC CORPORATE DESIGN SYSTEM
+   BLC CAREAADY CORPORATE DESIGN SYSTEM (design.md & NEXGEN Standard)
    --------------------------------------------------------------------------
-   - 60% Dominant Canvas: Soft Cool Airy Background (#F0F5F9)
-   - 30% Secondary Surfaces: Floating Pure White Cards & Sidebar (#FFFFFF)
-     with 18px border-radius & soft diffuse elevation shadow
-   - 10% Brand Accent: Official BLC Corporate Red (#E51937) & Soft Rose (#FDF2F4)
-   - Supporting Spike Accents: Teal (#00CEB6), Amber (#FFAE1F), Deep Slate (#111C2D)
+   - Canvas: Solid Neutral Background (#F9FAFB / #F0F5F9)
+   - Surfaces: Pure White Cards & Navigation (#FFFFFF) with crisp borders
+   - Primary Accent: Official BLC Corporate Red (#E51937)
+   - Status Semantics: Emerald Green (Approved), Cobalt Blue (Paid),
+     Amber (Pending/Review), Ruby Red (Rejected/Revision)
    ========================================================================== */
 
 :root {
-  /* 60% Dominan Canvas (Spike Pro Cool Grey-Blue Canvas) */
-  --canvas-bg: #f0f5f9;
-  --canvas-body: #f0f5f9;
+  /* Canvas Background (Warm Architectural Canvas per Elera) */
+  --canvas-bg: #f6f5f3;
+  --canvas-body: #f6f5f3;
 
-  /* 30% Sekunder Floating Surfaces & Borders */
+  /* Surfaces & Structural Borders */
   --surface-base: #ffffff;
+  --surface-card: #ffffff;
   --surface-elevated: #ffffff;
-  --surface-elevated-hover: #f8fafd;
-  --surface-highlight: #f0f5f9;
+  --surface-elevated-hover: #fbfbfa;
+  --surface-highlight: #f1f5f9;
 
-  --border-subtle: #eaeff4;
-  --border-medium: #dfe5ef;
+  --border-clean: #ededeb;
+  --border-subtle: #f2f1ed;
+  --border-medium: #cbd5e1;
   --border-focus: #e51937;
-  --border-emphasis: #cbd5e1;
+  --border-emphasis: #94a3b8;
 
-  /* Spike Pro Typography Hierarchy */
-  --text-primary: #111c2d;
-  --text-secondary: #5a6a85;
-  --text-muted: #7c8fac;
+  /* Typography Hierarchy */
+  --text-main: #191c1a;
+  --text-primary: #191c1a;
+  --text-secondary: #374151;
+  --text-muted: #4b5563;
+  --text-subtle: #4b5563;
 
-  /* Floating White Sidebar & Topbar */
+  /* Sidebar & Topbar Surfaces */
   --sidebar-bg: #ffffff;
-  --sidebar-active-bg: #fdf2f4;
-  --sidebar-border: #eaeff4;
+  --sidebar-active-bg: #ffffff;
+  --sidebar-border: #ededeb;
   --topbar-bg: #ffffff;
 
-  /* 10% Aksen: Official BLC Corporate Red */
-  --accent-ruby: #e51937;
-  --accent-ruby-hover: #c8132d;
-  --accent-ruby-active: #a30e24;
-  --accent-ruby-glow: rgba(229, 25, 55, 0.14);
-  --accent-ruby-subtle: #fdf2f4;
-  --accent-ruby-border: #fbcfe8;
+  /* Buttons & Controls */
+  --btn-charcoal: #191c1a;
+  --btn-charcoal-hover: #2d312e;
+  --accent-caready: #e51937;
+  --accent-caready-hover: #b81428;
 
-  /* Spike Pro Secondary Semantic Palette */
-  --spike-teal: #00ceb6;
-  --spike-teal-subtle: #e6fffa;
-  --spike-amber: #ffae1f;
-  --spike-amber-subtle: #fef5e5;
-  --spike-blue: #0085db;
-  --spike-blue-subtle: #e5f3fb;
-  --spike-purple: #8763da;
-  --spike-purple-subtle: #f2ecf9;
+  /* BLC Corporate Red Brand Palette */
+  --accent-ruby: #e51937;
+  --accent-ruby-hover: #b81428;
+  --accent-ruby-active: #8a0a19;
+  --accent-ruby-glow: rgba(229, 25, 55, 0.12);
+  --accent-ruby-subtle: #fdf2f4;
+  --accent-ruby-border: #fcd4da;
+
+  /* Functional Support Colors (design.md Bagian 1C) */
+  --color-success: #10b981;
+  --color-success-subtle: #ecfdf5;
+  --color-success-border: #a7f3d0;
+  --color-success-dark: #047b57;
+
+  --color-warning: #f59e0b;
+  --color-warning-subtle: #fffbeb;
+  --color-warning-border: #fde68a;
+  --color-warning-dark: #b45309;
+
+  --color-danger: #ef4444;
+  --color-danger-subtle: #fef2f2;
+  --color-danger-border: #fecaca;
+  --color-danger-dark: #dc2626;
+
+  --color-info: #2563eb;
+  --color-info-subtle: #eff6ff;
+  --color-info-border: #bfdbfe;
+  --color-info-dark: #1d4ed8;
 
   /* Status Badges */
-  --status-approved-bg: #e6fffa;
-  --status-approved-border: #b2f5ea;
-  --status-approved-text: #008a7a;
+  --status-approved-bg: #ecfdf5;
+  --status-approved-border: #a7f3d0;
+  --status-approved-text: #065f46;
 
-  --status-rejected-bg: #fdf2f4;
-  --status-rejected-border: #fecdd3;
-  --status-rejected-text: #c8132d;
+  --status-paid-bg: #eff6ff;
+  --status-paid-border: #bfdbfe;
+  --status-paid-text: #1e40af;
 
-  --status-pending-bg: #fef5e5;
+  --status-rejected-bg: #fef2f2;
+  --status-rejected-border: #fecaca;
+  --status-rejected-text: #991b1b;
+
+  --status-pending-bg: #fffbeb;
   --status-pending-border: #fde68a;
-  --status-pending-text: #b4690e;
+  --status-pending-text: #92400e;
 
-  --status-waiting-bg: #f0f5f9;
-  --status-waiting-border: #dfe5ef;
-  --status-waiting-text: #5a6a85;
+  --status-waiting-bg: #f3f4f6;
+  --status-waiting-border: #e5e7eb;
+  --status-waiting-text: #374151;
 
-  /* Spike Pro Card Geometry & Elevation */
-  --card-radius: 18px;
-  --pill-radius: 30px;
-  --btn-radius: 10px;
-  --shadow-card: 0px 2px 6px rgba(37, 83, 185, 0.08), 0px 6px 20px rgba(17, 28, 45, 0.04);
-  --shadow-hover: 0px 8px 24px rgba(17, 28, 45, 0.08);
-  --shadow-btn-red: 0px 4px 12px rgba(229, 25, 55, 0.22);
+  /* Standard Geometry & Crisp Elevation */
+  --card-radius: 10px;
+  --pill-radius: 9999px;
+  --btn-radius: 8px;
+  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  --shadow-hover: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  --shadow-btn-red: 0 2px 4px rgba(229, 25, 55, 0.2);
 
-  /* Typography Stacks (Lato from NEXGEN Spec) */
-  --font-display: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-sans: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-mono: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  /* Typography Stacks (Lato Official Specification) */
+  --font-display: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   font-family: var(--font-sans);
   color: var(--text-primary);
@@ -188,7 +154,7 @@ textarea:focus-visible {
 }
 
 /* ==========================================================================
-   SPIKE PRO FLOATING APP SHELL LAYOUT
+   BLC CAREAADY APP SHELL LAYOUT
    ========================================================================== */
 .shell {
   min-height: 100vh;
@@ -199,7 +165,7 @@ textarea:focus-visible {
   align-items: flex-start;
 }
 
-/* Floating Rounded Sidebar (Spike Pro Signature) */
+/* Corporate Navigation Sidebar */
 .sidebar {
   width: 270px;
   flex-shrink: 0;
@@ -213,7 +179,7 @@ textarea:focus-visible {
   position: sticky;
   top: 20px;
   min-height: calc(100vh - 40px);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  border: 1px solid #dededb;
 }
 
 .brand {
@@ -255,6 +221,11 @@ textarea:focus-visible {
 .sidebar a:hover {
   background: var(--canvas-bg);
   color: var(--accent-ruby);
+}
+
+.sidebar a:focus-visible {
+  outline: 3px solid #a6162e;
+  outline-offset: 2px;
 }
 
 .nav-active {
@@ -349,10 +320,10 @@ p {
   line-height: 1.5;
 }
 
-/* Spike Pro Pill & Rounded Buttons */
+/* BLC Button System (design.md Radius: 8px) */
 .primary, .secondary {
-  border-radius: var(--pill-radius);
-  padding: 9px 18px;
+  border-radius: var(--btn-radius);
+  padding: 10px 18px;
   font-size: 13px;
   font-weight: 700;
   display: inline-flex;
@@ -487,7 +458,7 @@ p {
 }
 
 /* ==========================================================================
-   SPIKE PRO DATA TABLE CARD
+   BLC CAREAADY DATA TABLE CARD
    ========================================================================== */
 .list-card {
   background: #ffffff;
@@ -1042,9 +1013,9 @@ input[aria-invalid=true] {
 }
 
 .form-callout-info {
-  background: var(--spike-blue-subtle);
-  border: 1px solid #bae6fd;
-  color: #0369a1;
+  background: var(--color-info-subtle);
+  border: 1px solid var(--color-info-border);
+  color: var(--color-info-dark);
 }
 
 .form-callout-success {
@@ -1197,9 +1168,58 @@ input[aria-invalid=true] {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  * {
     animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+  .s-drawer,
+  .approval-capsule-fill {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  .sidebar,
+  .topbar,
+  .mobile-menu-toggle,
+  .form-actions,
+  .s-action,
+  .secondary,
+  .role-simulator-card,
+  button,
+  .notice {
+    display: none !important;
+  }
+  .shell,
+  .main,
+  .content,
+  .list-card {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: transparent !important;
+  }
+  .table-wrap {
+    overflow: visible !important;
+  }
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+  th, td {
+    border: 1px solid #d1d5db !important;
+    padding: 8px !important;
+    color: #000000 !important;
+    page-break-inside: avoid;
   }
 }
 .metrics-grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
@@ -1220,3 +1240,370 @@ input[aria-invalid=true] {
 @media (max-width: 1250px) { .metrics-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } .analytics-grid { grid-template-columns: minmax(0, 1fr) !important; } }
 @media (max-width: 600px) { .document-table th:last-child, .document-table td:last-child { position: static; box-shadow: none; } }
 @media (max-width: 580px) { .metrics-grid { grid-template-columns: minmax(0, 1fr) !important; } }
+
+/* ==========================================================================
+   ELERA DESIGN SYSTEM ARCHITECTURE EXTENSIONS (nazday-elera.vercel.app)
+   ========================================================================== */
+
+/* Connected Telemetry Strip */
+.stats-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  background: var(--surface-card, #ffffff);
+  border: 1px solid var(--border-clean, #ededeb);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.stat {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 22px;
+  position: relative;
+  transition: background 0.15s ease;
+}
+
+.stat.metric-summary {
+  display: grid;
+  grid-template-rows: minmax(3rem, auto) minmax(3rem, auto) 1fr;
+  align-items: stretch;
+  gap: 0;
+}
+
+.metric-summary-pending { background: #fdf6f6; }
+
+.metric-summary-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  min-width: 0;
+}
+
+.metric-summary-heading > span { overflow-wrap: anywhere; }
+
+.metric-summary-value {
+  align-self: start;
+  margin-top: 8px;
+  color: #111827;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.metric-summary-footer {
+  margin: 12px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid #e2e8f0;
+  color: #4b5563;
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.metric-summary-breakdown { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+
+.document-tabs-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  margin-bottom: 20px;
+  padding-bottom: 4px;
+}
+
+.stat:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 20%;
+  height: 60%;
+  width: 1px;
+  background-color: var(--border-clean, #ededeb);
+}
+
+.stat-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.stat-content > p {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-muted, #8a8f89);
+  letter-spacing: 0.02em;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.stat-value {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-value > span:first-child {
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--text-main, #191c1a);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+/* Icon Chips */
+.s-icon-chip {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  background: var(--btn-charcoal, #191c1a);
+  color: #ffffff;
+  box-shadow: inset 0 0 6px 1px rgba(255, 255, 255, 0.25);
+}
+
+.s-icon-chip.light {
+  background: #f4f4f2;
+  color: #191c1a;
+  box-shadow: none;
+}
+
+.s-icon-chip.caready {
+  background: var(--accent-caready, #e51937);
+  color: #ffffff;
+  box-shadow: inset 0 0 6px 1px rgba(255, 255, 255, 0.35);
+}
+
+/* Segmented Tab Controls */
+.s-tabs {
+  background: #e9e8e6;
+  border-radius: 12px;
+  padding: 3px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.s-tabs > button,
+.s-tabs > .s-tab-item {
+  white-space: nowrap;
+  color: #5c5e63;
+  letter-spacing: -0.01em;
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 12px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.s-tabs > button.current,
+.s-tabs > .s-tab-item.active {
+  color: #121212;
+  background: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+  font-weight: 600;
+}
+
+/* Counter Pills */
+.s-count {
+  color: #5c5e63;
+  background: #e2e3e3;
+  border-radius: 6px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+.s-tabs > button.current .s-count,
+.s-tabs > .s-tab-item.active .s-count {
+  color: #ffffff;
+  background: #191c1a;
+}
+
+/* Semantic Status Badges */
+.s-badge {
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 14px;
+}
+
+.s-badge.green {
+  background: #e8f6e3;
+  color: #239b44;
+}
+
+.s-badge.amber {
+  background: #faf1dc;
+  color: #d89114;
+}
+
+.s-badge.red {
+  background: #fceae6;
+  color: #ed4b38;
+}
+
+.s-badge.blue {
+  background: #eaf0ff;
+  color: #427cff;
+}
+
+.s-badge.gray {
+  background: #f1f1ef;
+  color: #5c5e63;
+}
+
+/* Standard Elera Action Buttons */
+.s-action {
+  white-space: nowrap;
+  color: #424242;
+  background: #ffffff;
+  border: 1px solid #dddeda;
+  border-radius: 10px;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  display: inline-flex;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  transition: all 0.15s ease;
+}
+
+.s-action:hover:not(:disabled) {
+  background: #fbfbfa;
+  border-color: #cbd5e1;
+}
+
+.s-action.s-action-dark {
+  color: #ffffff;
+  background: #191c1a;
+  border-color: #191c1a;
+}
+
+.s-action.s-action-dark:hover:not(:disabled) {
+  background: #2d312e;
+  border-color: #2d312e;
+}
+
+.s-action.s-action-caready {
+  color: #ffffff;
+  background: var(--accent-caready, #e51937);
+  border-color: var(--accent-caready, #e51937);
+  box-shadow: 0 2px 4px rgba(229, 25, 55, 0.2);
+}
+
+.s-action.s-action-caready:hover:not(:disabled) {
+  background: var(--accent-caready-hover, #b81428);
+  border-color: var(--accent-caready-hover, #b81428);
+}
+
+/* Slide-Over Inspection Drawer */
+.s-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.35);
+  backdrop-filter: blur(2px);
+  z-index: 50;
+  transition: opacity 0.2s ease-out;
+}
+
+.s-drawer {
+  position: fixed;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  max-width: 580px;
+  background: #ffffff;
+  border-left: 1px solid var(--border-clean, #ededeb);
+  box-shadow: -12px 0 32px rgba(0, 0, 0, 0.08);
+  z-index: 51;
+  display: flex;
+  flex-direction: column;
+  animation: s-slide-in 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.detail-overlay[open] {
+  justify-content: flex-end;
+  align-items: stretch;
+  padding: 0;
+  background: rgba(15, 23, 42, 0.32);
+  backdrop-filter: none;
+}
+
+.detail-overlay .s-drawer {
+  width: min(580px, 100%);
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  border-radius: 16px 0 0 16px;
+}
+
+.detail-overlay .form-summary-row > * { min-width: 0; overflow-wrap: anywhere; }
+.detail-overlay .form-summary-row button { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+
+@keyframes s-slide-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@media (max-width: 1024px) {
+  .stats-strip {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .stat:nth-child(2)::after {
+    display: none;
+  }
+  .stat:nth-child(-n+2) {
+    border-bottom: 1px solid var(--border-clean, #ededeb);
+  }
+}
+
+@media (max-width: 640px) {
+  .stats-strip {
+    grid-template-columns: 1fr;
+  }
+  .stat::after {
+    display: none;
+  }
+  .stat:not(:last-child) {
+    border-bottom: 1px solid var(--border-clean, #ededeb);
+  }
+}

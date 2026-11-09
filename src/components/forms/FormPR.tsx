@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import type { PRDocument } from '../../types/document';
 import { calculatePoTotal } from '../../domain/calculations';
+import { OFFICIAL_BRANCHES } from '../../domain/branches';
 import { readAttachment } from '../../lib/read-attachment';
+import { formatCurrencyInput, parseCurrencyInput } from '../../lib/currency-format';
+import { TaxFields } from './TaxFields';
 
 export interface FormPRProps {
   initialDoc: PRDocument;
@@ -11,10 +14,10 @@ export interface FormPRProps {
 
 export const FormPR: React.FC<FormPRProps> = ({ initialDoc, onSave, onClose }) => {
   const [doc, setDoc] = useState<PRDocument>(initialDoc);
-  const [amountStr, setAmountStr] = useState<string>(String(initialDoc.subtotalAmount || ''));
+  const [amountStr, setAmountStr] = useState<string>(formatCurrencyInput(initialDoc.subtotalAmount));
   const [error, setError] = useState<string>('');
 
-  const amount = Number(amountStr) || 0;
+  const amount = parseCurrencyInput(amountStr);
   const isIamRequired = amount >= 5_000_000;
   const calc = calculatePoTotal({ subtotal: amount, otherCosts: doc.otherCosts, discount: doc.discount, ppnRate: doc.ppnRate ?? 0, pphRate: doc.pphRate ?? 0 });
 
@@ -41,6 +44,10 @@ export const FormPR: React.FC<FormPRProps> = ({ initialDoc, onSave, onClose }) =
     }
     if (amount <= 0) {
       setError('Nominal subtotal harus lebih besar dari Rp 0.');
+      return;
+    }
+    if (calc.totalAmount > 50_000_000) {
+      setError('Nilai total pengajuan melebihi batas sistem Rp 50.000.000. Pengajuan di atas batas ini menggunakan prosedur manual.');
       return;
     }
 
@@ -70,13 +77,21 @@ export const FormPR: React.FC<FormPRProps> = ({ initialDoc, onSave, onClose }) =
         <div className="form-grid-2">
           <div>
             <label htmlFor="pr-branch">Cabang <span>*</span></label>
-            <input
+            <select
               id="pr-branch"
-              list="branch-options"
               value={doc.branch}
               onChange={(e) => setDoc({ ...doc, branch: e.target.value })}
-              placeholder="Contoh: Pusat / Bandung"
-            />
+            >
+              <option value="">-- Pilih Cabang --</option>
+              {OFFICIAL_BRANCHES.map((b) => (
+                <option key={b} value={b}>
+                  {b}{b === 'Bekasi' ? ' (Pusat)' : ''}
+                </option>
+              ))}
+              {doc.branch && !OFFICIAL_BRANCHES.includes(doc.branch as any) && (
+                <option value={doc.branch}>{doc.branch}</option>
+              )}
+            </select>
           </div>
           <div>
             <label htmlFor="pr-budget">Tipe Anggaran <span>*</span></label>
@@ -119,7 +134,7 @@ export const FormPR: React.FC<FormPRProps> = ({ initialDoc, onSave, onClose }) =
                 id="pr-amount"
                 inputMode="numeric"
                 value={amountStr}
-                onChange={(e) => setAmountStr(e.target.value)}
+                onChange={(e) => setAmountStr(formatCurrencyInput(e.target.value))}
                 placeholder="0"
               />
             </div>
@@ -127,21 +142,39 @@ export const FormPR: React.FC<FormPRProps> = ({ initialDoc, onSave, onClose }) =
         </div>
 
         <div className="form-grid-2">
-          <div><label htmlFor="pr-other">Biaya lain</label><input id="pr-other" type="number" min="0" value={doc.otherCosts ?? 0} onChange={(e) => setDoc({ ...doc, otherCosts: Number(e.target.value) })} /></div>
-          <div><label htmlFor="pr-discount">Diskon</label><input id="pr-discount" type="number" min="0" value={doc.discount ?? 0} onChange={(e) => setDoc({ ...doc, discount: Number(e.target.value) })} /></div>
-          <div><label htmlFor="pr-ppn">PPN (perkiraan)</label><select id="pr-ppn" value={doc.ppnRate ?? 0} onChange={(e) => setDoc({ ...doc, ppnRate: Number(e.target.value) })}><option value="0">Tanpa PPN</option><option value="0.11">11% efektif</option></select></div>
-          <div><label htmlFor="pr-pph">PPh (perkiraan)</label><select id="pr-pph" value={doc.pphRate ?? 0} onChange={(e) => setDoc({ ...doc, pphRate: Number(e.target.value) })}><option value="0">Tanpa PPh</option><option value="0.02">2% PPh 23</option></select></div>
+          <div>
+            <label htmlFor="pr-other">Biaya lain</label>
+            <input
+              id="pr-other"
+              inputMode="numeric"
+              value={formatCurrencyInput(doc.otherCosts ?? 0)}
+              onChange={(e) => setDoc({ ...doc, otherCosts: parseCurrencyInput(e.target.value) })}
+              placeholder="0"
+            />
+          </div>
+          <div>
+            <label htmlFor="pr-discount">Diskon</label>
+            <input
+              id="pr-discount"
+              inputMode="numeric"
+              value={formatCurrencyInput(doc.discount ?? 0)}
+              onChange={(e) => setDoc({ ...doc, discount: parseCurrencyInput(e.target.value) })}
+              placeholder="0"
+            />
+          </div>
+        </div>
+        <TaxFields prefix="pr" values={doc} onChange={(values) => setDoc({ ...doc, ...values })} />
+        <div className="form-grid-2">
           <div><label htmlFor="pr-iam">Nomor IAM</label><input id="pr-iam" value={doc.iamNumber ?? ''} onChange={(e) => setDoc({ ...doc, iamNumber: e.target.value })} /></div>
           <div><label htmlFor="pr-number">Nomor PR terkait (jika ada)</label><input id="pr-number" value={doc.prNumber ?? ''} onChange={(e) => setDoc({ ...doc, prNumber: e.target.value })} /></div>
         </div>
-        <p className="help">Perkiraan PPN: Rp {calc.ppnAmount.toLocaleString('id-ID')} · PPh: Rp {calc.pphAmount.toLocaleString('id-ID')} · Total: Rp {calc.totalAmount.toLocaleString('id-ID')}. Dasar pajak menunggu konfirmasi Finance.</p>
+        <p className="help">Perkiraan PPN: Rp {calc.ppnAmount.toLocaleString('id-ID')} · PPh: Rp {calc.pphAmount.toLocaleString('id-ID')} · Total Bersih: Rp {calc.totalAmount.toLocaleString('id-ID')} (Batas maks. sistem Rp 50.000.000).</p>
 
         {isIamRequired && (
           <div className="form-callout form-callout-warning" role="note">
-            <strong>Pemberitahuan Kelengkapan Dokumen:</strong>
+            <strong>Pemberitahuan Kelengkapan Dokumen IAM:</strong>
             <p>
-              Estimasi subtotal ≥ Rp 5.000.000. Periksa kebutuhan nomor dan lampiran IAM;
-              aturan kelengkapannya masih menunggu konfirmasi.
+              Estimasi subtotal ≥ Rp 5.000.000. Nomor IAM dan Lampiran Memo IAM wajib dilengkapi sebelum PR diajukan.
             </p>
           </div>
         )}

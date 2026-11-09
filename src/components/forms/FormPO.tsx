@@ -1,6 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { calculatePoTotal } from '../../domain/calculations';
+import { OFFICIAL_BRANCHES } from '../../domain/branches';
 import { readAttachment } from '../../lib/read-attachment';
+import { formatCurrencyInput, parseCurrencyInput } from '../../lib/currency-format';
 import type { PODocument, PRDocument } from '../../types/document';
 
 export interface FormPOProps {
@@ -23,18 +25,18 @@ export const FormPO: React.FC<FormPOProps> = ({
   onClose,
 }) => {
   const [doc, setDoc] = useState<PODocument>(initialDoc);
-  const [subtotalStr, setSubtotalStr] = useState<string>(String(initialDoc.subtotal || ''));
-  const [otherCostsStr, setOtherCostsStr] = useState<string>(String(initialDoc.otherCosts || '0'));
-  const [discountStr, setDiscountStr] = useState<string>(String(initialDoc.discount || '0'));
+  const [subtotalStr, setSubtotalStr] = useState<string>(formatCurrencyInput(initialDoc.subtotal));
+  const [otherCostsStr, setOtherCostsStr] = useState<string>(formatCurrencyInput(initialDoc.otherCosts || 0));
+  const [discountStr, setDiscountStr] = useState<string>(formatCurrencyInput(initialDoc.discount || 0));
   const [ppnRate, setPpnRate] = useState<number>(initialDoc.ppnRate ?? 0.11);
   const [pphRate, setPphRate] = useState<number>(initialDoc.pphRate ?? 0);
   const [error, setError] = useState<string>('');
 
   const calc = useMemo(() => {
     return calculatePoTotal({
-      subtotal: Number(subtotalStr) || 0,
-      otherCosts: Number(otherCostsStr) || 0,
-      discount: Number(discountStr) || 0,
+      subtotal: parseCurrencyInput(subtotalStr),
+      otherCosts: parseCurrencyInput(otherCostsStr),
+      discount: parseCurrencyInput(discountStr),
       ppnRate,
       pphRate,
     });
@@ -49,8 +51,15 @@ export const FormPO: React.FC<FormPOProps> = ({
         title: prev.title || `PO: ${selectedPr.title}`,
         branch: selectedPr.branch,
         purpose: prev.purpose || selectedPr.purpose,
+        budgetType: selectedPr.budgetType || prev.budgetType,
+        iamNumber: selectedPr.iamNumber || prev.iamNumber,
+        stage1ApproverEmail: prev.stage1ApproverEmail || selectedPr.stage1ApproverEmail,
       }));
-      setSubtotalStr(String(selectedPr.subtotalAmount));
+      setSubtotalStr(formatCurrencyInput(selectedPr.subtotalAmount));
+      if (selectedPr.otherCosts !== undefined) setOtherCostsStr(formatCurrencyInput(selectedPr.otherCosts));
+      if (selectedPr.discount !== undefined) setDiscountStr(formatCurrencyInput(selectedPr.discount));
+      if (selectedPr.ppnRate !== undefined) setPpnRate(selectedPr.ppnRate);
+      if (selectedPr.pphRate !== undefined) setPphRate(selectedPr.pphRate);
     } else {
       setDoc((prev) => ({ ...prev, parentPrId: undefined }));
     }
@@ -62,12 +71,29 @@ export const FormPO: React.FC<FormPOProps> = ({
       setError('Judul pesanan pembelian (PO) wajib diisi.');
       return;
     }
+    if (!doc.branch.trim()) {
+      setError('Cabang wajib dipilih.');
+      return;
+    }
+    if (`${doc.title} ${doc.purpose ?? ''}`.toLowerCase().includes('realisasi')) {
+      setError('PO tidak boleh digunakan untuk realisasi uang muka. Gunakan dokumen RC (Realisasi Cash Advance).');
+      return;
+    }
     if (!doc.vendorName.trim()) {
       setError('Nama vendor / rekanan wajib diisi.');
       return;
     }
     if (calc.totalAmount <= 0) {
       setError('Total pesanan harus lebih besar dari Rp 0.');
+      return;
+    }
+    if (calc.totalAmount > 50_000_000) {
+      setError('Nilai total pesanan melebihi batas sistem Rp 50.000.000. Pengajuan di atas batas ini menggunakan prosedur manual.');
+      return;
+    }
+    const selectedPr = doc.parentPrId ? availablePrs.find((p) => p.id === doc.parentPrId) : undefined;
+    if (selectedPr && calc.subtotal > selectedPr.subtotalAmount) {
+      setError(`Subtotal PO (${rupiah.format(calc.subtotal)}) tidak boleh melebihi subtotal PR induk (${rupiah.format(selectedPr.subtotalAmount)}).`);
       return;
     }
 
@@ -123,7 +149,7 @@ export const FormPO: React.FC<FormPOProps> = ({
             </option>
           ))}
         </select>
-        <p className="help">Periksa kebutuhan PR induk; aturan ambang masih menunggu konfirmasi.</p>
+        <p className="help">Kategori Standard ≥ Rp 5.000.000 wajib merujuk PR induk yang disetujui (1 PR : 1 PO) dan Nomor IAM. Kategori Rutin & Mobilisasi dapat diajukan langsung dengan lampiran tagihan/invoice.</p>
 
         <div className="form-grid-2">
           <div>
@@ -142,13 +168,21 @@ export const FormPO: React.FC<FormPOProps> = ({
           </div>
           <div>
             <label htmlFor="po-branch">Cabang <span>*</span></label>
-            <input
+            <select
               id="po-branch"
-              list="branch-options"
               value={doc.branch}
               onChange={(e) => setDoc({ ...doc, branch: e.target.value })}
-              placeholder="Contoh: Bandung"
-            />
+            >
+              <option value="">-- Pilih Cabang --</option>
+              {OFFICIAL_BRANCHES.map((b) => (
+                <option key={b} value={b}>
+                  {b}{b === 'Bekasi' ? ' (Pusat)' : ''}
+                </option>
+              ))}
+              {doc.branch && !OFFICIAL_BRANCHES.includes(doc.branch as any) && (
+                <option value={doc.branch}>{doc.branch}</option>
+              )}
+            </select>
           </div>
         </div>
 
@@ -254,7 +288,7 @@ export const FormPO: React.FC<FormPOProps> = ({
               id="po-subtotal"
               inputMode="numeric"
               value={subtotalStr}
-              onChange={(e) => setSubtotalStr(e.target.value)}
+              onChange={(e) => setSubtotalStr(formatCurrencyInput(e.target.value))}
               placeholder="0"
             />
           </div>
@@ -264,7 +298,7 @@ export const FormPO: React.FC<FormPOProps> = ({
               id="po-other"
               inputMode="numeric"
               value={otherCostsStr}
-              onChange={(e) => setOtherCostsStr(e.target.value)}
+              onChange={(e) => setOtherCostsStr(formatCurrencyInput(e.target.value))}
               placeholder="0"
             />
           </div>
@@ -274,7 +308,7 @@ export const FormPO: React.FC<FormPOProps> = ({
               id="po-discount"
               inputMode="numeric"
               value={discountStr}
-              onChange={(e) => setDiscountStr(e.target.value)}
+              onChange={(e) => setDiscountStr(formatCurrencyInput(e.target.value))}
               placeholder="0"
             />
           </div>
@@ -288,7 +322,8 @@ export const FormPO: React.FC<FormPOProps> = ({
               value={String(ppnRate)}
               onChange={(e) => setPpnRate(Number(e.target.value))}
             >
-              <option value="0.11">11% efektif (perkiraan)</option>
+              <option value="0.11">11% efektif (PPN Umum)</option>
+              <option value="0.011">1.1% (PPN Besaran Tertentu)</option>
               <option value="0">0% (Bebas PPN / Non-PKP)</option>
             </select>
           </div>
@@ -302,6 +337,8 @@ export const FormPO: React.FC<FormPOProps> = ({
               <option value="0">0% (Tanpa Potongan PPh)</option>
               <option value="0.02">2% (PPh Pasal 23 Jasa)</option>
               <option value="0.005">0.5% (PPh Final UMKM)</option>
+              <option value="0.025">2.5% (PPh Pasal 21 Tenaga Ahli)</option>
+              <option value="0.1">10% (PPh Final Pasal 4(2) Sewa)</option>
             </select>
           </div>
         </div>

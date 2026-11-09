@@ -1,6 +1,6 @@
 import React from 'react';
 import type { BaseDocument, StageDecision } from '../types/document';
-import { ApprovalProgress } from './ApprovalProgress';
+import { displayPersonName } from '../domain/display-name';
 
 export interface ApprovalStepperProps {
   document: BaseDocument;
@@ -43,6 +43,8 @@ export const ApprovalStepper: React.FC<ApprovalStepperProps> = ({ document }) =>
   const heryBadge = getDecisionBadge(bod.heryStatus);
   const hashimotoBadge = getDecisionBadge(bod.hashimotoStatus);
 
+  if (document.docType === 'GR') return null;
+
   return (
     <section className="stepper-section" aria-label="Alur Persetujuan">
       <div className="stepper-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
@@ -55,18 +57,16 @@ export const ApprovalStepper: React.FC<ApprovalStepperProps> = ({ document }) =>
             </span>
           </span>
         </div>
-        <div>
-          <ApprovalProgress document={document} />
-        </div>
       </div>
 
       <div className="stepper-track">
         {/* Tahap 1: Atasan */}
+        {document.docType !== 'PV' && <>
         <div className={`step-node ${atasan.status === 'PENDING' ? 'step-active' : ''}`}>
           <div className="step-circle">1</div>
           <div className="step-content">
             <div className="step-title-row">
-              <strong>Tahap 1: Head</strong>
+              <strong>{displayPersonName(atasan.assignedTo)}</strong>
               <span className={`step-badge ${atasanBadge.className}`}>{atasanBadge.label}</span>
             </div>
             {atasan.decisionAt && (
@@ -77,13 +77,14 @@ export const ApprovalStepper: React.FC<ApprovalStepperProps> = ({ document }) =>
         </div>
 
         <div className="step-connector" />
+        </>}
 
-        {/* Tahap 2: Bu Ayu */}
+        {/* Tahap 2: Ayu Martina */}
         <div className={`step-node ${ayu.status === 'PENDING' ? 'step-active' : ''}`}>
-          <div className="step-circle">2</div>
+          <div className="step-circle">{document.docType === 'PV' ? 1 : 2}</div>
           <div className="step-content">
             <div className="step-title-row">
-              <strong>Tahap 2: GM</strong>
+              <strong>Ayu Martina</strong>
               <span className={`step-badge ${ayuBadge.className}`}>{ayuBadge.label}</span>
             </div>
             {ayu.decisionAt && <p className="step-time">Waktu: {formatDate(ayu.decisionAt)}</p>}
@@ -99,16 +100,16 @@ export const ApprovalStepper: React.FC<ApprovalStepperProps> = ({ document }) =>
             bod.heryStatus === 'PENDING' || bod.hashimotoStatus === 'PENDING' ? 'step-active' : ''
           }`}
         >
-          <div className="step-circle">3</div>
+          <div className="step-circle">{document.docType === 'PV' ? 2 : 3}</div>
           <div className="step-content">
             <div className="step-title-row">
-              <strong>Tahap 3: Direksi (BOD - Paralel)</strong>
+              <strong>Persetujuan bersama</strong>
             </div>
 
             <div className="bod-parallel-box">
               <div className="bod-reviewer">
                 <div className="bod-reviewer-head">
-                  <strong>Pak Hery</strong>
+                  <strong>Hery Sugiarto</strong>
                   <span className={`step-badge ${heryBadge.className}`}>{heryBadge.label}</span>
                 </div>
                 {bod.heryDecisionAt && (
@@ -119,7 +120,7 @@ export const ApprovalStepper: React.FC<ApprovalStepperProps> = ({ document }) =>
 
               <div className="bod-reviewer">
                 <div className="bod-reviewer-head">
-                  <strong>Hashimoto</strong>
+                  <strong>Koji Hashimoto</strong>
                   <span className={`step-badge ${hashimotoBadge.className}`}>{hashimotoBadge.label}</span>
                 </div>
                 {bod.hashimotoDecisionAt && (

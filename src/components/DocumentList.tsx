@@ -21,12 +21,14 @@ import {
 import type { AnyDocument, DocType, PVDocument, UserRole } from '../types/document';
 import { paymentLabel } from '../domain/payment-label';
 import { ApprovalProgress } from './ApprovalProgress';
+import './document-lists.css';
 
 export interface DocumentListProps {
   documents: AnyDocument[];
   activeTab: DocType | 'ALL';
   activeRole: UserRole;
   activeUserId: string;
+  activeUserEmail?: string;
   onOpenDetail: (doc: AnyDocument) => void;
   onEditDoc: (doc: AnyDocument) => void;
   onSubmitDoc: (docId: string) => void;
@@ -35,6 +37,9 @@ export interface DocumentListProps {
   onCreateRelated: (doc: AnyDocument) => void;
   onConfirmRc: (id: string) => void;
   onOpenExport?: () => void;
+  onSelectTab?: (tab: DocType | 'ALL') => void;
+  title?: string;
+  ownerOnly?: boolean;
 }
 
 const rupiah = new Intl.NumberFormat('id-ID', {
@@ -67,41 +72,65 @@ function getDocTypeVisual(docType: DocType) {
     case 'PR':
       return { icon: FileText, bg: '#FDF2F4', color: '#E51937', label: 'Purchase Request' };
     case 'PO':
-      return { icon: ShoppingBag, bg: '#E5F3FB', color: '#0085DB', label: 'Purchase Order' };
+      return { icon: ShoppingBag, bg: '#F1F5F9', color: '#1E293B', label: 'Purchase Order' };
+    case 'GR':
+      return { icon: CheckCircle2, bg: '#ECFDF5', color: '#065F46', label: 'Laporan Penerimaan' };
     case 'AV':
-      return { icon: Banknote, bg: '#FEF5E5', color: '#FFAE1F', label: 'Cash Advance' };
+      return { icon: Banknote, bg: '#F1F5F9', color: '#1E293B', label: 'Cash Advance' };
     case 'RB':
-      return { icon: Receipt, bg: '#F2ECF9', color: '#8763DA', label: 'Reimbursement' };
+      return { icon: Receipt, bg: '#F1F5F9', color: '#1E293B', label: 'Reimbursement' };
     case 'RC':
-      return { icon: Scale, bg: '#E6FFFA', color: '#00CEB6', label: 'Realization AV' };
+      return { icon: Scale, bg: '#F1F5F9', color: '#1E293B', label: 'Realization AV' };
     case 'PV':
-      return { icon: CreditCard, bg: '#E6FFFA', color: '#008A7A', label: 'Payment Voucher' };
+      return { icon: CreditCard, bg: '#F1F5F9', color: '#1E293B', label: 'Payment Voucher' };
   }
 }
 
 function getStatusBadge(status: string) {
   switch (status) {
     case 'APPROVED':
-      return { label: 'Disetujui', color: '#008A7A', bg: '#E6FFFA', border: '#B2F5EA' };
+      return { label: 'Disetujui', color: '#065F46', bg: '#ECFDF5', border: '#A7F3D0' };
     case 'PAID':
-      return { label: 'Lunas', color: '#008A7A', bg: '#E6FFFA', border: '#B2F5EA' };
+      return { label: 'Lunas', color: '#1E40AF', bg: '#EFF6FF', border: '#BFDBFE' };
     case 'REJECTED':
-      return { label: 'Ditolak (Revisi)', color: '#C8132D', bg: '#FDF2F4', border: '#FECDD3' };
+      return { label: 'Ditolak (Revisi)', color: '#991B1B', bg: '#FEF2F2', border: '#FECACA' };
     case 'SUBMITTED':
-      return { label: 'Diajukan', color: '#B4690E', bg: '#FEF5E5', border: '#FDE68A' };
+      return { label: 'Diajukan', color: '#92400E', bg: '#FFFBEB', border: '#FDE68A' };
     case 'IN_REVIEW':
-      return { label: 'Sedang Ditinjau', color: '#E51937', bg: '#FDF2F4', border: '#FBCFE8' };
+      return { label: 'Sedang Ditinjau', color: '#B45309', bg: '#FFFBEB', border: '#FDE68A' };
     case 'DRAFT':
     default:
-      return { label: 'Draf', color: '#5A6A85', bg: '#F0F5F9', border: '#DFE5EF' };
+      return { label: 'Draf', color: '#374151', bg: '#F3F4F6', border: '#E5E7EB' };
   }
 }
 
-function requiresRoleAction(doc: AnyDocument, activeRole: UserRole, allDocs: AnyDocument[]): boolean {
+function canCreatePvFromDoc(doc: AnyDocument, allDocs: AnyDocument[]): boolean {
+  if (doc.status !== 'APPROVED') return false;
+  if (doc.docType === 'PO') {
+    const committed = allDocs.reduce((sum, d) => {
+      if (d.status === 'REJECTED' || d.status === 'DRAFT') return sum;
+      if (d.docType === 'PV' && d.sourceDocId === doc.id) return sum + d.netAmountToPay;
+      if (d.docType === 'AV' && d.parentPoId === doc.id) return sum + d.amount;
+      return sum;
+    }, 0);
+    return doc.totalAmount - committed > 0;
+  }
+  if (doc.docType === 'AV' || doc.docType === 'RB') {
+    return !allDocs.some((d) => d.docType === 'PV' && d.sourceDocId === doc.id && d.status !== 'REJECTED');
+  }
+  if (doc.docType === 'RC' && doc.outcomeType === 'DEFICIT') {
+    return !allDocs.some((d) => d.docType === 'PV' && d.sourceDocId === doc.id && d.status !== 'REJECTED');
+  }
+  return false;
+}
+
+function requiresRoleAction(doc: AnyDocument, activeRole: UserRole, allDocs: AnyDocument[], activeUserId: string, activeUserEmail?: string): boolean {
   if (activeRole === 'PEMOHON') return doc.status === 'DRAFT' || doc.status === 'REJECTED';
+  if (['ATASAN', 'AYU', 'BOD_HERY', 'BOD_HASHIMOTO'].includes(activeRole) && doc.ownerId === activeUserId) return false;
   if (activeRole === 'ATASAN') {
     return (
       (doc.status === 'SUBMITTED' || doc.status === 'IN_REVIEW') &&
+      Boolean(activeUserEmail && doc.stage1ApproverEmail && activeUserEmail.trim().toLowerCase() === doc.stage1ApproverEmail.trim().toLowerCase()) &&
       doc.approvalSteps.atasan.status === 'PENDING'
     );
   }
@@ -124,13 +153,11 @@ function requiresRoleAction(doc: AnyDocument, activeRole: UserRole, allDocs: Any
     );
   }
   if (activeRole === 'KEUANGAN') {
-    if (doc.docType === 'PV') return (doc as PVDocument).paymentStatus === 'UNPAID';
-    const hasPv = allDocs.some((d) => d.docType === 'PV' && (d as PVDocument).sourceDocId === doc.id);
-    return (
-      doc.status === 'APPROVED' &&
-      !hasPv &&
-      (doc.docType !== 'RC' || doc.outcomeType === 'DEFICIT')
-    );
+    if (doc.docType === 'PV') return doc.status === 'APPROVED' && (doc as PVDocument).paymentStatus === 'UNPAID';
+    if (doc.docType === 'RC' && doc.outcomeType !== 'DEFICIT' && doc.status === 'APPROVED' && !doc.financeConfirmedAt) {
+      return true;
+    }
+    return canCreatePvFromDoc(doc, allDocs);
   }
   return false;
 }
@@ -140,6 +167,7 @@ export const DocumentList: React.FC<DocumentListProps> = ({
   activeTab,
   activeRole,
   activeUserId,
+  activeUserEmail,
   onOpenDetail,
   onEditDoc,
   onSubmitDoc,
@@ -148,17 +176,30 @@ export const DocumentList: React.FC<DocumentListProps> = ({
   onCreateRelated,
   onConfirmRc,
   onOpenExport,
+  onSelectTab,
+  title,
+  ownerOnly = false,
 }) => {
   const [search, setSearch] = useState('');
   const [selectedBranch, setSelectedBranch] = useState<string>('ALL');
   const [onlyMyActions, setOnlyMyActions] = useState(false);
+  const [ownType, setOwnType] = useState<DocType | 'ALL'>('ALL');
+  const [ownStatus, setOwnStatus] = useState<'ALL' | 'DRAFT' | 'PENDING' | 'REJECTED' | 'APPROVED' | 'PAID'>('ALL');
 
   const branches = useMemo(() => {
     return ['ALL', ...branchOptions(documents.map((d) => d.branch))];
   }, [documents]);
 
   const filtered = useMemo(() => {
-    let list = documents;
+    let list = ownerOnly ? documents.filter((document) => document.ownerId === activeUserId) : documents;
+    if (ownerOnly && ownType !== 'ALL') list = list.filter((d) => d.docType === ownType);
+    if (ownerOnly && ownStatus === 'PENDING') list = list.filter((d) => d.status === 'SUBMITTED' || d.status === 'IN_REVIEW');
+    else if (ownerOnly && (ownStatus === 'DRAFT' || ownStatus === 'REJECTED')) list = list.filter((d) => {
+      const last = [...d.auditLog].reverse().find((entry) => entry.action === 'REJECT' || entry.action === 'SUBMIT');
+      const revision = d.status === 'REJECTED' || (d.status === 'DRAFT' && last?.action === 'REJECT');
+      return ownStatus === 'REJECTED' ? revision : d.status === 'DRAFT' && !revision;
+    });
+    else if (ownerOnly && ownStatus !== 'ALL') list = list.filter((d) => d.status === ownStatus);
     if (activeTab !== 'ALL') {
       list = list.filter((d) => d.docType === activeTab);
     }
@@ -166,7 +207,7 @@ export const DocumentList: React.FC<DocumentListProps> = ({
       list = list.filter((d) => d.branch === selectedBranch);
     }
     if (onlyMyActions) {
-      list = list.filter((d) => (activeRole !== 'PEMOHON' || d.ownerId === activeUserId) && requiresRoleAction(d, activeRole, documents));
+      list = list.filter((d) => (activeRole !== 'PEMOHON' || d.ownerId === activeUserId) && requiresRoleAction(d, activeRole, documents, activeUserId, activeUserEmail));
     }
     if (search.trim()) {
       const q = search.toLowerCase();
@@ -179,15 +220,15 @@ export const DocumentList: React.FC<DocumentListProps> = ({
       );
     }
     return list;
-  }, [documents, activeTab, selectedBranch, onlyMyActions, activeRole, activeUserId, search]);
+  }, [documents, activeTab, selectedBranch, onlyMyActions, activeRole, activeUserId, activeUserEmail, search, ownerOnly, ownType, ownStatus]);
 
   return (
     <section
-      className="list-card"
+      className={`list-card${ownerOnly ? ' submission-list' : ''}`}
       aria-label="Daftar Dokumen Transaksi"
       style={{ padding: '26px', borderRadius: 'var(--card-radius)' }}
     >
-      {/* Spike Pro Card Header & Search Bar */}
+      {/* Table Card Header & Search Bar */}
       <div
         style={{
           display: 'flex',
@@ -200,7 +241,7 @@ export const DocumentList: React.FC<DocumentListProps> = ({
       >
         <div>
           <h2 style={{ fontSize: '18px', fontWeight: 900, margin: 0, color: '#111C2D' }}>
-            {activeTab === 'ALL' ? 'Daftar Transaksi Pengadaan' : `Dokumen Modul ${activeTab}`}
+            {title ?? (activeTab === 'ALL' ? 'Daftar Transaksi Pengadaan' : `Dokumen Modul ${activeTab}`)}
           </h2>
         </div>
 
@@ -256,8 +297,32 @@ export const DocumentList: React.FC<DocumentListProps> = ({
         </div>
       </div>
 
-      {/* Spike Pro Faceted Filter Pills (Cabang) */}
-      <div
+      {onSelectTab && (
+        <div className="document-tabs-scroll">
+          <div className="s-tabs" aria-label="Jenis dokumen">
+            {(['ALL', 'PR', 'PO', 'GR', 'AV', 'RB', 'RC', 'PV'] as const).map((type) => (
+              <button key={type} type="button" className={activeTab === type ? 'current' : ''}
+                aria-pressed={activeTab === type} onClick={() => onSelectTab(type)}>
+                {type === 'ALL' ? 'Semua' : type}
+                <span className="s-count">{type === 'ALL' ? documents.length : documents.filter((doc) => doc.docType === type).length}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {ownerOnly && <div className="register-filters">
+        <label>Jenis pengajuan<select value={ownType} onChange={(e) => setOwnType(e.target.value as DocType | 'ALL')}>
+          {(['ALL', 'PR', 'PO', 'GR', 'AV', 'RB', 'RC', 'PV'] as const).map((type) => <option key={type} value={type}>{type === 'ALL' ? 'Semua jenis' : type}</option>)}
+        </select></label>
+        <label>Status<select value={ownStatus} onChange={(e) => setOwnStatus(e.target.value as typeof ownStatus)}>
+          <option value="ALL">Semua status</option><option value="DRAFT">Draf</option><option value="PENDING">Menunggu</option><option value="REJECTED">Perlu revisi</option><option value="APPROVED">Disetujui</option><option value="PAID">Lunas</option>
+        </select></label>
+        <button type="button" className="secondary" onClick={() => { setSearch(''); setOwnType('ALL'); setOwnStatus('ALL'); setOnlyMyActions(false); setSelectedBranch('ALL'); }}>Atur ulang</button>
+      </div>}
+
+      {/* Branch Filter Pills */}
+      {!ownerOnly && <div
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -324,7 +389,7 @@ export const DocumentList: React.FC<DocumentListProps> = ({
         >
           Menunggu Tindakan Saya
         </button>
-      </div>
+      </div>}
 
       {filtered.length === 0 ? (
         <div className="empty" style={{ padding: '48px 16px', textAlign: 'center' }}>
@@ -333,7 +398,7 @@ export const DocumentList: React.FC<DocumentListProps> = ({
               width: '52px',
               height: '52px',
               margin: '0 auto 14px auto',
-              borderRadius: '16px',
+              borderRadius: 'var(--card-radius, 10px)',
               background: 'var(--accent-ruby-subtle)',
               display: 'flex',
               alignItems: 'center',
@@ -346,10 +411,10 @@ export const DocumentList: React.FC<DocumentListProps> = ({
           <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#111C2D', marginBottom: '6px' }}>
             Belum ada dokumen yang sesuai
           </h3>
-          <p style={{ fontSize: '13px', color: '#7C8FAC', maxWidth: '360px', margin: '0 auto' }}>
+          <p style={{ fontSize: '13px', color: 'var(--text-muted, #4B5563)', maxWidth: '360px', margin: '0 auto' }}>
             {search || selectedBranch !== 'ALL'
               ? 'Coba sesuaikan kata kunci pencarian atau pilih cabang lain.'
-              : 'Gunakan tombol pembuatan dokumen di atas untuk membuat pengajuan baru.'}
+              : activeRole === 'PEMOHON' ? 'Gunakan tombol pembuatan dokumen di atas untuk membuat pengajuan baru.' : 'Tidak ada dokumen untuk ditampilkan.'}
           </p>
         </div>
       ) : (
@@ -359,10 +424,20 @@ export const DocumentList: React.FC<DocumentListProps> = ({
               <tr>
                 <th scope="col">Dokumen & Pengajuan</th>
                 <th scope="col">Cabang</th>
-                <th scope="col">Nominal (IDR)</th>
+              <th scope="col" style={{ textAlign: 'right' }}>Nominal (IDR)</th>
                 <th scope="col">Status</th>
                 <th scope="col">Alur Persetujuan (3 Tahap)</th>
-                <th scope="col" style={{ textAlign: 'right' }}>
+                <th
+                  scope="col"
+                  style={{
+                    textAlign: 'right',
+                    position: 'sticky',
+                    right: 0,
+                    background: '#f8fafc',
+                    zIndex: 5,
+                    boxShadow: '-4px 0 6px -2px rgba(0,0,0,0.04)',
+                  }}
+                >
                   Tindakan
                 </th>
               </tr>
@@ -378,7 +453,10 @@ export const DocumentList: React.FC<DocumentListProps> = ({
                 const amount = getDocAmount(doc);
 
                 // Role permission checks
-                const canSubmit = activeRole === 'PEMOHON' && doc.ownerId === activeUserId && doc.status === 'DRAFT';
+                const canSubmit =
+                  ((activeRole === 'PEMOHON' && doc.ownerId === activeUserId) ||
+                    (activeRole === 'KEUANGAN' && doc.docType === 'PV')) &&
+                  doc.status === 'DRAFT';
                 const canEdit = canSubmit;
 
                 const isApproverRole =
@@ -386,46 +464,41 @@ export const DocumentList: React.FC<DocumentListProps> = ({
                   activeRole === 'AYU' ||
                   activeRole === 'BOD_HERY' ||
                   activeRole === 'BOD_HASHIMOTO';
-                const isReviewable =
-                  isApproverRole && (doc.status === 'SUBMITTED' || doc.status === 'IN_REVIEW');
-
-                const hasExistingPv = documents.some(
-                  (d) => d.docType === 'PV' && (d as PVDocument).sourceDocId === doc.id
-                );
+                const isReviewable = isApproverRole && requiresRoleAction(doc, activeRole, documents, activeUserId, activeUserEmail);
 
                 const canGeneratePv =
-                  activeRole === 'KEUANGAN' &&
-                  doc.status === 'APPROVED' &&
-                  !hasExistingPv &&
-                  doc.docType !== 'PV' &&
-                  (doc.docType !== 'RC' || doc.outcomeType === 'DEFICIT');
+                  activeRole === 'KEUANGAN' && canCreatePvFromDoc(doc, documents);
 
                 const canPayPv =
                   activeRole === 'KEUANGAN' &&
                   doc.docType === 'PV' &&
+                  doc.status === 'APPROVED' &&
                   (doc as PVDocument).paymentStatus === 'UNPAID';
 
                 return (
                   <tr key={doc.id}>
-                    {/* Spike Pro Avatar Box + Document Number & Title */}
+                    {/* Document Number & Title */}
                     <td data-label="Dokumen">
-                      <div
-                        style={{ display: 'flex', alignItems: 'center', gap: '14px', cursor: 'pointer' }}
+                      <button
+                        type="button"
+                        style={{ display: 'flex', alignItems: 'center', gap: '14px', background: 'transparent', border: 0, padding: 0, cursor: 'pointer', textAlign: 'left', font: 'inherit' }}
                         onClick={() => onOpenDetail(doc)}
+                        aria-label={`Buka detail ${doc.docNumber}: ${doc.title}`}
                       >
                         <div
                           style={{
-                            width: '44px',
-                            height: '44px',
-                            borderRadius: '12px',
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: 'var(--btn-radius)',
                             background: visual.bg,
                             color: visual.color,
                             display: 'grid',
                             placeItems: 'center',
                             flexShrink: 0,
+                            border: '1px solid #E2E8F0',
                           }}
                         >
-                          <DocIcon size={20} />
+                          <DocIcon size={18} />
                         </div>
                         <div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -433,8 +506,7 @@ export const DocumentList: React.FC<DocumentListProps> = ({
                               style={{
                                 fontSize: '13.5px',
                                 fontWeight: 800,
-                                color: '#111C2D',
-                                fontFamily: 'var(--font-mono)',
+                                color: '#111827',
                               }}
                             >
                               {doc.docNumber}
@@ -444,9 +516,10 @@ export const DocumentList: React.FC<DocumentListProps> = ({
                                 fontSize: '10px',
                                 fontWeight: 800,
                                 padding: '2px 7px',
-                                borderRadius: '6px',
+                                borderRadius: '4px',
                                 background: visual.bg,
                                 color: visual.color,
+                                border: '1px solid #E2E8F0',
                               }}
                             >
                               {doc.docType}
@@ -455,18 +528,16 @@ export const DocumentList: React.FC<DocumentListProps> = ({
                           <div
                             style={{
                               fontSize: '12.5px',
-                              color: '#7C8FAC',
+                              color: '#4B5563',
                               marginTop: '2px',
-                              maxWidth: '290px',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap',
+                              maxWidth: '360px',
+                              overflowWrap: 'anywhere',
                             }}
                           >
                             {doc.title}
                           </div>
                         </div>
-                      </div>
+                      </button>
                     </td>
 
                     {/* Branch */}
@@ -492,7 +563,8 @@ export const DocumentList: React.FC<DocumentListProps> = ({
                         fontSize: '14px',
                         fontWeight: 800,
                         color: '#111C2D',
-                        fontFamily: 'var(--font-mono)',
+                        fontVariantNumeric: 'tabular-nums',
+                        textAlign: 'right',
                       }}
                     >
                       {rupiah.format(amount)}
@@ -533,25 +605,27 @@ export const DocumentList: React.FC<DocumentListProps> = ({
 
                     {/* Multi-Stage Stepper Mini Preview */}
                     <td data-label="Persetujuan">
-                      {doc.docType === 'PV' ? (
-                        <span style={{ fontSize: '12px', color: '#7C8FAC' }}>
-                          Status Bayar:{' '}
-                          <strong
-                            style={{
-                              color:
-                                (doc as PVDocument).paymentStatus === 'PAID' ? '#008A7A' : '#B4690E',
-                            }}
-                          >
-                            {paymentLabel(doc, documents)}
-                          </strong>
+                      {doc.docType === 'GR' ? (
+                        <span style={{ fontSize: '12px', color: doc.itemCondition !== 'BAIK' ? '#991B1B' : '#065F46', fontWeight: 700 }}>
+                          {doc.itemCondition !== 'BAIK' ? `Perlu tindakan (${doc.itemCondition})` : 'Tanpa persetujuan · Baik'}
                         </span>
                       ) : (
                         <ApprovalProgress document={doc} />
                       )}
                     </td>
 
-                    {/* Action Buttons */}
-                    <td data-label="Tindakan" style={{ textAlign: 'right' }}>
+                    {/* Action Buttons (Sticky Right) */}
+                    <td
+                      data-label="Tindakan"
+                      style={{
+                        textAlign: 'right',
+                        position: 'sticky',
+                        right: 0,
+                        background: '#ffffff',
+                        zIndex: 5,
+                        boxShadow: '-4px 0 6px -2px rgba(0,0,0,0.04)',
+                      }}
+                    >
                       <div style={{ display: 'inline-flex', gap: '6px', alignItems: 'center' }}>
                         <button
                           type="button"
@@ -559,22 +633,58 @@ export const DocumentList: React.FC<DocumentListProps> = ({
                           style={{
                             padding: '6px 12px',
                             fontSize: '12px',
-                            borderRadius: '30px',
+                            borderRadius: 'var(--btn-radius)',
                           }}
                           onClick={() => onOpenDetail(doc)}
+                          aria-label={`Lihat detail ${doc.docNumber}`}
                         >
                           <Eye size={13} />
                           Detail
                         </button>
 
-                        {activeRole === 'PEMOHON' && doc.docType === 'PR' && doc.status === 'APPROVED' && (
-                          <button type="button" className="secondary" onClick={() => onCreateRelated(doc)}>Buat PO</button>
+                        {activeRole === 'PEMOHON' && doc.docType === 'PR' && doc.status === 'APPROVED' && !documents.some((item) => item.docType === 'PO' && item.parentPrId === doc.id && item.status !== 'REJECTED') && (
+                          <button
+                            type="button"
+                            className="secondary"
+                            style={{ borderRadius: 'var(--btn-radius)', padding: '6px 12px', fontSize: '12px' }}
+                            onClick={() => onCreateRelated(doc)}
+                            aria-label={`Buat PO dari ${doc.docNumber}`}
+                          >
+                            Buat PO
+                          </button>
+                        )}
+                        {activeRole === 'PEMOHON' && doc.docType === 'PO' && (doc.status === 'APPROVED' || doc.status === 'PAID') && (
+                          <button
+                            type="button"
+                            className="secondary"
+                            style={{ borderRadius: 'var(--btn-radius)', padding: '6px 12px', fontSize: '12px' }}
+                            onClick={() => onCreateRelated(doc)}
+                            aria-label={`Buat GR dari ${doc.docNumber}`}
+                          >
+                            Catat GR
+                          </button>
                         )}
                         {activeRole === 'PEMOHON' && doc.docType === 'AV' && doc.status === 'PAID' && doc.ownerId === activeUserId && documents.some((item) => item.docType === 'PV' && item.sourceDocId === doc.id && item.paymentStatus === 'PAID') && !documents.some((item) => item.docType === 'RC' && item.parentAvId === doc.id) && (
-                          <button type="button" className="secondary" onClick={() => onCreateRelated(doc)}>Buat RC</button>
+                          <button
+                            type="button"
+                            className="secondary"
+                            style={{ borderRadius: 'var(--btn-radius)', padding: '6px 12px', fontSize: '12px' }}
+                            onClick={() => onCreateRelated(doc)}
+                            aria-label={`Buat RC dari ${doc.docNumber}`}
+                          >
+                            Buat RC
+                          </button>
                         )}
-                        {activeRole === 'KEUANGAN' && doc.docType === 'RC' && (doc.status === 'APPROVED' || doc.status === 'PAID') && !doc.financeConfirmedAt && (
-                          <button type="button" className="secondary" onClick={() => onConfirmRc(doc.id)}>Konfirmasi penyelesaian</button>
+                        {activeRole === 'KEUANGAN' && doc.docType === 'RC' && doc.outcomeType !== 'DEFICIT' && (doc.status === 'APPROVED' || doc.status === 'PAID') && !doc.financeConfirmedAt && (
+                          <button
+                            type="button"
+                            className="secondary"
+                            style={{ borderRadius: 'var(--btn-radius)', padding: '6px 12px', fontSize: '12px' }}
+                            onClick={() => onConfirmRc(doc.id)}
+                            aria-label={`Konfirmasi penyelesaian ${doc.docNumber}`}
+                          >
+                            Konfirmasi penyelesaian
+                          </button>
                         )}
 
                         {canEdit && (
@@ -584,9 +694,10 @@ export const DocumentList: React.FC<DocumentListProps> = ({
                             style={{
                               padding: '6px 12px',
                               fontSize: '12px',
-                              borderRadius: '30px',
+                              borderRadius: 'var(--btn-radius)',
                             }}
                             onClick={() => onEditDoc(doc)}
+                            aria-label={`Ubah draf ${doc.docNumber}`}
                           >
                             <Edit3 size={13} />
                             Ubah
@@ -600,9 +711,10 @@ export const DocumentList: React.FC<DocumentListProps> = ({
                             style={{
                               padding: '6px 14px',
                               fontSize: '12px',
-                              borderRadius: '30px',
+                              borderRadius: 'var(--btn-radius)',
                             }}
                             onClick={() => onSubmitDoc(doc.id)}
+                            aria-label={`Ajukan ${doc.docNumber}`}
                           >
                             <Send size={13} />
                             Ajukan
@@ -616,13 +728,14 @@ export const DocumentList: React.FC<DocumentListProps> = ({
                             style={{
                               padding: '6px 14px',
                               fontSize: '12px',
-                              background: '#FFAE1F',
-                              borderColor: '#FFAE1F',
-                              color: '#111C2D',
-                              borderRadius: '30px',
-                              boxShadow: '0 4px 12px rgba(255, 174, 31, 0.25)',
+                              background: '#F59E0B',
+                              borderColor: '#F59E0B',
+                              color: '#FFFFFF',
+                              borderRadius: 'var(--btn-radius)',
+                              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
                             }}
                             onClick={() => onOpenDetail(doc)}
+                            aria-label={`Tinjau pengajuan ${doc.docNumber}`}
                           >
                             <CheckCircle2 size={13} />
                             Tinjau
@@ -636,12 +749,13 @@ export const DocumentList: React.FC<DocumentListProps> = ({
                             style={{
                               padding: '6px 14px',
                               fontSize: '12px',
-                              background: '#00CEB6',
-                              borderColor: '#00CEB6',
-                              borderRadius: '30px',
-                              boxShadow: '0 4px 12px rgba(0, 206, 182, 0.25)',
+                              background: '#2563EB',
+                              borderColor: '#2563EB',
+                              borderRadius: 'var(--btn-radius)',
+                              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
                             }}
                             onClick={() => onGeneratePv(doc.id)}
+                            aria-label={`Buat Payment Voucher dari ${doc.docNumber}`}
                           >
                             <PlusCircle size={13} />
                             Buat PV
@@ -655,12 +769,13 @@ export const DocumentList: React.FC<DocumentListProps> = ({
                             style={{
                               padding: '6px 14px',
                               fontSize: '12px',
-                              background: '#008A7A',
-                              borderColor: '#008A7A',
-                              borderRadius: '30px',
-                              boxShadow: '0 4px 12px rgba(0, 138, 122, 0.25)',
+                              background: '#10B981',
+                              borderColor: '#10B981',
+                              borderRadius: 'var(--btn-radius)',
+                              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
                             }}
                             onClick={() => onPayPv(doc as PVDocument)}
+                            aria-label={`Catat pembayaran ${doc.docNumber}`}
                           >
                             <CreditCard size={13} />
                             Bayar

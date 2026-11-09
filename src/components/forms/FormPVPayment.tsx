@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import type { PVDocument, PVPaymentDetails } from '../../types/document';
+import { formatCurrencyInput, parseCurrencyInput } from '../../lib/currency-format';
 
 export interface FormPVPaymentProps {
   pv: PVDocument;
@@ -21,9 +22,15 @@ export const FormPVPayment: React.FC<FormPVPaymentProps> = ({
   const [paidAt, setPaidAt] = useState<string>(
     new Date().toISOString().slice(0, 10)
   );
-  const [sourceBank, setSourceBank] = useState<string>('BCA Operasional Pusat');
+  const [sourceBank, setSourceBank] = useState<string>(
+    pv.plannedSourceAccount || 'BCA Operasional Pusat'
+  );
+  const [paidAmountStr, setPaidAmountStr] = useState<string>(
+    formatCurrencyInput(pv.netAmountToPay)
+  );
   const [referenceNumber, setReferenceNumber] = useState<string>('');
   const [proofUrl, setProofUrl] = useState<string>('');
+  const [notes, setNotes] = useState<string>('');
   const [error, setError] = useState<string>('');
 
   function handleSubmit(e: React.FormEvent) {
@@ -36,6 +43,13 @@ export const FormPVPayment: React.FC<FormPVPaymentProps> = ({
       setError('Bank sumber pembayaran perusahaan wajib diisi.');
       return;
     }
+    const paidAmount = parseCurrencyInput(paidAmountStr);
+    if (paidAmount !== pv.netAmountToPay) {
+      setError(
+        `Nominal dibayar (${rupiah.format(paidAmount)}) harus sama persis dengan Nilai Dibayarkan PV (${rupiah.format(pv.netAmountToPay)}).`
+      );
+      return;
+    }
     if (!referenceNumber.trim()) {
       setError('Nomor referensi / bukti transaksi transfer bank wajib diisi.');
       return;
@@ -44,8 +58,10 @@ export const FormPVPayment: React.FC<FormPVPaymentProps> = ({
     onRecordPayment(pv.id, {
       paidAt,
       sourceBank,
+      paidAmount,
       referenceNumber,
       proofUrl: proofUrl || undefined,
+      notes: notes.trim() || undefined,
     });
   }
 
@@ -108,20 +124,44 @@ export const FormPVPayment: React.FC<FormPVPaymentProps> = ({
           </div>
         </div>
 
-        <label htmlFor="pv-ref-num">Nomor Referensi Pembayaran <span>*</span></label>
-        <input
-          id="pv-ref-num"
-          value={referenceNumber}
-          onChange={(e) => setReferenceNumber(e.target.value)}
-          placeholder="Contoh: TRF-BLC-20261107-88219"
-        />
+        <div className="form-grid-2">
+          <div>
+            <label htmlFor="pv-paid-amount">Nominal Dibayarkan (Wajib Sesuai Net PV) <span>*</span></label>
+            <div className="money">
+              <span>Rp</span>
+              <input
+                id="pv-paid-amount"
+                inputMode="numeric"
+                value={paidAmountStr}
+                onChange={(e) => setPaidAmountStr(formatCurrencyInput(e.target.value))}
+              />
+            </div>
+          </div>
+          <div>
+            <label htmlFor="pv-ref-num">Nomor Referensi Pembayaran <span>*</span></label>
+            <input
+              id="pv-ref-num"
+              value={referenceNumber}
+              onChange={(e) => setReferenceNumber(e.target.value)}
+              placeholder="Contoh: TRF-BLC-20261107-88219"
+            />
+          </div>
+        </div>
 
-        <label htmlFor="pv-proof-url">Tautan / Nama Berkas Bukti Transfer</label>
+        <label htmlFor="pv-proof-url">Tautan / Nama Berkas Bukti Transfer (PaymentProof_)</label>
         <input
           id="pv-proof-url"
           value={proofUrl}
           onChange={(e) => setProofUrl(e.target.value)}
-          placeholder="Contoh: https://storage.blc.internal/proofs/20261107-88219.pdf"
+          placeholder="Contoh: PaymentProof_PV-202611-0001_TRF88219.pdf"
+        />
+
+        <label htmlFor="pv-notes">Catatan Pembayaran (Opsional)</label>
+        <input
+          id="pv-notes"
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          placeholder="Catatan tambahan pelunasan..."
         />
       </div>
 

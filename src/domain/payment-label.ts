@@ -4,7 +4,7 @@ export function paymentLabel(doc: AnyDocument, documents: AnyDocument[]): string
   if (doc.docType === 'PV') {
     return doc.paymentStatus === 'PAID' ? 'Dibayar' : 'Menunggu pembayaran';
   }
-  if (doc.docType === 'PR' || (doc.docType === 'RC' && doc.outcomeType !== 'DEFICIT')) return null;
+  if (doc.docType === 'PR' || doc.docType === 'GR' || (doc.docType === 'RC' && doc.outcomeType !== 'DEFICIT')) return null;
   const voucher = documents.find(
     (item): item is PVDocument => item.docType === 'PV' && item.sourceDocId === doc.id
   );

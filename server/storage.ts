@@ -14,10 +14,13 @@ export const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024; // 10 MB
 
 export type AttachmentCategory =
   | 'IAM_MEMO'
+  | 'QUOTATION'
   | 'INVOICE'
   | 'RECEIPT'
   | 'REFUND_PROOF'
   | 'PAYMENT_PROOF'
+  | 'PHOTO'
+  | 'BAST'
   | 'SUPPORTING';
 
 export interface StoredAttachment {

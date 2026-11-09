@@ -1,0 +1,25 @@
+import { describe, expect, it } from 'vitest';
+import { displayPersonName } from './display-name';
+
+describe('displayPersonName', () => {
+  it('maps known identities and historical role labels to the requested names', () => {
+    expect(displayPersonName('Bu Ayu (Verifikator Keuangan)')).toBe('Ayu Martina');
+    expect(displayPersonName('Pak Hery (Direksi BoD)')).toBe('Hery Sugiarto');
+    expect(displayPersonName('Mr. Hashimoto (Direksi BoD)')).toBe('Koji Hashimoto');
+    expect(displayPersonName('Pak Hendra (Atasan Langsung)')).toBe('Hendra');
+    expect(displayPersonName('Dewi Lestari (Pemohon Pusat)')).toBe('Dewi Lestari');
+    expect(displayPersonName('Erika Ayu Fitriana (Keuangan)')).toBe('Erika Ayu Fitriana');
+  });
+
+  it('does not invent names for empty or generic role labels', () => {
+    for (const input of [undefined, '', '  ', 'Atasan Langsung', 'Manajer Operasional', 'Staff Surabaya']) {
+      expect(displayPersonName(input)).toBe('Nama belum tersedia');
+    }
+  });
+
+  it('keeps unknown names intact without stripping meaningful text or guessing identities', () => {
+    expect(displayPersonName('  Jane (Née Doe)  ')).toBe('Jane (Née Doe)');
+    expect(displayPersonName('Ayu Puspita')).toBe('Ayu Puspita');
+    expect(displayPersonName('Hendra Wijaya')).toBe('Hendra Wijaya');
+  });
+});

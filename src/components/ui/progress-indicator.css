@@ -1,0 +1,4 @@
+.approval-capsule { position: relative; min-width: 225px; }
+.approval-capsule-track { position: absolute; top: 4px; left: 10px; height: 12px; border-radius: 999px; background: #e3e8e4; overflow: hidden; }
+.approval-capsule-fill { height: 100%; border-radius: inherit; background: #079982; }
+.approval-progress--capsule .approval-progress-step:not(:last-child)::before { display: none; }

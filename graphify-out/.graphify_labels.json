@@ -1,15 +1,10 @@
 {
-  "0": "Approval workflow, architecture, and data model",
   "1": "Email thread evidence and Finance feedback",
   "5": "SharePoint Site Pages and Notebook",
   "6": "Reimbursement (RB) request form",
   "8": "SharePoint home page (Beranda) and registers",
-  "10": "Purchase Request (PR) form",
-  "11": "Cash Advance (AV) request form",
   "13": "Cash Advance Realization (RC) request form",
   "14": "ApprovalHistory SharePoint list and skip reasons",
-  "15": "RC_Drafts SharePoint list",
-  "16": "ApprovalDocs document library",
   "17": "AV_Drafts SharePoint list",
   "18": "TypeScript configuration",
   "19": "Graph navigation"

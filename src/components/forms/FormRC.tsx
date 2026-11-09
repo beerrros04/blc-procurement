@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { calculateRcOutcome } from '../../domain/calculations';
 import { addWorkingDays } from '../../domain/working-days';
 import { readAttachment } from '../../lib/read-attachment';
+import { formatCurrencyInput, parseCurrencyInput } from '../../lib/currency-format';
 import type { AVDocument, RCDocument } from '../../types/document';
 
 export interface FormRCProps {
@@ -25,14 +26,14 @@ export const FormRC: React.FC<FormRCProps> = ({
 }) => {
   const [doc, setDoc] = useState<RCDocument>(initialDoc);
   const [realizedStr, setRealizedStr] = useState<string>(
-    String(initialDoc.subtotal ?? (initialDoc.realizedAmount || ''))
+    formatCurrencyInput(initialDoc.subtotal ?? initialDoc.realizedAmount)
   );
   const [error, setError] = useState<string>('');
 
   const outcome = useMemo(() => {
     return calculateRcOutcome({
       avOriginalAmount: doc.avOriginalAmount,
-      realizedAmount: Math.max(0, (Number(realizedStr) || 0) + (doc.otherCosts ?? 0) - (doc.discount ?? 0)),
+      realizedAmount: Math.max(0, parseCurrencyInput(realizedStr) + (doc.otherCosts ?? 0) - (doc.discount ?? 0)),
     });
   }, [doc.avOriginalAmount, doc.otherCosts, doc.discount, realizedStr]);
 
@@ -79,6 +80,10 @@ export const FormRC: React.FC<FormRCProps> = ({
     }
     if (outcome.realizedAmount <= 0) {
       setError('Total realisasi penggunaan dana harus lebih dari Rp 0.');
+      return;
+    }
+    if (outcome.realizedAmount > 50_000_000) {
+      setError('Total realisasi melebihi batas sistem Rp 50.000.000.');
       return;
     }
 
@@ -141,30 +146,69 @@ export const FormRC: React.FC<FormRCProps> = ({
         </select>
 
         {doc.parentAvId && (
-          <div className="form-grid-2" style={{ marginTop: '14px' }}>
-            <div>
-              <label>Nominal Uang Muka Diterima (AV)</label>
-              <input value={rupiah.format(doc.avOriginalAmount)} disabled readOnly />
+          <>
+            <div style={{ marginTop: '14px' }}>
+              <label htmlFor="rc-outcome-preset">Hasil Penyelesaian (Hasil RC)</label>
+              <select
+                id="rc-outcome-preset"
+                value={outcome.outcomeType}
+                onChange={(e) => {
+                  const val = e.target.value as 'SURPLUS' | 'EXACT' | 'DEFICIT';
+                  if (val === 'EXACT') {
+                    const targetSubtotal = Math.max(0, doc.avOriginalAmount - (doc.otherCosts ?? 0) + (doc.discount ?? 0));
+                    setRealizedStr(formatCurrencyInput(targetSubtotal));
+                  }
+                }}
+              >
+                <option value="SURPLUS">Return to Caready — Sisa Dana (Surplus)</option>
+                <option value="EXACT">Sama dengan CA — Nihil / Pas (Exact)</option>
+                <option value="DEFICIT">Return to Employee — Kekurangan Dana (Defisit)</option>
+              </select>
+              <p className="help">Pilih &ldquo;Sama dengan CA&rdquo; untuk mengisi otomatis jumlah realisasi sesuai uang muka yang diterima.</p>
             </div>
-            <div>
-              <label htmlFor="rc-realized">Subtotal Realisasi <span>*</span></label>
-              <div className="money">
-                <span>Rp</span>
-                <input
-                  id="rc-realized"
-                  inputMode="numeric"
-                  value={realizedStr}
-                  onChange={(e) => setRealizedStr(e.target.value)}
-                  placeholder="0"
-                />
+            <div className="form-grid-2" style={{ marginTop: '10px' }}>
+              <div>
+                <label>Nominal Uang Muka Diterima (AV)</label>
+                <input value={rupiah.format(doc.avOriginalAmount)} disabled readOnly />
+              </div>
+              <div>
+                <label htmlFor="rc-realized">Subtotal Realisasi <span>*</span></label>
+                <div className="money">
+                  <span>Rp</span>
+                  <input
+                    id="rc-realized"
+                    inputMode="numeric"
+                    value={realizedStr}
+                    onChange={(e) => setRealizedStr(formatCurrencyInput(e.target.value))}
+                    placeholder="0"
+                  />
+                </div>
               </div>
             </div>
-          </div>
+          </>
         )}
 
         {doc.parentAvId && <div className="form-grid-2">
-          <div><label htmlFor="rc-other">Biaya lain</label><input id="rc-other" type="number" min="0" value={doc.otherCosts ?? 0} onChange={(e) => setDoc({ ...doc, otherCosts: Number(e.target.value) })} /></div>
-          <div><label htmlFor="rc-discount">Diskon</label><input id="rc-discount" type="number" min="0" value={doc.discount ?? 0} onChange={(e) => setDoc({ ...doc, discount: Number(e.target.value) })} /></div>
+          <div>
+            <label htmlFor="rc-other">Biaya lain</label>
+            <input
+              id="rc-other"
+              inputMode="numeric"
+              value={formatCurrencyInput(doc.otherCosts ?? 0)}
+              onChange={(e) => setDoc({ ...doc, otherCosts: parseCurrencyInput(e.target.value) })}
+              placeholder="0"
+            />
+          </div>
+          <div>
+            <label htmlFor="rc-discount">Diskon</label>
+            <input
+              id="rc-discount"
+              inputMode="numeric"
+              value={formatCurrencyInput(doc.discount ?? 0)}
+              onChange={(e) => setDoc({ ...doc, discount: parseCurrencyInput(e.target.value) })}
+              placeholder="0"
+            />
+          </div>
           <div><label htmlFor="rc-budget">Tipe anggaran</label><select id="rc-budget" value={doc.budgetType ?? 'OPEX'} onChange={(e) => setDoc({ ...doc, budgetType: e.target.value })}><option value="OPEX">OPEX</option><option value="CAPEX">CAPEX</option><option value="PROJECT">Project</option></select></div>
         </div>}
 

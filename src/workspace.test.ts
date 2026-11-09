@@ -181,3 +181,38 @@ describe('End-to-End Operational Lifecycle Simulation', () => {
     expect(approvedRc.outcomeType).toBe('SURPLUS');
   });
 });
+describe('Operations Navigation Role Filter (Elera Spec)', () => {
+  it('opens a view available to each role', async () => {
+    const { getInitialWorkspaceTab } = await import('./main');
+    expect(getInitialWorkspaceTab('ADMIN')).toBe('DASHBOARD');
+    expect(getInitialWorkspaceTab('AYU')).toBe('DASHBOARD');
+    expect(getInitialWorkspaceTab('ATASAN')).toBe('PENGAJUAN');
+    expect(getInitialWorkspaceTab('KEUANGAN')).toBe('PENGAJUAN');
+  });
+
+  it('PEMOHON sees only Pengajuan under Operations', async () => {
+    const { getVisibleOperationsNav } = await import('./main');
+    const nav = getVisibleOperationsNav('PEMOHON');
+    expect(nav.map((n) => n.id)).toEqual(['PENGAJUAN']);
+  });
+
+  it('ATASAN sees only Pengajuan under Operations', async () => {
+    const { getVisibleOperationsNav } = await import('./main');
+    const nav = getVisibleOperationsNav('ATASAN');
+    expect(nav.map((n) => n.id)).toEqual(['PENGAJUAN']);
+  });
+
+  it('ADMIN, AYU, and BOD see Dashboard, Pengajuan, and Dokumen', async () => {
+    const { getVisibleOperationsNav } = await import('./main');
+    expect(getVisibleOperationsNav('ADMIN').map((n) => n.id)).toEqual(['DASHBOARD', 'PENGAJUAN', 'DOKUMEN']);
+    expect(getVisibleOperationsNav('AYU').map((n) => n.id)).toEqual(['DASHBOARD', 'PENGAJUAN', 'DOKUMEN']);
+    expect(getVisibleOperationsNav('BOD_HERY').map((n) => n.id)).toEqual(['DASHBOARD', 'PENGAJUAN', 'DOKUMEN']);
+    expect(getVisibleOperationsNav('BOD_HASHIMOTO').map((n) => n.id)).toEqual(['DASHBOARD', 'PENGAJUAN', 'DOKUMEN']);
+  });
+
+  it('KEUANGAN sees Pengajuan and Dokumen', async () => {
+    const { getVisibleOperationsNav } = await import('./main');
+    const nav = getVisibleOperationsNav('KEUANGAN');
+    expect(nav.map((n) => n.id)).toEqual(['PENGAJUAN', 'DOKUMEN']);
+  });
+});

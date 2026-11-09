@@ -17,6 +17,10 @@ import {
 } from 'lucide-react';
 import type { AnyDocument, DocType } from '../types/document';
 import { openAttachment } from '../api';
+import { branchOptions } from '../domain/branches';
+import { displayPersonName } from '../domain/display-name';
+import { ApprovalProgress } from './ApprovalProgress';
+import './document-lists.css';
 
 const rupiah = new Intl.NumberFormat('id-ID', {
   style: 'currency',
@@ -25,6 +29,25 @@ const rupiah = new Intl.NumberFormat('id-ID', {
 });
 
 function getDocAmount(doc: AnyDocument): number {
+  switch (doc.docType) {
+    case 'PR':
+      return (doc.totalAmount ?? doc.subtotalAmount) + (doc.pphAmount ?? 0);
+    case 'PO':
+      return doc.totalAmount + doc.pphAmount;
+    case 'AV':
+      return doc.amount + (doc.pphAmount ?? 0);
+    case 'RB':
+      return doc.totalAmount + (doc.pphAmount ?? 0);
+    case 'RC':
+      return doc.realizedAmount;
+    case 'PV':
+      return doc.grossAmount;
+    default:
+      return 0;
+  }
+}
+
+function getNetPayableAmount(doc: AnyDocument): number {
   switch (doc.docType) {
     case 'PR':
       return doc.totalAmount ?? doc.subtotalAmount;
@@ -48,15 +71,17 @@ function getDocTypeVisual(docType: DocType) {
     case 'PR':
       return { icon: FileText, bg: '#FDF2F4', color: '#E51937', label: 'Purchase Request' };
     case 'PO':
-      return { icon: ShoppingBag, bg: '#E5F3FB', color: '#0085DB', label: 'Purchase Order' };
+      return { icon: ShoppingBag, bg: '#F1F5F9', color: '#1E293B', label: 'Purchase Order' };
+    case 'GR':
+      return { icon: CheckCircle2, bg: '#ECFDF5', color: '#065F46', label: 'Laporan Penerimaan' };
     case 'AV':
-      return { icon: Banknote, bg: '#FEF5E5', color: '#FFAE1F', label: 'Cash Advance' };
+      return { icon: Banknote, bg: '#F1F5F9', color: '#1E293B', label: 'Cash Advance' };
     case 'RB':
-      return { icon: Receipt, bg: '#F2ECF9', color: '#8763DA', label: 'Reimbursement' };
+      return { icon: Receipt, bg: '#F1F5F9', color: '#1E293B', label: 'Reimbursement' };
     case 'RC':
-      return { icon: Scale, bg: '#E6FFFA', color: '#00CEB6', label: 'Realisasi AV' };
+      return { icon: Scale, bg: '#F1F5F9', color: '#1E293B', label: 'Realisasi AV' };
     case 'PV':
-      return { icon: CreditCard, bg: '#E6FFFA', color: '#008A7A', label: 'Payment Voucher' };
+      return { icon: CreditCard, bg: '#F1F5F9', color: '#1E293B', label: 'Payment Voucher' };
   }
 }
 
@@ -65,13 +90,13 @@ function getStatusBadge(status: string) {
     case 'APPROVED':
       return { label: 'Disetujui', color: '#008A7A', bg: '#E6FFFA', border: '#B2F5EA' };
     case 'PAID':
-      return { label: 'Lunas', color: '#008A7A', bg: '#E6FFFA', border: '#B2F5EA' };
+      return { label: 'Lunas', color: '#1E40AF', bg: '#EFF6FF', border: '#BFDBFE' };
     case 'REJECTED':
       return { label: 'Ditolak', color: '#C8132D', bg: '#FDF2F4', border: '#FECDD3' };
     case 'SUBMITTED':
       return { label: 'Diajukan', color: '#B4690E', bg: '#FEF5E5', border: '#FDE68A' };
     case 'IN_REVIEW':
-      return { label: 'Ditinjau', color: '#E51937', bg: '#FDF2F4', border: '#FBCFE8' };
+      return { label: 'Ditinjau', color: '#92400E', bg: '#FFFBEB', border: '#FDE68A' };
     case 'DRAFT':
     default:
       return { label: 'Draf', color: '#5A6A85', bg: '#F0F5F9', border: '#DFE5EF' };
@@ -81,9 +106,9 @@ function getStatusBadge(status: string) {
 function getDocApplicant(doc: AnyDocument): string {
   const firstLog = doc.auditLog[0];
   if (firstLog && firstLog.actor) {
-    return firstLog.actor.replace(/\s*\(.*?\)\s*/g, '');
+    return displayPersonName(firstLog.actor);
   }
-  return `Staff ${doc.branch}`;
+  return 'Nama belum tersedia';
 }
 
 function formatDateShort(iso: string): string {
@@ -115,9 +140,13 @@ function formatDateTime(iso: string): string {
 const CATEGORY_LABELS: Record<string, string> = {
   IAM_MEMO: 'Internal Approval Memo',
   QUOTATION: 'Quotation Vendor',
+  INVOICE: 'Invoice / Tagihan',
   RECEIPT: 'Kwitansi / Struk',
   REFUND_PROOF: 'Bukti Pengembalian',
   PAYMENT_PROOF: 'Bukti Transfer',
+  PHOTO: 'Foto Barang (GR)',
+  BAST: 'BAST Jasa (GR)',
+  SUPPORTING: 'Dokumen Pendukung',
   OTHER: 'Dokumen Pendukung',
 };
 
@@ -130,32 +159,69 @@ export interface ApprovalRegisterViewProps {
   onOpenDetail: (doc: AnyDocument) => void;
 }
 
+export type QuickLedgerFilter =
+  | 'ALL'
+  | 'MENUNGGU'
+  | 'MENUNGGU_PV'
+  | 'JADWAL_PEMBAYARAN'
+  | 'UNPAID'
+  | 'PAID'
+  | 'AV_TANPA_PO'
+  | 'CA_BELUM_REALISASI';
+
+export interface RegisterFilters {
+  search: string;
+  type: DocType | 'ALL';
+  branch: string;
+  progress: 'ALL' | 'DRAFT' | 'MENUNGGU' | 'REJECTED' | 'APPROVED' | 'PAID';
+  action: QuickLedgerFilter;
+}
+
+export function filterRegisterDocuments(documents: AnyDocument[], filters: RegisterFilters): AnyDocument[] {
+  const { search, type, branch, progress, action } = filters;
+  return documents.filter((doc) => {
+    if (type !== 'ALL' && doc.docType !== type) return false;
+    if (branch !== 'ALL' && doc.branch !== branch) return false;
+    if (progress === 'MENUNGGU' && doc.status !== 'SUBMITTED' && doc.status !== 'IN_REVIEW') return false;
+    const lastDecision = [...doc.auditLog].reverse().find((entry) => entry.action === 'REJECT' || entry.action === 'SUBMIT');
+    const needsRevision = doc.status === 'REJECTED' || (doc.status === 'DRAFT' && lastDecision?.action === 'REJECT');
+    if (progress === 'REJECTED' && !needsRevision) return false;
+    if (progress === 'DRAFT' && (doc.status !== 'DRAFT' || needsRevision)) return false;
+    if (progress !== 'ALL' && progress !== 'MENUNGGU' && progress !== 'REJECTED' && progress !== 'DRAFT' && doc.status !== progress) return false;
+    const isPvPaid = doc.docType === 'PV' && doc.paymentStatus === 'PAID';
+    if (action === 'MENUNGGU' && doc.status !== 'SUBMITTED' && doc.status !== 'IN_REVIEW') return false;
+    if (action === 'MENUNGGU_PV') {
+      const needsPv = doc.status === 'APPROVED' &&
+        (doc.docType === 'PO' || doc.docType === 'AV' || doc.docType === 'RB' || (doc.docType === 'RC' && doc.outcomeType === 'DEFICIT')) &&
+        !documents.some((d) => d.docType === 'PV' && d.sourceDocId === doc.id && d.status !== 'REJECTED');
+      if (!needsPv) return false;
+    }
+    if (action === 'JADWAL_PEMBAYARAN' && !(doc.docType === 'PV' && doc.paymentStatus === 'UNPAID')) return false;
+    if (action === 'PAID' && !isPvPaid) return false;
+    if (action === 'UNPAID' && !(doc.docType === 'PV' && doc.paymentStatus === 'UNPAID')) return false;
+    if (action === 'AV_TANPA_PO' && !(doc.docType === 'AV' && !doc.parentPoId)) return false;
+    if (action === 'CA_BELUM_REALISASI') {
+      if (doc.docType !== 'AV' || doc.status !== 'PAID') return false;
+      if (documents.some((rc) => rc.docType === 'RC' && rc.parentAvId === doc.id && Boolean(rc.financeConfirmedAt))) return false;
+    }
+    const q = search.trim().toLowerCase();
+    return !q || [doc.docNumber, doc.title, doc.branch, doc.purpose].some((value) => value.toLowerCase().includes(q));
+  });
+}
+
 export const ApprovalRegisterView: React.FC<ApprovalRegisterViewProps> = ({
   documents,
   onOpenDetail,
 }) => {
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<DocType | 'ALL'>('ALL');
-  const [paymentFilter, setPaymentFilter] = useState<'ALL' | 'PAID' | 'UNPAID'>('ALL');
+  const [paymentFilter, setPaymentFilter] = useState<QuickLedgerFilter>('ALL');
+  const [branchFilter, setBranchFilter] = useState('ALL');
+  const [progressFilter, setProgressFilter] = useState<RegisterFilters['progress']>('ALL');
 
-  const filtered = useMemo(() => {
-    return documents.filter((doc) => {
-      if (typeFilter !== 'ALL' && doc.docType !== typeFilter) return false;
-      const isPaid = doc.status === 'PAID' || (doc.docType === 'PV' && doc.paymentStatus === 'PAID');
-      if (paymentFilter === 'PAID' && !isPaid) return false;
-      if (paymentFilter === 'UNPAID' && isPaid) return false;
-
-      if (search.trim()) {
-        const q = search.toLowerCase();
-        return (
-          doc.docNumber.toLowerCase().includes(q) ||
-          doc.title.toLowerCase().includes(q) ||
-          doc.branch.toLowerCase().includes(q)
-        );
-      }
-      return true;
-    });
-  }, [documents, search, typeFilter, paymentFilter]);
+  const filtered = useMemo(() => filterRegisterDocuments(documents, {
+    search, type: typeFilter, branch: branchFilter, progress: progressFilter, action: paymentFilter,
+  }), [documents, search, typeFilter, branchFilter, progressFilter, paymentFilter]);
 
   return (
     <section
@@ -191,6 +257,7 @@ export const ApprovalRegisterView: React.FC<ApprovalRegisterViewProps> = ({
           />
           <input
             type="search"
+            aria-label="Cari nomor, judul, tujuan, atau cabang di register"
             placeholder="Cari nomor dokumen, judul, cabang..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -207,91 +274,41 @@ export const ApprovalRegisterView: React.FC<ApprovalRegisterViewProps> = ({
         </div>
       </div>
 
-      {/* Filter Pills */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          flexWrap: 'wrap',
-          marginBottom: '22px',
-          paddingBottom: '16px',
-          borderBottom: '1px solid var(--border-subtle)',
-        }}
-      >
-        <span
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '5px',
-            fontSize: '12px',
-            fontWeight: 700,
-            color: '#7C8FAC',
-            marginRight: '4px',
-          }}
-        >
-          <Filter size={13} />
-          Modul:
-        </span>
-        {(['ALL', 'PR', 'PO', 'AV', 'RB', 'RC', 'PV'] as const).map((t) => {
-          const isSelected = typeFilter === t;
-          return (
-            <button
-              key={t}
-              type="button"
-              onClick={() => setTypeFilter(t)}
-              style={{
-                padding: '6px 14px',
-                fontSize: '12px',
-                fontWeight: 700,
-                borderRadius: '30px',
-                cursor: 'pointer',
-                border: `1px solid ${isSelected ? '#E51937' : 'var(--border-subtle)'}`,
-                background: isSelected ? '#E51937' : '#F8FAFD',
-                color: isSelected ? '#FFFFFF' : '#5A6A85',
-              }}
-            >
-              {t === 'ALL' ? 'Semua' : t}
-            </button>
-          );
-        })}
-
-        <div style={{ marginLeft: 'auto', display: 'flex', gap: '6px' }}>
-          {(['ALL', 'PAID', 'UNPAID'] as const).map((p) => {
-            const active = paymentFilter === p;
-            const label = p === 'ALL' ? 'Semua Bayar' : p === 'PAID' ? 'Lunas' : 'Belum Dibayar';
-            return (
-              <button
-                key={p}
-                type="button"
-                onClick={() => setPaymentFilter(p)}
-                style={{
-                  padding: '6px 14px',
-                  fontSize: '12px',
-                  fontWeight: 700,
-                  borderRadius: '30px',
-                  cursor: 'pointer',
-                  border: `1px solid ${active ? '#E51937' : 'var(--border-subtle)'}`,
-                  background: active ? '#FFF5F7' : '#F8FAFD',
-                  color: active ? '#E51937' : '#5A6A85',
-                }}
-              >
-                {label}
-              </button>
-            );
-          })}
-        </div>
+      <div className="register-filters" aria-label="Filter register">
+        <label>Jenis pengajuan
+          <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value as DocType | 'ALL')}>
+            {(['ALL', 'PR', 'PO', 'GR', 'AV', 'RB', 'RC', 'PV'] as const).map((type) => <option key={type} value={type}>{type === 'ALL' ? 'Semua jenis' : type}</option>)}
+          </select>
+        </label>
+        <label>Cabang
+          <select value={branchFilter} onChange={(e) => setBranchFilter(e.target.value)}>
+            <option value="ALL">Semua cabang</option>
+            {branchOptions(documents.map((doc) => doc.branch)).map((branch) => <option key={branch} value={branch}>{branch}</option>)}
+          </select>
+        </label>
+        <label>Progres
+          <select value={progressFilter} onChange={(e) => setProgressFilter(e.target.value as RegisterFilters['progress'])}>
+            <option value="ALL">Semua progres</option><option value="DRAFT">Draf</option><option value="MENUNGGU">Menunggu</option><option value="REJECTED">Perlu revisi</option><option value="APPROVED">Disetujui</option><option value="PAID">Lunas</option>
+          </select>
+        </label>
+        <label>Tindak lanjut
+          <select value={paymentFilter} onChange={(e) => setPaymentFilter(e.target.value as QuickLedgerFilter)}>
+            <option value="ALL">Semua tindak lanjut</option><option value="MENUNGGU">Menunggu</option><option value="MENUNGGU_PV">Menunggu PV</option><option value="JADWAL_PEMBAYARAN">Jadwal Pembayaran</option><option value="UNPAID">Belum Dibayar</option><option value="PAID">Lunas</option><option value="AV_TANPA_PO">AV Tanpa PO</option><option value="CA_BELUM_REALISASI">CA Belum Direalisasikan</option>
+          </select>
+        </label>
+        <button type="button" className="secondary" onClick={() => { setSearch(''); setTypeFilter('ALL'); setBranchFilter('ALL'); setProgressFilter('ALL'); setPaymentFilter('ALL'); }}>Atur ulang</button>
       </div>
+      <p className="register-filter-summary" role="status">{filtered.length} dari {documents.length} dokumen ditampilkan</p>
 
       {/* Register Table */}
       <div className="table-wrap">
-        <table>
+        <table className="document-table register-table">
           <thead>
             <tr>
               <th>Nomor & Judul</th>
               <th>Cabang</th>
               <th>Total Pengajuan</th>
-              <th>Dibayarkan</th>
+              <th title="Nilai neto yang direncanakan; status aktual ada pada kolom Pembayaran">Dibayarkan <span className="register-column-note">(neto)</span></th>
               <th>Tahap</th>
               <th>Status</th>
               <th>Pembayaran</th>
@@ -301,28 +318,35 @@ export const ApprovalRegisterView: React.FC<ApprovalRegisterViewProps> = ({
             </tr>
           </thead>
           <tbody>
+            {filtered.length === 0 && <tr><td colSpan={10}>Tidak ada dokumen yang sesuai dengan filter.</td></tr>}
             {filtered.map((doc) => {
               const visual = getDocTypeVisual(doc.docType);
               const DocIcon = visual.icon;
               const badge = getStatusBadge(doc.status);
               const totalAmt = getDocAmount(doc);
-              const isPaid =
-                doc.status === 'PAID' || (doc.docType === 'PV' && doc.paymentStatus === 'PAID');
-              const paidAmt = isPaid ? totalAmt : 0;
-
-              const dots = [
-                { name: '1. Atasan', st: doc.approvalSteps.atasan.status },
-                { name: '2. Bu Ayu', st: doc.approvalSteps.ayu.status },
-                { name: '3a. Pak Hery', st: doc.approvalSteps.bod.heryStatus },
-                { name: '3b. Hashimoto', st: doc.approvalSteps.bod.hashimotoStatus },
-              ];
+              const netPayableAmt = getNetPayableAmount(doc);
+              const isPvPaid = doc.docType === 'PV' && doc.paymentStatus === 'PAID';
 
               return (
                 <tr key={doc.id}>
-                  <td>
-                    <div
-                      style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}
+                  <td data-label="Dokumen">
+                    <button
+                      type="button"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        background: 'transparent',
+                        border: 0,
+                        padding: 0,
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        font: 'inherit',
+                        color: 'inherit',
+                        width: '100%',
+                      }}
                       onClick={() => onOpenDetail(doc)}
+                      aria-label={`Buka detail ${doc.docNumber}: ${doc.title}`}
                     >
                       <div
                         style={{
@@ -334,6 +358,7 @@ export const ApprovalRegisterView: React.FC<ApprovalRegisterViewProps> = ({
                           display: 'grid',
                           placeItems: 'center',
                           flexShrink: 0,
+                          border: '1px solid #E2E8F0',
                         }}
                       >
                         <DocIcon size={18} />
@@ -351,59 +376,39 @@ export const ApprovalRegisterView: React.FC<ApprovalRegisterViewProps> = ({
                               borderRadius: '6px',
                               background: visual.bg,
                               color: visual.color,
+                              border: '1px solid #E2E8F0',
                             }}
                           >
                             {doc.docType}
                           </span>
                         </div>
-                        <div style={{ fontSize: '12px', color: '#7C8FAC', marginTop: '2px' }}>
+                        <div style={{ fontSize: '12px', color: 'var(--text-muted, #4B5563)', marginTop: '2px' }}>
                           {doc.title}
                         </div>
                       </div>
-                    </div>
+                    </button>
                   </td>
-                  <td>
+                  <td data-label="Cabang">
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontWeight: 600 }}>
-                      <Building2 size={13} color="#7C8FAC" />
+                      <Building2 size={13} color="#4B5563" />
                       {doc.branch}
                     </span>
                   </td>
-                  <td style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, color: '#111C2D' }}>
+                  <td data-label="Total Pengajuan" style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, color: '#111C2D' }}>
                     {rupiah.format(totalAmt)}
                   </td>
                   <td
+                    data-label="Dibayarkan"
                     style={{
                       fontFamily: 'var(--font-mono)',
                       fontWeight: 800,
-                      color: paidAmt > 0 ? '#008A7A' : '#7C8FAC',
+                      color: netPayableAmt > 0 ? '#008A7A' : 'var(--text-muted, #4B5563)',
                     }}
                   >
-                    {rupiah.format(paidAmt)}
+                    {rupiah.format(netPayableAmt)}
                   </td>
-                  <td>
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
-                      {dots.map((d, i) => {
-                        let bg = '#CBD5E1';
-                        if (d.st === 'APPROVED') bg = '#00CEB6';
-                        else if (d.st === 'PENDING') bg = '#FFAE1F';
-                        else if (d.st === 'REJECTED') bg = '#E51937';
-                        return (
-                          <span
-                            key={i}
-                            title={`${d.name}: ${d.st}`}
-                            style={{
-                              width: '9px',
-                              height: '9px',
-                              borderRadius: '50%',
-                              background: bg,
-                              display: 'inline-block',
-                            }}
-                          />
-                        );
-                      })}
-                    </div>
-                  </td>
-                  <td>
+                  <td data-label="Tahap"><ApprovalProgress document={doc} /></td>
+                  <td data-label="Status">
                     <span
                       style={{
                         display: 'inline-flex',
@@ -421,32 +426,37 @@ export const ApprovalRegisterView: React.FC<ApprovalRegisterViewProps> = ({
                       {badge.label}
                     </span>
                   </td>
-                  <td>
-                    <span
-                      style={{
-                        padding: '4px 10px',
-                        borderRadius: '999px',
-                        fontSize: '11px',
-                        fontWeight: 800,
-                        background: isPaid ? '#E6FFFA' : '#FEF5E5',
-                        color: isPaid ? '#008A7A' : '#B4690E',
-                      }}
-                    >
-                      {isPaid ? 'Lunas' : 'Belum Dibayar'}
-                    </span>
+                  <td data-label="Pembayaran">
+                    {doc.docType === 'PV' ? (
+                      <span
+                        style={{
+                          padding: '4px 10px',
+                          borderRadius: '999px',
+                          fontSize: '11px',
+                          fontWeight: 800,
+                          background: isPvPaid ? '#E6FFFA' : '#FEF5E5',
+                          color: isPvPaid ? '#008A7A' : '#B4690E',
+                        }}
+                      >
+                        {isPvPaid ? 'Lunas' : 'Belum Dibayar'}
+                      </span>
+                    ) : (
+                      <span style={{ color: '#94A3B8', fontWeight: 700 }}>—</span>
+                    )}
                   </td>
-                  <td style={{ fontWeight: 700, fontSize: '12.5px', color: '#5A6A85' }}>
+                  <td data-label="Pemohon" style={{ fontWeight: 700, fontSize: '12.5px', color: '#374151' }}>
                     {getDocApplicant(doc)}
                   </td>
-                  <td style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: '#7C8FAC' }}>
+                  <td data-label="Tanggal" style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--text-muted, #4B5563)' }}>
                     {formatDateShort(doc.createdAt)}
                   </td>
-                  <td style={{ textAlign: 'right' }}>
+                  <td data-label="Tindakan" style={{ textAlign: 'right' }}>
                     <button
                       type="button"
                       className="secondary"
-                      style={{ padding: '6px 12px', fontSize: '12px', borderRadius: '30px' }}
+                      style={{ padding: '6px 12px', fontSize: '12px', borderRadius: 'var(--btn-radius, 8px)' }}
                       onClick={() => onOpenDetail(doc)}
+                      aria-label={`Buka detail ${doc.docNumber}`}
                     >
                       <Eye size={13} /> Detail
                     </button>
@@ -504,9 +514,9 @@ export const ApprovalHistoryView: React.FC<ApprovalHistoryViewProps> = ({
           actionType = 'APPROVE';
           actionBadge = 'Disetujui';
           if (actUpper.includes('ATASAN')) stageLabel = 'Tahap 1: Atasan';
-          else if (actUpper.includes('AYU')) stageLabel = 'Tahap 2: Bu Ayu';
-          else if (actUpper.includes('HERY')) stageLabel = 'Tahap 3A: Pak Hery';
-          else if (actUpper.includes('HASHIMOTO')) stageLabel = 'Tahap 3B: Hashimoto';
+          else if (actUpper.includes('AYU')) stageLabel = 'Ayu Martina';
+          else if (actUpper.includes('HERY')) stageLabel = 'Hery Sugiarto';
+          else if (actUpper.includes('HASHIMOTO')) stageLabel = 'Koji Hashimoto';
           else stageLabel = 'Persetujuan BoD';
         } else if (actUpper.includes('REJECT')) {
           actionType = 'REJECT';
@@ -584,7 +594,7 @@ export const ApprovalHistoryView: React.FC<ApprovalHistoryViewProps> = ({
               left: '14px',
               top: '50%',
               transform: 'translateY(-50%)',
-              color: '#7C8FAC',
+              color: 'var(--text-muted, #4B5563)',
             }}
           />
           <input
@@ -624,7 +634,7 @@ export const ApprovalHistoryView: React.FC<ApprovalHistoryViewProps> = ({
             gap: '5px',
             fontSize: '12px',
             fontWeight: 700,
-            color: '#7C8FAC',
+            color: 'var(--text-secondary, #374151)',
             marginRight: '4px',
           }}
         >
@@ -654,7 +664,7 @@ export const ApprovalHistoryView: React.FC<ApprovalHistoryViewProps> = ({
                 cursor: 'pointer',
                 border: `1px solid ${active ? '#E51937' : 'var(--border-subtle)'}`,
                 background: active ? '#E51937' : '#F8FAFD',
-                color: active ? '#FFFFFF' : '#5A6A85',
+                color: active ? '#FFFFFF' : 'var(--text-secondary, #374151)',
               }}
             >
               {f.label}
@@ -664,7 +674,7 @@ export const ApprovalHistoryView: React.FC<ApprovalHistoryViewProps> = ({
       </div>
 
       <div className="table-wrap">
-        <table>
+        <table className="document-table register-table">
           <thead>
             <tr>
               <th>Waktu</th>
@@ -697,17 +707,17 @@ export const ApprovalHistoryView: React.FC<ApprovalHistoryViewProps> = ({
 
               return (
                 <tr key={row.id}>
-                  <td style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: '#7C8FAC' }}>
+                  <td data-label="Waktu" style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--text-muted, #4B5563)' }}>
                     {formatDateTime(row.timestamp)}
                   </td>
-                  <td>
+                  <td data-label="Dokumen">
                     <strong style={{ fontFamily: 'var(--font-mono)', color: '#111C2D', fontSize: '13px' }}>
                       {row.docNumber}
                     </strong>
-                    <div style={{ fontSize: '12px', color: '#7C8FAC' }}>{row.doc.title}</div>
+                    <div style={{ fontSize: '12px', color: 'var(--text-muted, #4B5563)' }}>{row.doc.title}</div>
                   </td>
-                  <td style={{ fontWeight: 700, color: '#111C2D' }}>{row.stageLabel}</td>
-                  <td>
+                  <td data-label="Tahap" style={{ fontWeight: 700, color: '#111C2D' }}>{row.stageLabel}</td>
+                  <td data-label="Keputusan">
                     <span
                       style={{
                         display: 'inline-flex',
@@ -725,14 +735,15 @@ export const ApprovalHistoryView: React.FC<ApprovalHistoryViewProps> = ({
                       {row.actionBadge}
                     </span>
                   </td>
-                  <td style={{ fontWeight: 800, color: '#111C2D' }}>{row.actor}</td>
-                  <td style={{ color: '#5A6A85', maxWidth: '280px' }}>{row.comment}</td>
-                  <td style={{ textAlign: 'right' }}>
+                  <td data-label="Pejabat" style={{ fontWeight: 800, color: '#111C2D' }}>{displayPersonName(row.actor)}</td>
+                  <td data-label="Catatan" style={{ color: 'var(--text-secondary, #374151)', maxWidth: '280px' }}>{row.comment}</td>
+                  <td data-label="Tindakan" style={{ textAlign: 'right' }}>
                     <button
                       type="button"
                       className="secondary"
-                      style={{ padding: '6px 12px', fontSize: '12px', borderRadius: '30px' }}
+                      style={{ padding: '6px 12px', fontSize: '12px', borderRadius: 'var(--btn-radius, 8px)' }}
                       onClick={() => onOpenDetail(row.doc)}
+                      aria-label={`Buka detail ${row.docNumber}`}
                     >
                       <Eye size={13} /> Detail
                     </button>
@@ -844,7 +855,7 @@ export const ApprovalDocsView: React.FC<ApprovalDocsViewProps> = ({
               left: '14px',
               top: '50%',
               transform: 'translateY(-50%)',
-              color: '#7C8FAC',
+              color: 'var(--text-muted, #4B5563)',
             }}
           />
           <input
@@ -884,7 +895,7 @@ export const ApprovalDocsView: React.FC<ApprovalDocsViewProps> = ({
             gap: '5px',
             fontSize: '12px',
             fontWeight: 700,
-            color: '#7C8FAC',
+            color: 'var(--text-secondary, #374151)',
             marginRight: '4px',
           }}
         >
@@ -915,7 +926,7 @@ export const ApprovalDocsView: React.FC<ApprovalDocsViewProps> = ({
                 cursor: 'pointer',
                 border: `1px solid ${active ? '#E51937' : 'var(--border-subtle)'}`,
                 background: active ? '#E51937' : '#F8FAFD',
-                color: active ? '#FFFFFF' : '#5A6A85',
+                color: active ? '#FFFFFF' : 'var(--text-secondary, #374151)',
               }}
             >
               {c.label}
@@ -925,7 +936,7 @@ export const ApprovalDocsView: React.FC<ApprovalDocsViewProps> = ({
       </div>
 
       <div className="table-wrap">
-        <table>
+        <table className="document-table register-table">
           <thead>
             <tr>
               <th>Nama Berkas</th>
@@ -944,7 +955,7 @@ export const ApprovalDocsView: React.FC<ApprovalDocsViewProps> = ({
 
               return (
                 <tr key={item.id}>
-                  <td>
+                  <td data-label="Nama Berkas">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       <div
                         style={{
@@ -962,13 +973,13 @@ export const ApprovalDocsView: React.FC<ApprovalDocsViewProps> = ({
                       </div>
                       <div>
                         <strong style={{ fontSize: '13px', color: '#111C2D' }}>{item.fileName}</strong>
-                        <div style={{ fontSize: '11px', color: '#7C8FAC', fontFamily: 'var(--font-mono)' }}>
+                        <div style={{ fontSize: '11px', color: 'var(--text-muted, #4B5563)', fontFamily: 'var(--font-mono)' }}>
                           {Math.round(item.sizeBytes / 1024)} KB • {formatDateShort(item.uploadedAt)}
                         </div>
                       </div>
                     </div>
                   </td>
-                  <td>
+                  <td data-label="Kategori">
                     <span
                       style={{
                         padding: '4px 10px',
@@ -976,43 +987,45 @@ export const ApprovalDocsView: React.FC<ApprovalDocsViewProps> = ({
                         fontSize: '11px',
                         fontWeight: 800,
                         background: '#F0F5F9',
-                        color: '#5A6A85',
+                        color: 'var(--text-secondary, #374151)',
                       }}
                     >
                       {catLabel}
                     </span>
                   </td>
-                  <td>
+                  <td data-label="Dokumen Induk">
                     <strong style={{ fontFamily: 'var(--font-mono)', color: '#E51937', fontSize: '13px' }}>
                       {doc.docNumber}
                     </strong>
-                    <div style={{ fontSize: '12px', color: '#7C8FAC' }}>{doc.title}</div>
+                    <div style={{ fontSize: '12px', color: 'var(--text-muted, #4B5563)' }}>{doc.title}</div>
                   </td>
-                  <td style={{ fontWeight: 700, color: '#5A6A85' }}>{doc.branch}</td>
-                  <td style={{ fontWeight: 700, color: '#5A6A85' }}>{getDocApplicant(doc)}</td>
-                  <td style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, color: '#111C2D' }}>
+                  <td data-label="Cabang" style={{ fontWeight: 700, color: 'var(--text-secondary, #374151)' }}>{doc.branch}</td>
+                  <td data-label="Pemohon" style={{ fontWeight: 700, color: 'var(--text-secondary, #374151)' }}>{getDocApplicant(doc)}</td>
+                  <td data-label="Nominal" style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, color: '#111C2D' }}>
                     {rupiah.format(getDocAmount(doc))}
                   </td>
-                  <td style={{ textAlign: 'right' }}>
+                  <td data-label="Tindakan" style={{ textAlign: 'right' }}>
                     <div style={{ display: 'inline-flex', gap: '6px', alignItems: 'center' }}>
-                        <button
-                          type="button"
-                          onClick={() => void openAttachment(item.attachmentId).catch(() => setFileError('Lampiran tidak dapat dibuka.'))}
-                          className="secondary"
-                          style={{
-                            padding: '6px 12px',
-                            fontSize: '12px',
-                            borderRadius: '30px',
-                            textDecoration: 'none',
-                          }}
-                        >
-                          <ExternalLink size={13} /> Unduh
-                        </button>
+                      <button
+                        type="button"
+                        onClick={() => void openAttachment(item.attachmentId).catch(() => setFileError('Lampiran tidak dapat dibuka.'))}
+                        className="secondary"
+                        style={{
+                          padding: '6px 12px',
+                          fontSize: '12px',
+                          borderRadius: 'var(--btn-radius, 8px)',
+                          textDecoration: 'none',
+                        }}
+                        aria-label={`Unduh ${item.fileName}`}
+                      >
+                        <ExternalLink size={13} /> Unduh
+                      </button>
                       <button
                         type="button"
                         className="secondary"
-                        style={{ padding: '6px 12px', fontSize: '12px', borderRadius: '30px' }}
+                        style={{ padding: '6px 12px', fontSize: '12px', borderRadius: 'var(--btn-radius, 8px)' }}
                         onClick={() => onOpenDetail(doc)}
+                        aria-label={`Buka detail ${doc.docNumber}`}
                       >
                         <Eye size={13} /> Detail
                       </button>

@@ -1,4 +1,4 @@
-export type DocType = 'PR' | 'PO' | 'AV' | 'RB' | 'RC' | 'PV';
+export type DocType = 'PR' | 'PO' | 'AV' | 'RB' | 'RC' | 'GR' | 'PV';
 
 export type UserRole =
   | 'PEMOHON'
@@ -53,12 +53,32 @@ export interface BankDetails {
   accountHolder: string;
 }
 
+export type AttachmentCategoryType =
+  | 'IAM_MEMO'
+  | 'QUOTATION'
+  | 'INVOICE'
+  | 'RECEIPT'
+  | 'REFUND_PROOF'
+  | 'PAYMENT_PROOF'
+  | 'PHOTO'
+  | 'BAST'
+  | 'SUPPORTING'
+  | 'OTHER';
+
+export interface LineItem {
+  id: string;
+  description: string;
+  qty: number;
+  unit: string;
+  unitPrice: number;
+}
+
 export interface DocumentAttachment {
   id: string;
   name: string;
   size: number;
   mimeType: string;
-  category: 'IAM_MEMO' | 'QUOTATION' | 'RECEIPT' | 'REFUND_PROOF' | 'PAYMENT_PROOF' | 'OTHER';
+  category: AttachmentCategoryType;
   uploadedAt: string;
   dataUrl?: string;
 }
@@ -82,15 +102,7 @@ export interface BaseDocument {
     bod: BodParallelState;
   };
   auditLog: AuditLogEntry[];
-  attachments?: Array<{
-    id: string;
-    name: string;
-    size: number;
-    mimeType: string;
-    category: 'IAM_MEMO' | 'QUOTATION' | 'RECEIPT' | 'REFUND_PROOF' | 'PAYMENT_PROOF' | 'OTHER';
-    uploadedAt: string;
-    dataUrl?: string;
-  }>;
+  attachments?: DocumentAttachment[];
 }
 
 export interface PRDocument extends BaseDocument {
@@ -98,6 +110,7 @@ export interface PRDocument extends BaseDocument {
   budgetType: string;
   subtotalAmount: number;
   isIamRequired: boolean;
+  items?: LineItem[];
   requiredDate?: string;
   notes?: string;
   otherCosts?: number;
@@ -118,6 +131,7 @@ export interface PODocument extends BaseDocument {
   vendorName: string;
   paymentMethod: 'BANK_TRANSFER' | 'CASH';
   bankDetails?: BankDetails;
+  items?: LineItem[];
   subtotal: number;
   otherCosts: number;
   discount: number;
@@ -195,10 +209,24 @@ export interface RCDocument extends BaseDocument {
   discount?: number;
 }
 
+export interface GRDocument extends BaseDocument {
+  docType: 'GR';
+  parentPoId: string;
+  parentPoNumber?: string;
+  vendorName?: string;
+  receiptType: 'GOODS' | 'SERVICE';
+  receivedDate: string;
+  itemCondition: 'BAIK' | 'KURANG' | 'RUSAK';
+  notes?: string;
+  requiresFollowUp?: boolean;
+}
+
 export interface PVPaymentDetails {
   paidAt: string;
   sourceBank: string;
   referenceNumber: string;
+  paidAmount?: number;
+  notes?: string;
   proofUrl?: string;
 }
 
@@ -214,6 +242,10 @@ export interface PVDocument extends BaseDocument {
   netAmountToPay: number;
   paymentStatus: 'UNPAID' | 'PAID';
   paymentMethod?: 'BANK_TRANSFER' | 'CASH';
+  paymentDueDate?: string;
+  plannedSourceAccount?: string;
+  invoiceNumber?: string;
+  invoiceDate?: string;
   paymentDetails?: PVPaymentDetails;
 }
 
@@ -223,4 +255,5 @@ export type AnyDocument =
   | AVDocument
   | RBDocument
   | RCDocument
+  | GRDocument
   | PVDocument;

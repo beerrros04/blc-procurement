@@ -14,9 +14,9 @@ export const ROLE_DEFINITIONS: Array<{
 }> = [
   { role: 'PEMOHON', title: 'Pemohon', badge: 'Staff' },
   { role: 'ATASAN', title: 'Atasan', badge: 'Tahap 1' },
-  { role: 'AYU', title: 'Bu Ayu', badge: 'Tahap 2' },
-  { role: 'BOD_HERY', title: 'Pak Hery', badge: 'BOD' },
-  { role: 'BOD_HASHIMOTO', title: 'Hashimoto', badge: 'BOD' },
+  { role: 'AYU', title: 'Ayu Martina', badge: 'Tahap 2' },
+  { role: 'BOD_HERY', title: 'Hery Sugiarto', badge: 'BOD' },
+  { role: 'BOD_HASHIMOTO', title: 'Koji Hashimoto', badge: 'BOD' },
   { role: 'KEUANGAN', title: 'Keuangan', badge: 'Finance' },
 ];
 

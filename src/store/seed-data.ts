@@ -16,6 +16,7 @@ export const INITIAL_SEED_DOCUMENTS: AnyDocument[] = [
     budgetType: 'CAPEX',
     subtotalAmount: 12_500_000,
     isIamRequired: true,
+    iamNumber: 'IAM-2026-0001',
     requiredDate: '2026-11-20',
     approvalSteps: {
       atasan: {
@@ -77,6 +78,7 @@ export const INITIAL_SEED_DOCUMENTS: AnyDocument[] = [
     budgetType: 'CAPEX',
     subtotalAmount: 25_000_000,
     isIamRequired: true,
+    iamNumber: 'IAM-2026-0002',
     requiredDate: '2026-11-15',
     approvalSteps: {
       atasan: {
@@ -167,7 +169,9 @@ export const INITIAL_SEED_DOCUMENTS: AnyDocument[] = [
     parentPrId: 'seed-pr-02',
     title: 'PO: Pembelian Genset Silent 15kVA',
     branch: 'Surabaya',
-    purpose: 'Realisasi pengadaan genset dari PR-202611-0002',
+    purpose: 'Pemesanan pengadaan genset dari PR-202611-0002',
+    budgetType: 'CAPEX',
+    iamNumber: 'IAM-2026-0002',
     status: 'IN_REVIEW',
     createdAt: '2026-11-04T10:00:00.000Z',
     updatedAt: '2026-11-04T15:30:00.000Z',

@@ -7,6 +7,7 @@ import type {
   ApprovalStage,
   AVDocument,
   DocType,
+  GRDocument,
   PODocument,
   PRDocument,
   PVDocument,
@@ -77,6 +78,17 @@ interface PersistedState {
 }
 
 const IAM_THRESHOLD_RUPIAH = 5_000_000;
+const MAX_SYSTEM_AMOUNT_RUPIAH = 50_000_000;
+
+export interface PvGenerationOptions {
+  paymentDueDate?: string;
+  plannedSourceAccount?: string;
+  invoiceNumber?: string;
+  invoiceDate?: string;
+  purpose?: string;
+  grossAmount?: number;
+  pphDeduction?: number;
+}
 
 // shortcut: JSON file persistence in .data/db.json, swap to pg Pool with db/schema.sql when PostgreSQL instance is provisioned
 export class ProcurementRepository {
@@ -129,6 +141,15 @@ export class ProcurementRepository {
   }
 
   private flush(): void {
+    const cacheKeys = Object.keys(this.state.idempotencyCache);
+    if (cacheKeys.length > 200) {
+      for (const oldKey of cacheKeys.slice(0, cacheKeys.length - 200)) {
+        delete this.state.idempotencyCache[oldKey];
+      }
+    }
+    if (this.state.outboxJobs.length > 500) {
+      this.state.outboxJobs = this.state.outboxJobs.slice(-500);
+    }
     if (this.sqlitePath) {
       mkdirSync(dirname(this.sqlitePath), { recursive: true });
       const db = new DatabaseSync(this.sqlitePath);
@@ -246,7 +267,23 @@ export class ProcurementRepository {
       name: attachment.originalName,
       size: attachment.sizeBytes,
       mimeType: attachment.mimeType,
-      category: attachment.category === 'IAM_MEMO' ? 'IAM_MEMO' : attachment.category === 'RECEIPT' ? 'RECEIPT' : attachment.category === 'REFUND_PROOF' ? 'REFUND_PROOF' : 'OTHER',
+      category: attachment.category === 'IAM_MEMO'
+        ? 'IAM_MEMO'
+        : attachment.category === 'QUOTATION'
+        ? 'QUOTATION'
+        : attachment.category === 'INVOICE'
+        ? 'INVOICE'
+        : attachment.category === 'RECEIPT'
+        ? 'RECEIPT'
+        : attachment.category === 'REFUND_PROOF'
+        ? 'REFUND_PROOF'
+        : attachment.category === 'PAYMENT_PROOF'
+        ? 'PAYMENT_PROOF'
+        : attachment.category === 'PHOTO'
+        ? 'PHOTO'
+        : attachment.category === 'BAST'
+        ? 'BAST'
+        : 'OTHER',
       uploadedAt: attachment.createdAt,
     }];
     if (doc.docType === 'RB') {
@@ -271,6 +308,12 @@ export class ProcurementRepository {
 
   private normalizeCalculations(doc: VersionedDocument): void {
     if (doc.docType === 'PR') {
+      if (Array.isArray(doc.items) && doc.items.length > 0) {
+        doc.subtotalAmount = doc.items.reduce(
+          (sum, item) => sum + Math.max(0, Math.round(Number(item.qty) || 0)) * Math.max(0, Math.round(Number(item.unitPrice) || 0)),
+          0
+        );
+      }
       doc.subtotalAmount = Math.max(0, Math.round(Number(doc.subtotalAmount) || 0));
       doc.isIamRequired = doc.subtotalAmount >= IAM_THRESHOLD_RUPIAH;
       const calc = calculatePoTotal({ subtotal: doc.subtotalAmount, otherCosts: doc.otherCosts, discount: doc.discount, ppnRate: doc.ppnRate ?? 0, pphRate: doc.pphRate ?? 0 });
@@ -278,6 +321,12 @@ export class ProcurementRepository {
       doc.pphAmount = calc.pphAmount;
       doc.totalAmount = calc.totalAmount;
     } else if (doc.docType === 'PO') {
+      if (Array.isArray(doc.items) && doc.items.length > 0) {
+        doc.subtotal = doc.items.reduce(
+          (sum, item) => sum + Math.max(0, Math.round(Number(item.qty) || 0)) * Math.max(0, Math.round(Number(item.unitPrice) || 0)),
+          0
+        );
+      }
       const calc = calculatePoTotal({
         subtotal: doc.subtotal,
         otherCosts: doc.otherCosts,
@@ -305,6 +354,15 @@ export class ProcurementRepository {
       doc.pphAmount = calc.pphAmount;
       doc.totalAmount = calc.totalAmount;
     } else if (doc.docType === 'RC') {
+      if (
+        doc.outcomeType === 'EXACT' &&
+        (doc.subtotal === undefined || doc.subtotal === 0) &&
+        (doc.realizedAmount === undefined || doc.realizedAmount === 0) &&
+        doc.avOriginalAmount > 0
+      ) {
+        doc.subtotal = doc.avOriginalAmount;
+        doc.realizedAmount = doc.avOriginalAmount;
+      }
       const calc = calculateRcOutcome({
         avOriginalAmount: doc.avOriginalAmount,
         realizedAmount: doc.subtotal === undefined ? doc.realizedAmount : Math.max(0, doc.subtotal + (doc.otherCosts ?? 0) - (doc.discount ?? 0)),
@@ -321,6 +379,23 @@ export class ProcurementRepository {
       doc.grossAmount = calc.grossAmount;
       doc.pphDeduction = calc.pphDeduction;
       doc.netAmountToPay = calc.netAmountToPay;
+    }
+  }
+
+  private assertPoPrCardinality(poDoc: PODocument): void {
+    if (!poDoc.parentPrId) return;
+    const duplicatePo = this.state.documents.find(
+      (d) =>
+        d.docType === 'PO' &&
+        d.id !== poDoc.id &&
+        (d as PODocument).parentPrId === poDoc.parentPrId
+    );
+    if (duplicatePo) {
+      throw new DomainError(
+        `Satu PR hanya dapat digunakan untuk satu PO. PR tersebut sudah dipakai pada ${duplicatePo.docNumber}.`,
+        409,
+        'DUPLICATE_PO_FOR_PR'
+      );
     }
   }
 
@@ -349,6 +424,29 @@ export class ProcurementRepository {
     }
   }
 
+  private stripSystemFields(input: Record<string, unknown>): Record<string, unknown> {
+    const {
+      id: _id,
+      docNumber: _docNumber,
+      docType: _docType,
+      createdAt: _createdAt,
+      updatedAt: _updatedAt,
+      auditLog: _auditLog,
+      ownerId: _ownerId,
+      attachments: _attachments,
+      status: _status,
+      currentStage: _currentStage,
+      approvalSteps: _approvalSteps,
+      version: _version,
+      financeConfirmedAt: _financeConfirmedAt,
+      paymentStatus: _paymentStatus,
+      paymentDetails: _paymentDetails,
+      expectedVersion: _expectedVersion,
+      ...safe
+    } = input;
+    return safe;
+  }
+
   createDocument(input: Partial<AnyDocument> & { docType: DocType }, actor: string): VersionedDocument {
     const nowIso = new Date().toISOString();
     const id = input.id || randomUUID();
@@ -356,6 +454,7 @@ export class ProcurementRepository {
       throw new DomainError('ID dokumen sudah digunakan.', 409, 'DUPLICATE_DOCUMENT');
     }
     const docNumber = this.nextDocNumber(input.docType);
+    const safeInput = this.stripSystemFields(input as Record<string, unknown>);
 
     const base = {
       id,
@@ -369,7 +468,7 @@ export class ProcurementRepository {
       createdAt: nowIso,
       updatedAt: nowIso,
       currentStage: 'ATASAN' as ApprovalStage,
-      approvalSteps: input.approvalSteps ?? {
+      approvalSteps: {
         atasan: {
           stage: 'ATASAN' as const,
           label: 'Tahap 1: Atasan Langsung',
@@ -401,9 +500,13 @@ export class ProcurementRepository {
     };
 
     const merged = {
-      ...input,
+      ...safeInput,
       ...base,
-    } as VersionedDocument;
+    } as unknown as VersionedDocument;
+
+    if (merged.docType === 'PO' && (merged as PODocument).parentPrId) {
+      this.assertPoPrCardinality(merged as PODocument);
+    }
 
     if (merged.docType === 'RC' && (merged as RCDocument).parentAvId) {
       this.assertRcCardinality(merged as RCDocument);
@@ -446,14 +549,19 @@ export class ProcurementRepository {
     }
 
     const nowIso = new Date().toISOString();
-    const { expectedVersion: _ignored, id: _ignoreId, docNumber: _ignoreNum, auditLog: _ignoreAudit, ownerId: _ignoreOwner, attachments: _ignoreAttachments, ...safePatch } = patch;
+    const safePatch = this.stripSystemFields(patch as Record<string, unknown>);
 
     const updated: VersionedDocument = {
       ...current,
       ...safePatch,
       id: current.id,
+      ownerId: current.ownerId,
       docNumber: current.docNumber,
       docType: current.docType,
+      status: current.status,
+      currentStage: current.currentStage,
+      approvalSteps: current.approvalSteps,
+      createdAt: current.createdAt,
       updatedAt: nowIso,
       version: current.version + 1,
       auditLog: [
@@ -467,6 +575,10 @@ export class ProcurementRepository {
         },
       ],
     } as VersionedDocument;
+
+    if (updated.docType === 'PO' && (updated as PODocument).parentPrId) {
+      this.assertPoPrCardinality(updated as PODocument);
+    }
 
     if (updated.docType === 'RC' && (updated as RCDocument).parentAvId) {
       this.assertRcCardinality(updated as RCDocument);
@@ -515,6 +627,56 @@ export class ProcurementRepository {
       );
     }
 
+    if (doc.docType === 'GR') {
+      const gr = doc as GRDocument;
+      const parentPo = this.state.documents.find(
+        (item): item is VersionedDocument & PODocument =>
+          item.id === gr.parentPoId && item.docType === 'PO' && (item.status === 'APPROVED' || item.status === 'PAID')
+      );
+      if (!parentPo) {
+        throw new DomainError('Laporan penerimaan (GR) wajib merujuk pada PO yang sudah disetujui.', 422, 'GR_INVALID_PARENT_PO');
+      }
+      if (!gr.receivedDate) {
+        throw new DomainError('Tanggal penerimaan barang/jasa wajib diisi.', 422, 'GR_DATE_REQUIRED');
+      }
+      const requiredCat = gr.receiptType === 'SERVICE' ? 'BAST' : 'PHOTO';
+      const hasAttachment =
+        this.state.attachments.some((a) => a.documentId === doc.id && a.category === requiredCat) ||
+        (doc.attachments ?? []).some((a) => a.category === requiredCat);
+      if (!hasAttachment) {
+        throw new DomainError(
+          gr.receiptType === 'SERVICE'
+            ? 'Laporan penerimaan Jasa wajib melampirkan berita acara serah terima (BAST_).'
+            : 'Laporan penerimaan Barang wajib melampirkan foto barang (Photo_).',
+          422,
+          'GR_ATTACHMENT_REQUIRED'
+        );
+      }
+
+      const now = new Date().toISOString();
+      gr.parentPoNumber = parentPo.docNumber;
+      gr.requiresFollowUp = gr.itemCondition !== 'BAIK';
+      doc.status = 'APPROVED';
+      doc.currentStage = 'BOD';
+      doc.version += 1;
+      doc.updatedAt = now;
+      doc.auditLog.push({
+        id: randomUUID(),
+        timestamp: now,
+        actor,
+        action: 'SUBMIT_GR',
+        comment: `Laporan penerimaan (${gr.receiptType === 'SERVICE' ? 'Jasa/BAST' : 'Barang/Foto'}) dicatat dengan kondisi: ${gr.itemCondition}${gr.itemCondition !== 'BAIK' ? ' [Perlu tindakan]' : ''}`,
+      });
+      this.enqueueOutbox('DOCUMENT_FULLY_APPROVED', doc, {
+        actor,
+        parentPoId: parentPo.id,
+        itemCondition: gr.itemCondition,
+        needsAction: gr.itemCondition !== 'BAIK',
+      });
+      this.flush();
+      return structuredClone(doc);
+    }
+
     if (doc.docType === 'AV' && !doc.activityEndDate) {
       throw new DomainError('Tanggal selesai kegiatan wajib diisi.', 422, 'AV_END_DATE_REQUIRED');
     }
@@ -528,11 +690,63 @@ export class ProcurementRepository {
     if (transferBank !== null && (!transferBank?.bankName?.trim() || !transferBank?.accountNumber?.trim() || !transferBank?.accountHolder?.trim())) {
       throw new DomainError('Rekening penerima transfer wajib diisi lengkap.', 422, 'BANK_REQUIRED');
     }
-    if (doc.docType === 'AV' && doc.parentPoId && !this.state.documents.some((item) => item.id === doc.parentPoId && item.docType === 'PO' && item.status === 'APPROVED')) {
-      throw new DomainError('PO induk harus berstatus disetujui.', 422, 'INVALID_PARENT_PO');
+
+    if (doc.docType === 'PO') {
+      if (/\brealisasi\b/i.test(doc.title) || /\brealisasi\b/i.test(doc.purpose)) {
+        throw new DomainError(
+          'Realisasi uang muka melalui PO tidak diterima lagi. Gunakan dokumen Realisasi Uang Muka (RC).',
+          422,
+          'PO_REALIZATION_FORBIDDEN'
+        );
+      }
+      this.assertPoPrCardinality(doc as PODocument);
+
+      if (doc.parentPrId) {
+        const parentPr = this.state.documents.find(
+          (item): item is VersionedDocument & PRDocument =>
+            item.id === doc.parentPrId && item.docType === 'PR' && item.status === 'APPROVED'
+        );
+        if (!parentPr) {
+          throw new DomainError('PR induk harus berstatus disetujui.', 422, 'INVALID_PARENT_PR');
+        }
+        if (doc.subtotal > parentPr.subtotalAmount) {
+          throw new DomainError(
+            `Nilai PO sebelum pajak (Rp ${doc.subtotal.toLocaleString('id-ID')}) tidak boleh melebihi nilai PR induk (Rp ${parentPr.subtotalAmount.toLocaleString('id-ID')}).`,
+            422,
+            'PO_EXCEEDS_PR_AMOUNT'
+          );
+        }
+        if (parentPr.iamNumber?.trim()) {
+          if (doc.iamNumber?.trim() && doc.iamNumber.trim() !== parentPr.iamNumber.trim()) {
+            throw new DomainError('Nomor IAM pada PO harus sama dengan nomor IAM pada PR induk.', 422, 'PO_IAM_MISMATCH');
+          }
+          doc.iamNumber = parentPr.iamNumber;
+        }
+      } else if ((doc.poCategory ?? 'STANDARD') === 'STANDARD' && doc.subtotal >= IAM_THRESHOLD_RUPIAH) {
+        throw new DomainError(
+          'PO Pembelian Umum dengan nilai sebelum pajak >= Rp 5.000.000 wajib mengacu pada PR yang sudah disetujui.',
+          422,
+          'PO_PR_REQUIRED'
+        );
+      }
     }
-    if (doc.docType === 'PO' && doc.parentPrId && !this.state.documents.some((item) => item.id === doc.parentPrId && item.docType === 'PR' && item.status === 'APPROVED')) {
-      throw new DomainError('PR induk harus berstatus disetujui.', 422, 'INVALID_PARENT_PR');
+
+    if (doc.docType === 'AV' && doc.parentPoId) {
+      const parentPo = this.state.documents.find(
+        (item): item is VersionedDocument & PODocument =>
+          item.id === doc.parentPoId && item.docType === 'PO' && item.status === 'APPROVED'
+      );
+      if (!parentPo) {
+        throw new DomainError('PO induk harus berstatus disetujui.', 422, 'INVALID_PARENT_PO');
+      }
+      const committedOnPo = this.getCommittedAmountOnPo(parentPo.id, doc.id);
+      if (committedOnPo + doc.amount > parentPo.totalAmount) {
+        throw new DomainError(
+          'Jumlah AV dan PV untuk PO yang sama tidak boleh melebihi total PO.',
+          422,
+          'AV_EXCEEDS_PO_TOTAL'
+        );
+      }
     }
 
     // Validasi kardinalitas 1 AV : 1 RC saat submit
@@ -546,6 +760,16 @@ export class ProcurementRepository {
       doc.avOriginalAmount = pv.netAmountToPay;
     }
     this.normalizeCalculations(doc);
+
+    const docTotalAmount = this.extractDocAmount(doc);
+    if (docTotalAmount > MAX_SYSTEM_AMOUNT_RUPIAH) {
+      throw new DomainError(
+        `Nilai total pengajuan (Rp ${docTotalAmount.toLocaleString('id-ID')}) melebihi batas sistem Rp 50.000.000. Pengajuan di atas batas ini menggunakan prosedur manual.`,
+        422,
+        'EXCEEDS_SYSTEM_LIMIT'
+      );
+    }
+
     if (doc.docType === 'RC') {
       if (doc.outcomeType === 'SURPLUS' && !this.state.attachments.some((attachment) => attachment.documentId === doc.id && attachment.category === 'REFUND_PROOF')) {
         throw new DomainError('Lampiran bukti pengembalian dana wajib disertakan.', 422, 'RC_REFUND_PROOF_REQUIRED');
@@ -556,18 +780,33 @@ export class ProcurementRepository {
     }
 
     const now = new Date().toISOString();
-    doc.status = 'SUBMITTED';
-    doc.currentStage = 'ATASAN';
-    doc.version += 1;
-    doc.updatedAt = now;
+    if (doc.docType === 'PV') {
+      doc.status = 'IN_REVIEW';
+      doc.currentStage = 'AYU';
+      doc.version += 1;
+      doc.updatedAt = now;
 
-    doc.approvalSteps.atasan.status = 'PENDING';
-    doc.approvalSteps.atasan.decisionAt = undefined;
-    doc.approvalSteps.atasan.comment = undefined;
+      doc.approvalSteps.atasan.status = 'APPROVED';
+      doc.approvalSteps.atasan.decisionAt = now;
+      doc.approvalSteps.atasan.comment = 'PV diajukan ulang oleh Keuangan';
 
-    doc.approvalSteps.ayu.status = 'WAITING';
-    doc.approvalSteps.ayu.decisionAt = undefined;
-    doc.approvalSteps.ayu.comment = undefined;
+      doc.approvalSteps.ayu.status = 'PENDING';
+      doc.approvalSteps.ayu.decisionAt = undefined;
+      doc.approvalSteps.ayu.comment = undefined;
+    } else {
+      doc.status = 'SUBMITTED';
+      doc.currentStage = 'ATASAN';
+      doc.version += 1;
+      doc.updatedAt = now;
+
+      doc.approvalSteps.atasan.status = 'PENDING';
+      doc.approvalSteps.atasan.decisionAt = undefined;
+      doc.approvalSteps.atasan.comment = undefined;
+
+      doc.approvalSteps.ayu.status = 'WAITING';
+      doc.approvalSteps.ayu.decisionAt = undefined;
+      doc.approvalSteps.ayu.comment = undefined;
+    }
 
     doc.approvalSteps.bod.heryStatus = 'WAITING';
     doc.approvalSteps.bod.heryDecisionAt = undefined;
@@ -694,10 +933,16 @@ export class ProcurementRepository {
         doc.approvalSteps.bod.heryStatus = 'REJECTED';
         doc.approvalSteps.bod.heryDecisionAt = now;
         doc.approvalSteps.bod.heryComment = trimmedComment;
+        if (doc.approvalSteps.bod.hashimotoStatus === 'PENDING') {
+          doc.approvalSteps.bod.hashimotoStatus = 'WAITING';
+        }
       } else if (input.role === 'BOD_HASHIMOTO') {
         doc.approvalSteps.bod.hashimotoStatus = 'REJECTED';
         doc.approvalSteps.bod.hashimotoDecisionAt = now;
         doc.approvalSteps.bod.hashimotoComment = trimmedComment;
+        if (doc.approvalSteps.bod.heryStatus === 'PENDING') {
+          doc.approvalSteps.bod.heryStatus = 'WAITING';
+        }
       }
 
       // Reset ke DRAFT agar pemohon dapat merevisi dan mengajukan ulang
@@ -797,7 +1042,24 @@ export class ProcurementRepository {
     return structuredClone(doc);
   }
 
-  generatePvFromSource(sourceDocId: string, actor: string): VersionedDocument & PVDocument {
+  private getCommittedAmountOnPo(poId: string, excludeDocId?: string): number {
+    let total = 0;
+    for (const d of this.state.documents) {
+      if (d.id === excludeDocId || d.status === 'REJECTED') continue;
+      if (d.docType === 'PV' && d.sourceDocId === poId && d.status !== 'DRAFT') {
+        total += d.netAmountToPay;
+      } else if (d.docType === 'AV' && d.parentPoId === poId && d.status !== 'DRAFT') {
+        total += d.amount;
+      }
+    }
+    return total;
+  }
+
+  generatePvFromSource(
+    sourceDocId: string,
+    actor: string,
+    options?: PvGenerationOptions
+  ): VersionedDocument & PVDocument {
     const source = this.state.documents.find((d) => d.id === sourceDocId);
     if (!source) {
       throw new DomainError(
@@ -815,17 +1077,6 @@ export class ProcurementRepository {
       );
     }
 
-    const existingPv = this.state.documents.find(
-      (d) => d.docType === 'PV' && (d as PVDocument).sourceDocId === sourceDocId
-    );
-    if (existingPv) {
-      throw new DomainError(
-        `Payment Voucher untuk dokumen ${source.docNumber} sudah pernah dibuat (${existingPv.docNumber}).`,
-        409,
-        'DUPLICATE_PV_FOR_SOURCE'
-      );
-    }
-
     let grossAmount = 0;
     let pphDeduction = 0;
     let payeeName = '';
@@ -835,8 +1086,42 @@ export class ProcurementRepository {
 
     if (source.docType === 'PO') {
       const po = source as PODocument;
-      grossAmount = po.subtotal + po.otherCosts - po.discount + po.ppnAmount;
-      pphDeduction = po.pphAmount;
+      const fullGross = po.subtotal + po.otherCosts - po.discount + po.ppnAmount;
+      const fullPph = po.pphAmount;
+      const fullNet = po.totalAmount;
+      const alreadyCommittedNet = this.getCommittedAmountOnPo(po.id);
+      const remainingNet = fullNet - alreadyCommittedNet;
+
+      if (remainingNet <= 0) {
+        const existingPv = this.state.documents.find(
+          (d) => d.docType === 'PV' && (d as PVDocument).sourceDocId === sourceDocId
+        );
+        throw new DomainError(
+          `Payment Voucher untuk dokumen ${source.docNumber} sudah pernah dibuat (${existingPv?.docNumber ?? 'penuh'}).`,
+          409,
+          'DUPLICATE_PV_FOR_SOURCE'
+        );
+      }
+
+      if (options?.grossAmount !== undefined && options.grossAmount > 0) {
+        grossAmount = Math.round(Number(options.grossAmount));
+        pphDeduction = Math.max(0, Math.round(Number(options.pphDeduction ?? 0)));
+        const requestedNet = Math.max(0, grossAmount - pphDeduction);
+        if (requestedNet > remainingNet) {
+          throw new DomainError(
+            `Jumlah PV dan AV untuk PO ${source.docNumber} tidak boleh melebihi sisa nilai PO (Rp ${remainingNet.toLocaleString('id-ID')}).`,
+            422,
+            'PV_EXCEEDS_SOURCE_AMOUNT'
+          );
+        }
+      } else if (alreadyCommittedNet > 0) {
+        grossAmount = remainingNet;
+        pphDeduction = 0;
+      } else {
+        grossAmount = fullGross;
+        pphDeduction = fullPph;
+      }
+
       payeeName = po.vendorName;
       paymentMethod = po.paymentMethod;
       bankDetails = po.bankDetails || {
@@ -845,55 +1130,72 @@ export class ProcurementRepository {
         accountHolder: po.vendorName,
       };
       sourceDocType = 'PO';
-    } else if (source.docType === 'AV') {
-      const av = source as AVDocument;
-      pphDeduction = av.pphAmount ?? 0;
-      grossAmount = av.amount + pphDeduction;
-      payeeName = av.bankDetails?.accountHolder || av.vendorName || av.title;
-      paymentMethod = av.disbursementMethod === 'CASH' ? 'CASH' : 'BANK_TRANSFER';
-      bankDetails = av.bankDetails || {
-        bankName: '',
-        accountNumber: '',
-        accountHolder: payeeName,
-      };
-      sourceDocType = 'AV';
-    } else if (source.docType === 'RB') {
-      const rb = source as RBDocument;
-      pphDeduction = rb.pphAmount ?? 0;
-      grossAmount = rb.totalAmount + pphDeduction;
-      paymentMethod = rb.paymentMethod ?? 'BANK_TRANSFER';
-      payeeName = rb.beneficiaryBank.accountHolder || rb.vendorName || rb.title;
-      bankDetails = rb.beneficiaryBank;
-      sourceDocType = 'RB';
-    } else if (source.docType === 'RC') {
-      const rc = source as RCDocument;
-      if (rc.outcomeType !== 'DEFICIT') {
+    } else {
+      const existingPv = this.state.documents.find(
+        (d) => d.docType === 'PV' && (d as PVDocument).sourceDocId === sourceDocId
+      );
+      if (existingPv) {
         throw new DomainError(
-          'PV hanya dapat dibuat dari dokumen RC yang berstatus DEFICIT (kekurangan dana).',
-          422,
-          'RC_NOT_DEFICIT'
+          `Payment Voucher untuk dokumen ${source.docNumber} sudah pernah dibuat (${existingPv.docNumber}).`,
+          409,
+          'DUPLICATE_PV_FOR_SOURCE'
         );
       }
-      grossAmount = Math.abs(rc.balanceAmount);
-      pphDeduction = 0;
-      payeeName = rc.reimbursementBank?.accountHolder || 'Karyawan Pemohon';
-      bankDetails = rc.reimbursementBank || {
-        bankName: '',
-        accountNumber: '',
-        accountHolder: payeeName,
-      };
-      sourceDocType = 'RC_DEFICIT';
-    } else {
-      throw new DomainError(
-        `Dokumen jenis ${source.docType} tidak dapat menghasilkan Payment Voucher secara langsung.`,
-        422,
-        'UNSUPPORTED_PV_SOURCE'
-      );
+
+      if (source.docType === 'AV') {
+        const av = source as AVDocument;
+        pphDeduction = av.pphAmount ?? 0;
+        grossAmount = av.amount + pphDeduction;
+        payeeName = av.bankDetails?.accountHolder || av.vendorName || av.title;
+        paymentMethod = av.disbursementMethod === 'CASH' ? 'CASH' : 'BANK_TRANSFER';
+        bankDetails = av.bankDetails || {
+          bankName: '',
+          accountNumber: '',
+          accountHolder: payeeName,
+        };
+        sourceDocType = 'AV';
+      } else if (source.docType === 'RB') {
+        const rb = source as RBDocument;
+        pphDeduction = rb.pphAmount ?? 0;
+        grossAmount = rb.totalAmount + pphDeduction;
+        paymentMethod = rb.paymentMethod ?? 'BANK_TRANSFER';
+        payeeName = rb.beneficiaryBank.accountHolder || rb.vendorName || rb.title;
+        bankDetails = rb.beneficiaryBank;
+        sourceDocType = 'RB';
+      } else if (source.docType === 'RC') {
+        const rc = source as RCDocument;
+        if (rc.outcomeType !== 'DEFICIT') {
+          throw new DomainError(
+            'PV hanya dapat dibuat dari dokumen RC yang berstatus DEFICIT (kekurangan dana).',
+            422,
+            'RC_NOT_DEFICIT'
+          );
+        }
+        grossAmount = Math.abs(rc.balanceAmount);
+        pphDeduction = 0;
+        payeeName = rc.reimbursementBank?.accountHolder || 'Karyawan Pemohon';
+        bankDetails = rc.reimbursementBank || {
+          bankName: '',
+          accountNumber: '',
+          accountHolder: payeeName,
+        };
+        sourceDocType = 'RC_DEFICIT';
+      } else {
+        throw new DomainError(
+          `Dokumen jenis ${source.docType} tidak dapat menghasilkan Payment Voucher secara langsung.`,
+          422,
+          'UNSUPPORTED_PV_SOURCE'
+        );
+      }
     }
 
     const { netAmountToPay } = calculatePvNet({ grossAmount, pphDeduction });
     const now = new Date().toISOString();
     const pvDocNumber = this.nextDocNumber('PV');
+    const defaultDueDate =
+      options?.paymentDueDate ||
+      (source.docType === 'AV' ? source.paymentDueDate : source.docType === 'RB' ? source.paymentDueDate : undefined) ||
+      now.slice(0, 10);
 
     const pvDoc: VersionedDocument & PVDocument = {
       id: randomUUID(),
@@ -901,12 +1203,31 @@ export class ProcurementRepository {
       docType: 'PV',
       title: `Payment Voucher untuk ${source.docNumber} - ${source.title}`,
       branch: source.branch,
-      purpose: source.purpose,
-      status: 'APPROVED',
+      purpose: options?.purpose?.trim() || source.purpose,
+      status: 'IN_REVIEW',
       createdAt: now,
       updatedAt: now,
-      currentStage: 'BOD',
-      approvalSteps: structuredClone(source.approvalSteps),
+      currentStage: 'AYU',
+      approvalSteps: {
+        atasan: {
+          stage: 'ATASAN',
+          label: 'Tahap 1: Staf Keuangan',
+          assignedTo: actor,
+          status: 'APPROVED',
+          decisionAt: now,
+          comment: 'PV diajukan oleh Keuangan',
+        },
+        ayu: {
+          stage: 'AYU',
+          label: 'Tahap 2: Bu Ayu (GM / Keuangan)',
+          assignedTo: 'Bu Ayu',
+          status: 'PENDING',
+        },
+        bod: {
+          heryStatus: 'WAITING',
+          hashimotoStatus: 'WAITING',
+        },
+      },
       sourceDocType,
       sourceDocId: source.id,
       sourceDocNumber: source.docNumber,
@@ -917,6 +1238,10 @@ export class ProcurementRepository {
       netAmountToPay,
       paymentStatus: 'UNPAID',
       paymentMethod,
+      paymentDueDate: defaultDueDate,
+      plannedSourceAccount: options?.plannedSourceAccount?.trim() || 'BCA Operasional Pusat',
+      invoiceNumber: options?.invoiceNumber?.trim() || undefined,
+      invoiceDate: options?.invoiceDate || undefined,
       version: 1,
       auditLog: [
         {
@@ -924,7 +1249,7 @@ export class ProcurementRepository {
           timestamp: now,
           actor,
           action: 'GENERATE_PV',
-          comment: `PV diterbitkan otomatis dari dokumen induk ${source.docNumber}`,
+          comment: `PV diajukan dari dokumen induk ${source.docNumber} (menunggu persetujuan Ayu -> Hery & Hashimoto)`,
         },
       ],
     };
@@ -984,11 +1309,31 @@ export class ProcurementRepository {
       );
     }
 
+    if (pv.status !== 'APPROVED') {
+      throw new DomainError(
+        `Payment Voucher ${pv.docNumber} harus disetujui penuh (Ayu -> Hery & Hashimoto) sebelum pembayaran dapat dicatat.`,
+        422,
+        'PV_NOT_APPROVED'
+      );
+    }
+
+    if (
+      details.paidAmount !== undefined &&
+      Math.round(Number(details.paidAmount)) !== pv.netAmountToPay
+    ) {
+      throw new DomainError(
+        `Nilai yang dibayarkan (Rp ${Math.round(Number(details.paidAmount)).toLocaleString('id-ID')}) harus sama persis dengan nilai Dibayarkan pada PV (Rp ${pv.netAmountToPay.toLocaleString('id-ID')}).`,
+        422,
+        'PAID_AMOUNT_MISMATCH'
+      );
+    }
+
     const now = new Date().toISOString();
     pv.paymentStatus = 'PAID';
     pv.status = 'PAID';
     pv.paymentDetails = {
       ...details,
+      paidAmount: pv.netAmountToPay,
       paidAt: details.paidAt || now,
     };
     pv.version += 1;
@@ -999,13 +1344,31 @@ export class ProcurementRepository {
       timestamp: now,
       actor,
       action: 'RECORD_PAYMENT',
-      comment: `Pembayaran berhasil dicatat. Bank: ${details.sourceBank}, Ref: ${details.referenceNumber}`,
+      comment: `Pembayaran berhasil dicatat dan diverifikasi terhadap ${pv.docNumber}`,
     });
 
     if (pv.sourceDocId) {
       const sourceDoc = this.state.documents.find((d) => d.id === pv.sourceDocId);
       if (sourceDoc) {
-        sourceDoc.status = 'PAID';
+        if (sourceDoc.docType === 'PO') {
+          const paidOnPo = this.state.documents.reduce((sum, d) => {
+            if (d.docType === 'PV' && d.sourceDocId === sourceDoc.id && d.paymentStatus === 'PAID') {
+              return sum + d.netAmountToPay;
+            }
+            if (d.docType === 'AV' && d.parentPoId === sourceDoc.id && d.status === 'PAID') {
+              return sum + d.amount;
+            }
+            return sum;
+          }, 0);
+          if (paidOnPo >= sourceDoc.totalAmount) {
+            sourceDoc.status = 'PAID';
+          }
+        } else {
+          sourceDoc.status = 'PAID';
+          if (sourceDoc.docType === 'RC') {
+            sourceDoc.financeConfirmedAt = now;
+          }
+        }
         sourceDoc.version += 1;
         sourceDoc.updatedAt = now;
         sourceDoc.auditLog.push({
@@ -1028,13 +1391,14 @@ export class ProcurementRepository {
     return structuredClone(pv);
   }
 
-  getDashboardMetrics(role: UserRole): DashboardMetrics {
+  getDashboardMetrics(role: UserRole, userEmail?: string): DashboardMetrics {
     const byDocType: Record<DocType, number> = {
       PR: 0,
       PO: 0,
       AV: 0,
       RB: 0,
       RC: 0,
+      GR: 0,
       PV: 0,
     };
 
@@ -1056,7 +1420,11 @@ export class ProcurementRepository {
 
       // Hitung antrean spesifik peran
       if (doc.status === 'SUBMITTED' || doc.status === 'IN_REVIEW') {
-        if (role === 'ATASAN' && doc.approvalSteps.atasan.status === 'PENDING') {
+        if (
+          role === 'ATASAN' &&
+          doc.approvalSteps.atasan.status === 'PENDING' &&
+          (!userEmail || doc.stage1ApproverEmail?.toLowerCase() === userEmail.toLowerCase())
+        ) {
           pendingForRoleCount++;
         } else if (role === 'AYU' && doc.approvalSteps.ayu.status === 'PENDING') {
           pendingForRoleCount++;
@@ -1073,8 +1441,8 @@ export class ProcurementRepository {
         }
       } else if (role === 'KEUANGAN') {
         if (
-          (doc.docType === 'PV' && (doc as PVDocument).paymentStatus === 'UNPAID') ||
-          (doc.docType !== 'PV' && doc.docType !== 'PR' && doc.status === 'APPROVED')
+          (doc.docType === 'PV' && doc.status === 'APPROVED' && (doc as PVDocument).paymentStatus === 'UNPAID') ||
+          (doc.docType !== 'PV' && doc.docType !== 'PR' && doc.docType !== 'GR' && doc.status === 'APPROVED')
         ) {
           pendingForRoleCount++;
         }
@@ -1116,6 +1484,8 @@ export class ProcurementRepository {
         return doc.totalAmount;
       case 'RC':
         return doc.realizedAmount;
+      case 'GR':
+        return 0;
       case 'PV':
         return doc.netAmountToPay;
     }

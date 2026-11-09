@@ -7,23 +7,109 @@ export interface ExportModalProps {
   onClose: () => void;
 }
 
+function extractFinanceExportFields(d: AnyDocument) {
+  let subtotal = 0;
+  let ppn = 0;
+  let pph = 0;
+  let dibayarkan = 0;
+  let bankName = '';
+  let accountNumber = '';
+  let accountHolder = '';
+  let dueDate = '';
+
+  if (d.docType === 'PR') {
+    subtotal = d.subtotalAmount;
+    ppn = d.ppnAmount ?? 0;
+    pph = d.pphAmount ?? 0;
+    dibayarkan = d.totalAmount ?? d.subtotalAmount;
+    dueDate = d.requiredDate || '';
+  } else if (d.docType === 'PO') {
+    subtotal = d.subtotal + d.otherCosts - d.discount;
+    ppn = d.ppnAmount;
+    pph = d.pphAmount;
+    dibayarkan = d.totalAmount;
+    bankName = d.bankDetails?.bankName || '';
+    accountNumber = d.bankDetails?.accountNumber || '';
+    accountHolder = d.bankDetails?.accountHolder || '';
+  } else if (d.docType === 'AV') {
+    subtotal = d.subtotal ?? d.amount;
+    ppn = d.ppnAmount ?? 0;
+    pph = d.pphAmount ?? 0;
+    dibayarkan = d.amount;
+    bankName = d.bankDetails?.bankName || '';
+    accountNumber = d.bankDetails?.accountNumber || '';
+    accountHolder = d.bankDetails?.accountHolder || '';
+    dueDate = d.paymentDueDate || '';
+  } else if (d.docType === 'RB') {
+    subtotal = d.subtotal + d.otherCosts - d.discount;
+    ppn = d.ppnAmount ?? 0;
+    pph = d.pphAmount ?? 0;
+    dibayarkan = d.totalAmount;
+    bankName = d.beneficiaryBank?.bankName || '';
+    accountNumber = d.beneficiaryBank?.accountNumber || '';
+    accountHolder = d.beneficiaryBank?.accountHolder || '';
+    dueDate = d.paymentDueDate || '';
+  } else if (d.docType === 'RC') {
+    subtotal = d.realizedAmount;
+    dibayarkan = d.realizedAmount;
+    bankName = d.reimbursementBank?.bankName || '';
+    accountNumber = d.reimbursementBank?.accountNumber || '';
+    accountHolder = d.reimbursementBank?.accountHolder || '';
+    dueDate = d.submissionDeadline || '';
+  } else if (d.docType === 'PV') {
+    subtotal = d.grossAmount;
+    pph = d.pphDeduction;
+    dibayarkan = d.netAmountToPay;
+    bankName = d.beneficiaryBank?.bankName || '';
+    accountNumber = d.beneficiaryBank?.accountNumber || '';
+    accountHolder = d.beneficiaryBank?.accountHolder || '';
+    dueDate = d.paymentDueDate || '';
+  } else if (d.docType === 'GR') {
+    dueDate = d.receivedDate || '';
+  }
+
+  return { subtotal, ppn, pph, dibayarkan, bankName, accountNumber, accountHolder, dueDate };
+}
+
 export const ExportModal: React.FC<ExportModalProps> = ({ documents, onClose }) => {
   const [format, setFormat] = useState<'PDF' | 'CSV'>('CSV');
 
   function handleDownload() {
     const list = documents;
     if (format === 'CSV') {
-      const headers = ['Nomor Dokumen', 'Tipe', 'Judul', 'Cabang', 'Status', 'Tahap', 'Tanggal Dibuat', 'Pemohon'];
-      const rows = list.map((d) => [
-        `"${d.docNumber}"`,
-        `"${d.docType}"`,
-        `"${d.title.replace(/"/g, '""')}"`,
-        `"${d.branch}"`,
-        `"${d.status}"`,
-        `"${d.currentStage}"`,
-        `"${d.createdAt}"`,
-        `"${d.auditLog[0]?.actor || 'Pemohon'}"`,
-      ]);
+      const headers = [
+        'Nomor',
+        'Jenis',
+        'Cabang',
+        'Judul',
+        'Tujuan',
+        'Subtotal',
+        'PPN',
+        'PPh',
+        'Dibayarkan',
+        'Bank',
+        'No. rekening',
+        'Nama rekening',
+        'Jatuh tempo',
+      ];
+      const rows = list.map((d) => {
+        const fin = extractFinanceExportFields(d);
+        return [
+          `"${d.docNumber}"`,
+          `"${d.docType}"`,
+          `"${d.branch}"`,
+          `"${d.title.replace(/"/g, '""')}"`,
+          `"${(d.purpose || '').replace(/"/g, '""')}"`,
+          String(fin.subtotal),
+          String(fin.ppn),
+          String(fin.pph),
+          String(fin.dibayarkan),
+          `"${fin.bankName.replace(/"/g, '""')}"`,
+          `"${fin.accountNumber.replace(/"/g, '""')}"`,
+          `"${fin.accountHolder.replace(/"/g, '""')}"`,
+          `"${fin.dueDate}"`,
+        ];
+      });
 
       const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\r\n');
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });

@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import type { AnyDocument, AVDocument, DocType, UserRole } from '../types/document';
+import { displayPersonName } from '../domain/display-name';
 
 export interface BentoMetricsProps {
   documents: AnyDocument[];
@@ -33,20 +34,25 @@ function getDocAmount(doc: AnyDocument): number {
   }
 }
 
-const MODULE_SHORT_NAMES: Record<DocType, string> = {
-  PR: 'Purchase Req',
+const MODULE_NAMES: Record<DocType, string> = {
+  PR: 'Purchase Request',
   PO: 'Purchase Order',
+  GR: 'Laporan Penerimaan',
   AV: 'Cash Advance',
-  RB: 'Reimburse',
-  RC: 'Realisasi AV',
-  PV: 'Payment Vch',
+  RB: 'Reimbursement',
+  RC: 'Realisasi Uang Muka',
+  PV: 'Payment Voucher',
 };
 
 const ACTIVITY_LABELS: Record<string, string> = {
-  UPLOAD_ATTACHMENT: 'Menambahkan lampiran', CREATE_DRAFT: 'Membuat draf',
-  UPDATE_DRAFT: 'Memperbarui draf', SUBMIT: 'Mengajukan dokumen',
-  APPROVE: 'Menyetujui pengajuan', REJECT: 'Mengembalikan pengajuan',
-  GENERATE_PV: 'Menerbitkan payment voucher', RECORD_PAYMENT: 'Mencatat pembayaran',
+  UPLOAD_ATTACHMENT: 'Menambahkan lampiran',
+  CREATE_DRAFT: 'Membuat draf',
+  UPDATE_DRAFT: 'Memperbarui draf',
+  SUBMIT: 'Mengajukan dokumen',
+  APPROVE: 'Menyetujui pengajuan',
+  REJECT: 'Mengembalikan pengajuan',
+  GENERATE_PV: 'Menerbitkan payment voucher',
+  RECORD_PAYMENT: 'Mencatat pembayaran',
   PARENT_MARKED_PAID: 'Menandai dokumen dibayar',
 };
 
@@ -62,14 +68,14 @@ function formatCompactRupiah(val: number): string {
   return rupiah.format(val);
 }
 
-const ROLE_GREETING_NAMES: Record<UserRole, string> = {
+const ROLE_TITLES: Record<UserRole, string> = {
   ADMIN: 'Admin Lokal',
-  PEMOHON: 'Dewi Lestari (Staff Pemohon)',
-  ATASAN: 'Pak Hendra (Atasan Langsung)',
-  AYU: 'Bu Ayu (Verifikator Keuangan)',
-  BOD_HERY: 'Pak Hery (Direksi BoD)',
-  BOD_HASHIMOTO: 'Koji Hashimoto (Direksi BoD)',
-  KEUANGAN: 'Erika Ayu Fitriana (Keuangan)',
+  PEMOHON: 'Staff Pemohon',
+  ATASAN: 'Atasan Langsung (Tahap 1)',
+  AYU: 'GM',
+  BOD_HERY: 'Direksi',
+  BOD_HASHIMOTO: 'Direksi',
+  KEUANGAN: 'Kasir & Akuntansi Keuangan',
 };
 
 export const BentoMetrics: React.FC<BentoMetricsProps> = ({
@@ -82,7 +88,6 @@ export const BentoMetrics: React.FC<BentoMetricsProps> = ({
     approvedOrPaidCount,
     inReviewCount,
     draftOrRejectedCount,
-    completionPct,
     unsettledAvs,
     outstandingAvTotal,
     settledAvRatio,
@@ -90,7 +95,7 @@ export const BentoMetrics: React.FC<BentoMetricsProps> = ({
     maxModuleVal,
     recentLogs,
   } = useMemo(() => {
-    // 2. Pending Actions specific to active role
+    // 1. Pending actions specifically for active role
     const pendingForRole = documents.filter((d) => {
       if (activeRole === 'PEMOHON') return d.status === 'DRAFT' || d.status === 'REJECTED';
       if (activeRole === 'ATASAN') {
@@ -119,14 +124,14 @@ export const BentoMetrics: React.FC<BentoMetricsProps> = ({
       }
       if (activeRole === 'KEUANGAN') {
         return (
-          (d.status === 'APPROVED' && d.docType !== 'PV') ||
-          (d.docType === 'PV' && d.paymentStatus === 'UNPAID')
+          (d.status === 'APPROVED' && d.docType !== 'PV' && d.docType !== 'PR' && d.docType !== 'GR') ||
+          (d.docType === 'PV' && d.status === 'APPROVED' && d.paymentStatus === 'UNPAID')
         );
       }
       return false;
     }).length;
 
-    // 3. Status counts for Donut Ring
+    // 2. Status counts
     const approvedOrPaidCount = documents.filter(
       (d) => d.status === 'APPROVED' || d.status === 'PAID'
     ).length;
@@ -136,21 +141,27 @@ export const BentoMetrics: React.FC<BentoMetricsProps> = ({
     const draftOrRejectedCount = documents.filter(
       (d) => d.status === 'DRAFT' || d.status === 'REJECTED'
     ).length;
-    const totalCount = Math.max(documents.length, 1);
-    const completionPct = Math.round((approvedOrPaidCount / totalCount) * 100);
 
-    // 4. Outstanding AV vs Realized RC
+    // 3. Outstanding AV vs Realized RC
     const allPaidAvs = documents.filter(
       (d): d is AVDocument => d.docType === 'AV' && d.status === 'PAID'
     );
-    const unsettledAvs = allPaidAvs.filter((av) => !documents.some((rc) => rc.docType === 'RC' && rc.parentAvId === av.id && Boolean(rc.financeConfirmedAt)));
+    const unsettledAvs = allPaidAvs.filter(
+      (av) =>
+        !documents.some(
+          (rc) =>
+            rc.docType === 'RC' &&
+            rc.parentAvId === av.id &&
+            Boolean(rc.financeConfirmedAt)
+        )
+    );
     const outstandingAvTotal = unsettledAvs.reduce((sum, d) => sum + d.amount, 0);
     const settledAvRatio =
       allPaidAvs.length > 0
         ? Math.round(((allPaidAvs.length - unsettledAvs.length) / allPaidAvs.length) * 100)
         : 0;
 
-    // 5. Module breakdown for Spike Pro "Profit & Expenses" Bar Chart
+    // 4. Module breakdown by document type
     const docTypes: DocType[] = ['PR', 'PO', 'AV', 'RB', 'RC', 'PV'];
     const moduleStats = docTypes.map((t) => {
       const docsOfType = documents.filter((d) => d.docType === t);
@@ -167,7 +178,7 @@ export const BentoMetrics: React.FC<BentoMetricsProps> = ({
     });
     const maxModuleVal = Math.max(...moduleStats.map((m) => m.totalVal), 10_000_000);
 
-    // 6. Recent Audit Logs for Spike Pro "Upcoming Schedules / Activity Timeline"
+    // 5. Recent Audit Logs
     const recentLogs = documents
       .flatMap((doc) =>
         doc.auditLog.map((log) => ({
@@ -184,7 +195,6 @@ export const BentoMetrics: React.FC<BentoMetricsProps> = ({
       approvedOrPaidCount,
       inReviewCount,
       draftOrRejectedCount,
-      completionPct,
       unsettledAvs,
       outstandingAvTotal,
       settledAvRatio,
@@ -194,467 +204,216 @@ export const BentoMetrics: React.FC<BentoMetricsProps> = ({
     };
   }, [documents, activeRole]);
 
-  const timelineColors = ['#E51937', '#00CEB6', '#FFAE1F', '#0085DB', '#8763DA'];
-
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginBottom: '24px' }}>
+    <div className="flex flex-col gap-5 mb-6">
       {/* =====================================================================
-          ROW 1: SPIKE PRO TOP BENTO ROW (Welcome Card + 3 Micro-Chart Cards)
+          ROW 1: OPERATIONAL ACTION QUEUE BAR (4 FUNCTIONAL CARDS)
          ===================================================================== */}
       <section
-        aria-label="Metrik Utama Pengadaan"
-        className="metrics-grid"
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))',
-          gap: '20px',
-        }}
+        aria-label="Antrean Tindakan dan Status Pengadaan"
+        className="stats-strip"
       >
-        {/* CARD 1: Spike Pro Welcome / Greeting Card */}
+        {/* CARD 1: Tugas Menunggu Sesuai Peran */}
         <div
-          style={{
-            background: 'linear-gradient(135deg, #FFFFFF 0%, #FFF5F7 100%)',
-            borderRadius: 'var(--card-radius)',
-            padding: '24px',
-            boxShadow: 'var(--shadow-card)',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            position: 'relative',
-            overflow: 'hidden',
-            border: '1px solid #FBCFE8',
-          }}
+          className={`stat metric-summary ${
+            pendingForRole > 0
+              ? 'metric-summary-pending'
+              : ''
+          }`}
         >
-          <div>
-            <h3 style={{ fontSize: '17px', fontWeight: 900, color: '#111C2D', margin: '0 0 6px 0' }}>
-              {ROLE_GREETING_NAMES[activeRole]}
-            </h3>
-            <p style={{ fontSize: '12.5px', color: '#5A6A85', margin: 0 }}>
-              {pendingForRole > 0
-                ? `${pendingForRole} dokumen menunggu tindak lanjut.`
-                : 'Tidak ada antrean tugas.'}
-            </p>
-          </div>
-
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '20px',
-              marginTop: '20px',
-              paddingTop: '16px',
-              borderTop: '1px solid rgba(229, 25, 55, 0.12)',
-            }}
-          >
-            <div>
-              <div style={{ fontSize: '20px', fontWeight: 900, color: '#E51937', fontFamily: 'var(--font-mono)' }}>
-                {pendingForRole}
-              </div>
-              <div style={{ fontSize: '11px', fontWeight: 700, color: '#5A6A85' }}>Tugas Menunggu</div>
-            </div>
-            <div style={{ width: '1px', height: '28px', background: 'rgba(229, 25, 55, 0.15)' }} />
-            <div>
-              <div style={{ fontSize: '20px', fontWeight: 900, color: '#111C2D', fontFamily: 'var(--font-mono)' }}>
-                {completionPct}%
-              </div>
-              <div style={{ fontSize: '11px', fontWeight: 700, color: '#5A6A85' }}>Rasio Selesai</div>
-            </div>
-          </div>
-        </div>
-
-        {/* CARD 2: Total Nilai Pengadaan */}
-        <div
-          style={{
-            background: '#FFFFFF',
-            borderRadius: 'var(--card-radius)',
-            padding: '24px',
-            boxShadow: 'var(--shadow-card)',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-          }}
-        >
-          <div>
-            <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#111C2D', margin: 0 }}>
-              Dokumen Disetujui / Dibayar
-            </h4>
-
-            <div
-              style={{
-                fontSize: '22px',
-                fontWeight: 900,
-                color: '#111C2D',
-                fontFamily: 'var(--font-mono)',
-                marginTop: '12px',
-              }}
-            >
-              {approvedOrPaidCount} dokumen
-            </div>
-          </div>
-
-          {/* Mini 6-Column Bar Sparkline */}
-          <div style={{ marginTop: '16px' }}>
-            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', height: '48px', gap: '8px' }}>
-              {moduleStats.map((m, idx) => {
-                const h = Math.max(Math.round((m.totalVal / maxModuleVal) * 44), 8);
-                const isPrimary = idx % 2 === 0;
-                return (
-                  <div
-                    key={m.type}
-                    style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}
-                    title={`${m.type}: ${rupiah.format(m.totalVal)}`}
-                  >
-                    <div
-                      style={{
-                        width: '100%',
-                        maxWidth: '18px',
-                        height: `${h}px`,
-                        borderRadius: '6px',
-                        background: isPrimary ? '#E51937' : '#FCD4DA',
-                        transition: 'height 0.3s ease',
-                      }}
-                    />
-                    <span style={{ fontSize: '9.5px', fontWeight: 700, color: '#7C8FAC' }}>{m.type}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
-        {/* CARD 3: Pipeline Persetujuan */}
-        <div
-          style={{
-            background: '#FFFFFF',
-            borderRadius: 'var(--card-radius)',
-            padding: '24px',
-            boxShadow: 'var(--shadow-card)',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-          }}
-        >
-          <div>
-            <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#111C2D', margin: 0 }}>
-              Pipeline Persetujuan
-            </h4>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '12px' }}>
-            <div>
-              <div style={{ fontSize: '26px', fontWeight: 900, color: '#111C2D', fontFamily: 'var(--font-mono)' }}>
-                {inReviewCount} <span style={{ fontSize: '13px', fontWeight: 700, color: '#7C8FAC' }}>Aktif</span>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '8px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11.5px', color: '#5A6A85' }}>
-                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#00CEB6' }} />
-                  Selesai: <strong>{approvedOrPaidCount}</strong>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11.5px', color: '#5A6A85' }}>
-                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#E51937' }} />
-                  Ditinjau: <strong>{inReviewCount}</strong>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11.5px', color: '#5A6A85' }}>
-                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#FFAE1F' }} />
-                  Draf: <strong>{draftOrRejectedCount}</strong>
-                </div>
-              </div>
-            </div>
-
-            {/* SVG Donut Ring Chart */}
-            <svg width="84" height="84" viewBox="0 0 42 42" aria-hidden="true">
-              <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#F0F5F9" strokeWidth="5" />
-              <circle
-                cx="21"
-                cy="21"
-                r="15.915"
-                fill="transparent"
-                stroke="#00CEB6"
-                strokeWidth="5"
-                strokeDasharray={`${completionPct} ${100 - completionPct}`}
-                strokeDashoffset="25"
-                strokeLinecap="round"
-              />
-              <text
-                x="50%"
-                y="53%"
-                dominantBaseline="middle"
-                textAnchor="middle"
-                fontSize="8.5"
-                fontWeight="800"
-                fill="#111C2D"
-              >
-                {completionPct}%
-              </text>
-            </svg>
-          </div>
-        </div>
-
-        {/* CARD 4: Outstanding Uang Muka */}
-        <div
-          style={{
-            background: '#FFFFFF',
-            borderRadius: 'var(--card-radius)',
-            padding: '24px',
-            boxShadow: 'var(--shadow-card)',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-          }}
-        >
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#111C2D', margin: 0 }}>
-                Outstanding Uang Muka
-              </h4>
+          <div className="metric-summary-heading">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#4B5563]">
+                Tugas Menunggu Saya
+              </span>
               <span
-                style={{
-                  padding: '4px 10px',
-                  borderRadius: '20px',
-                  fontSize: '11px',
-                  fontWeight: 800,
-                  background: 'var(--spike-amber-subtle)',
-                  color: '#B4690E',
-                }}
+                className={`text-[11px] font-bold px-2 py-0.5 rounded ${
+                  pendingForRole > 0
+                    ? 'bg-[#E51937] text-white'
+                    : 'bg-[#F3F4F6] text-[#4B5563]'
+                }`}
               >
+                {pendingForRole} Tugas
+              </span>
+          </div>
+            <div className="metric-summary-value">
+              {pendingForRole}{' '}
+              <span className="text-xs font-semibold text-[#4B5563]">dokumen</span>
+            </div>
+          <p className="metric-summary-footer">
+            Peran: <strong className="text-[#111827]">{ROLE_TITLES[activeRole]}</strong>
+          </p>
+        </div>
+
+        {/* CARD 2: Outstanding Uang Muka (AV) */}
+        <div className="stat metric-summary">
+          <div className="metric-summary-heading">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#4B5563]">
+                Uang Muka Beredar
+              </span>
+              <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-[#FFFBEB] text-[#92400E] border border-[#FDE68A]">
                 {unsettledAvs.length} Belum dikonfirmasi
               </span>
-            </div>
-
-            <div
-              style={{
-                fontSize: '22px',
-                fontWeight: 900,
-                color: '#111C2D',
-                fontFamily: 'var(--font-mono)',
-                marginTop: '12px',
-              }}
-            >
+          </div>
+            <div className="metric-summary-value tabular-nums">
               {rupiah.format(outstandingAvTotal)}
             </div>
-          </div>
-
-          <div style={{ marginTop: '16px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11.5px', fontWeight: 700, marginBottom: '6px' }}>
-              <span style={{ color: '#5A6A85' }}>Realisasi AV Selesai</span>
-              <span style={{ color: '#E51937' }}>{settledAvRatio}%</span>
+          <div className="metric-summary-footer">
+            <div className="flex items-center justify-between text-xs mb-1.5 font-medium text-[#4B5563]">
+              <span>Realisasi AV Selesai</span>
+              <span className="font-bold text-[#111827]">{settledAvRatio}%</span>
             </div>
-            <div
-              style={{
-                width: '100%',
-                height: '8px',
-                background: '#F0F5F9',
-                borderRadius: '999px',
-                overflow: 'hidden',
-              }}
-            >
+            <div className="w-full h-2 rounded-full bg-[#F1F5F9] overflow-hidden">
               <div
-                style={{
-                  width: `${settledAvRatio}%`,
-                  height: '100%',
-                  background: 'linear-gradient(90deg, #E51937 0%, #FF6B81 100%)',
-                  borderRadius: '999px',
-                }}
+                className="h-full bg-[#10B981] rounded-full transition-all duration-300"
+                style={{ width: `${settledAvRatio}%` }}
               />
             </div>
           </div>
+        </div>
+
+        {/* CARD 3: Dokumen Ditinjau & Revisi */}
+        <div className="stat metric-summary">
+          <div className="metric-summary-heading">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#4B5563]">
+                Sedang Diproses & Revisi
+              </span>
+              <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-[#EFF6FF] text-[#1E40AF] border border-[#BFDBFE]">
+                {inReviewCount} Ditinjau
+              </span>
+          </div>
+            <div className="metric-summary-value">
+              {inReviewCount + draftOrRejectedCount}{' '}
+              <span className="text-xs font-semibold text-[#4B5563]">dokumen</span>
+            </div>
+          <div className="metric-summary-footer metric-summary-breakdown">
+            <span>
+              Sedang Ditinjau: <strong className="text-[#92400E]">{inReviewCount}</strong>
+            </span>
+            <span>
+              Draf / Revisi: <strong className="text-[#991b1b]">{draftOrRejectedCount}</strong>
+            </span>
+          </div>
+        </div>
+
+        {/* CARD 4: Dokumen Disetujui / Lunas */}
+        <div className="stat metric-summary">
+          <div className="metric-summary-heading">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#4B5563]">
+                Penyelesaian Berjalan
+              </span>
+              <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-[#ECFDF5] text-[#065F46] border border-[#A7F3D0]">
+                Aktif
+              </span>
+          </div>
+            <div className="metric-summary-value">
+              {approvedOrPaidCount}{' '}
+              <span className="text-xs font-semibold text-[#4B5563]">dokumen</span>
+            </div>
+          <p className="metric-summary-footer">
+            Tercatat <strong className="text-[#065F46]">Disetujui</strong> atau{' '}
+            <strong className="text-[#1E40AF]">Lunas</strong> di sistem
+          </p>
         </div>
       </section>
 
       {/* =====================================================================
-          ROW 2: ANALYTICS BAR CHART (8 COL) + ACTIVITY TIMELINE (4 COL)
+          ROW 2: MODULAR VOLUME SUMMARY & AUDIT TIMELINE
          ===================================================================== */}
       <section
-        aria-label="Analitik & Jejak Aktivitas"
-        className="analytics-grid"
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
-          gap: '20px',
-        }}
+        aria-label="Ringkasan Modul dan Rekam Jejak"
+        className="grid grid-cols-1 lg:grid-cols-3 gap-5"
       >
-        {/* LEFT: Module Volume Chart (Spike Next.js Pro Grouped Vertical Bars) */}
-        <div
-          style={{
-            background: '#FFFFFF',
-            borderRadius: 'var(--card-radius)',
-            padding: '26px',
-            boxShadow: 'var(--shadow-card)',
-            minWidth: 0,
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              flexWrap: 'wrap',
-              gap: '12px',
-              marginBottom: '20px',
-            }}
-          >
-            <h3 style={{ fontSize: '17px', fontWeight: 900, color: '#111C2D', margin: 0 }}>
-              Nilai Pengajuan per Modul
-            </h3>
+        {/* LEFT 2-COLS: Interactive Module Breakdown Bar */}
+        <div className="lg:col-span-2 p-5 rounded-lg bg-white border border-[#E2E8F0] flex flex-col justify-between">
+          <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
+            <div>
+              <h3 className="text-sm font-bold text-[#111827]">
+                Volume & Nominal per Jenis Dokumen
+              </h3>
+              <p className="text-xs text-[#4B5563]">
+                Pilih jenis dokumen untuk memfilter daftar pengadaan
+              </p>
+            </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '12px', fontWeight: 700 }}>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#111C2D' }}>
-                <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#E51937' }} />
-                Total Pengajuan
+            <div className="flex items-center gap-4 text-xs font-medium">
+              <span className="inline-flex items-center gap-1.5 text-[#111827]">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#E51937]" />
+                Nilai Diajukan
               </span>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#5A6A85' }}>
-                <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#00CEB6' }} />
-                Disetujui / Dibayar
+              <span className="inline-flex items-center gap-1.5 text-[#4B5563]">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#10B981]" />
+                Disetujui / Lunas
               </span>
             </div>
           </div>
 
-          {/* Interactive Visual Grouped Bars with Clear Nominal & Module Context */}
-          <div
-            className="module-chart"
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(6, minmax(0, 1fr))',
-              gap: '10px',
-              padding: '16px 14px',
-              background: '#F8FAFD',
-              borderRadius: '14px',
-              border: '1px solid var(--border-subtle)',
-            }}
-          >
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
             {moduleStats.map((m) => {
-              const totalH = m.totalVal > 0 ? Math.max(Math.round((m.totalVal / maxModuleVal) * 110), 14) : 6;
-              const appH = m.approvedVal > 0 ? Math.max(Math.round((m.approvedVal / maxModuleVal) * 110), 10) : 6;
+              const totalH =
+                m.totalVal > 0 ? Math.max(Math.round((m.totalVal / maxModuleVal) * 90), 12) : 6;
+              const appH =
+                m.approvedVal > 0
+                  ? Math.max(Math.round((m.approvedVal / maxModuleVal) * 90), 8)
+                  : 6;
+
               return (
-                <div
+                <button
+                  type="button"
                   key={m.type}
                   onClick={() => onSelectTab && onSelectTab(m.type)}
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: '10px',
-                    padding: '12px 8px',
-                    borderRadius: '12px',
-                    background: '#FFFFFF',
-                    border: '1px solid var(--border-subtle)',
-                    cursor: onSelectTab ? 'pointer' : 'default',
-                  }}
-                  title={`${MODULE_SHORT_NAMES[m.type]} (${m.type}) — Pengajuan: ${rupiah.format(m.totalVal)} | Disetujui: ${rupiah.format(m.approvedVal)}`}
+                  className="flex flex-col items-center justify-between p-3 rounded-lg border border-[#E2E8F0] hover:border-[#CBD5E1] bg-[#F8FAFC] hover:bg-white transition-all cursor-pointer text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E51937]"
+                  title={`${MODULE_NAMES[m.type]} (${m.type}) : Pengajuan: ${rupiah.format(m.totalVal)} | Disetujui: ${rupiah.format(m.approvedVal)}`}
+                  aria-label={`Filter tabel ke modul ${MODULE_NAMES[m.type]}, total nilai ${formatCompactRupiah(m.totalVal)}`}
                 >
-                  {/* Top Context: Document Count + Compact Nominal */}
-                  <div style={{ textAlign: 'center' }}>
-                    <div
-                      style={{
-                        fontSize: '11.5px',
-                        fontWeight: 900,
-                        color: m.totalVal > 0 ? '#111C2D' : '#7C8FAC',
-                        fontFamily: 'var(--font-mono)',
-                      }}
-                    >
+                  <div className="text-center w-full">
+                    <span className="text-xs font-bold text-[#111827] block">
                       {formatCompactRupiah(m.totalVal)}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: '10px',
-                        fontWeight: 800,
-                        color: '#7C8FAC',
-                        marginTop: '2px',
-                      }}
-                    >
+                    </span>
+                    <span className="text-[10px] text-[#4B5563] font-medium block">
                       {m.count} dok
-                    </div>
+                    </span>
                   </div>
 
-                  {/* Grouped Vertical Bars */}
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'flex-end',
-                      justifyContent: 'center',
-                      gap: '6px',
-                      height: '115px',
-                      width: '100%',
-                      borderBottom: '1px dashed var(--border-subtle)',
-                      paddingBottom: '6px',
-                    }}
-                  >
+                  <div className="flex items-end justify-center gap-1.5 h-24 w-full my-2 pb-1 border-b border-dashed border-[#CBD5E1]">
                     <div
+                      className="w-3 rounded-t transition-all duration-200"
                       style={{
-                        width: '14px',
                         height: `${totalH}px`,
-                        borderRadius: '6px 6px 3px 3px',
-                        background: m.totalVal > 0 ? '#E51937' : '#EAEFF4',
-                        transition: 'height 0.3s ease',
+                        backgroundColor: m.totalVal > 0 ? '#E51937' : '#E2E8F0',
                       }}
                     />
                     <div
+                      className="w-3 rounded-t transition-all duration-200"
                       style={{
-                        width: '14px',
                         height: `${appH}px`,
-                        borderRadius: '6px 6px 3px 3px',
-                        background: m.approvedVal > 0 ? '#00CEB6' : '#EAEFF4',
-                        transition: 'height 0.3s ease',
+                        backgroundColor: m.approvedVal > 0 ? '#10B981' : '#E2E8F0',
                       }}
                     />
                   </div>
 
-                  {/* Bottom Module Identity */}
-                  <div style={{ textAlign: 'center' }}>
-                    <span
-                      style={{
-                        display: 'inline-block',
-                        fontSize: '11.5px',
-                        fontWeight: 900,
-                        color: m.count > 0 ? '#E51937' : '#5A6A85',
-                        padding: '2px 8px',
-                        borderRadius: '6px',
-                        background: m.count > 0 ? '#FDF2F4' : '#F0F5F9',
-                        fontFamily: 'var(--font-mono)',
-                      }}
-                    >
+                  <div className="text-center w-full">
+                    <span className="inline-block text-xs font-bold px-2 py-0.5 rounded bg-white border border-[#E2E8F0] text-[#E51937]">
                       {m.type}
                     </span>
-                    <div
-                      style={{
-                        fontSize: '10.5px',
-                        fontWeight: 700,
-                        color: '#5A6A85',
-                        marginTop: '4px',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {MODULE_SHORT_NAMES[m.type]}
-                    </div>
+                    <span className="text-[11px] text-[#4B5563] block truncate mt-1">
+                      {m.type === 'PR' ? 'Req' : m.type === 'PO' ? 'Order' : m.type === 'AV' ? 'Advance' : m.type === 'RB' ? 'Reimburse' : m.type === 'RC' ? 'Realisasi' : 'Voucher'}
+                    </span>
                   </div>
-                </div>
+                </button>
               );
             })}
           </div>
         </div>
 
-        {/* RIGHT: Vertical Activity Timeline Card */}
-        <div
-          style={{
-            background: '#FFFFFF',
-            borderRadius: 'var(--card-radius)',
-            padding: '26px',
-            boxShadow: 'var(--shadow-card)',
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          <div style={{ marginBottom: '18px' }}>
-            <h3 style={{ fontSize: '17px', fontWeight: 900, color: '#111C2D', margin: 0 }}>
-              Jejak Aktivitas Terkini
-            </h3>
+        {/* RIGHT 1-COL: Activity Timeline */}
+        <div className="p-5 rounded-lg bg-white border border-[#E2E8F0] flex flex-col justify-between">
+          <div className="mb-4">
+            <h3 className="text-sm font-bold text-[#111827]">Rekam Jejak Aktivitas Terkini</h3>
+            <p className="text-xs text-[#4B5563]">Log riwayat keputusan sistem terbaru</p>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0', flex: 1 }}>
-            {recentLogs.map((log, i) => {
-              const ringColor = timelineColors[i % timelineColors.length];
-              const isLast = i === recentLogs.length - 1;
+          <div className="space-y-3 flex-1 flex flex-col justify-center">
+            {recentLogs.map((log) => {
               let timeStr = '';
               try {
                 timeStr = new Intl.DateTimeFormat('id-ID', {
@@ -666,53 +425,18 @@ export const BentoMetrics: React.FC<BentoMetricsProps> = ({
               }
 
               return (
-                <div
-                  key={log.id}
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: '54px 24px 1fr',
-                    gap: '8px',
-                    minHeight: isLast ? 'auto' : '58px',
-                  }}
-                >
-                  {/* Time column */}
-                  <div style={{ fontSize: '11.5px', fontWeight: 700, color: '#5A6A85', paddingTop: '1px', fontFamily: 'var(--font-mono)' }}>
+                <div key={log.id} className="flex items-start gap-2.5 text-xs">
+                  <span className="w-11 text-[11px] font-semibold text-[#4B5563] shrink-0 pt-0.5">
                     {timeStr}
-                  </div>
-
-                  {/* Spike Pro Hollow Circle + Vertical Line */}
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <span
-                      style={{
-                        width: '12px',
-                        height: '12px',
-                        borderRadius: '50%',
-                        border: `3px solid ${ringColor}`,
-                        background: '#FFFFFF',
-                        flexShrink: 0,
-                        marginTop: '3px',
-                      }}
-                    />
-                    {!isLast && (
-                      <span
-                        style={{
-                          width: '2px',
-                          flex: 1,
-                          background: '#EAEFF4',
-                          margin: '4px 0',
-                        }}
-                      />
-                    )}
-                  </div>
-
-                  {/* Event details */}
-                  <div style={{ paddingBottom: isLast ? '0' : '12px' }}>
-                    <div style={{ fontSize: '12.5px', fontWeight: 800, color: '#111C2D', lineHeight: 1.3 }}>
+                  </span>
+                  <div className="w-2 h-2 rounded-full bg-[#E51937] shrink-0 mt-1.5" />
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-[#111827] truncate">
                       {ACTIVITY_LABELS[log.action] ?? log.action.replaceAll('_', ' ')}
-                    </div>
-                    <div style={{ fontSize: '11.5px', color: '#7C8FAC', marginTop: '2px' }}>
-                      <strong style={{ color: '#E51937', fontFamily: 'var(--font-mono)' }}>{log.docNumber}</strong> • {log.actor}
-                    </div>
+                    </p>
+                    <p className="text-[11px] text-[#4B5563] truncate">
+                      <strong className="text-[#E51937]">{log.docNumber}</strong> · {displayPersonName(log.actor)}
+                    </p>
                   </div>
                 </div>
               );
@@ -723,3 +447,5 @@ export const BentoMetrics: React.FC<BentoMetricsProps> = ({
     </div>
   );
 };
+
+export default BentoMetrics;

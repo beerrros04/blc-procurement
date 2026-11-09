@@ -1,7 +1,7 @@
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
 import type { AnyDocument, DocType, PVPaymentDetails, UserRole } from '../src/types/document';
 import { authenticateCredentials, verifyJwt, SEEDED_USERS, type AuthUser } from './auth';
-import { DomainError, ProcurementRepository } from './repository';
+import { DomainError, ProcurementRepository, type PvGenerationOptions } from './repository';
 import {
   LocalAttachmentStorage,
   type AttachmentCategory,
@@ -47,7 +47,10 @@ function extractAuthUser(req: Request): AuthUser {
   };
 }
 
-function requireOwner(user: AuthUser, document: { ownerId?: string }): void {
+function requireOwner(user: AuthUser, document: { ownerId?: string; docType?: DocType }): void {
+  if (document.docType === 'PV' && user.role === 'KEUANGAN') {
+    return;
+  }
   if (user.role !== 'PEMOHON' || document.ownerId !== user.id) {
     throw new DomainError('Hanya pengaju pemilik dokumen yang dapat melakukan tindakan ini.', 403, 'FORBIDDEN_OWNER');
   }
@@ -118,7 +121,7 @@ export function createAppServer(options?: AppServerOptions): BLCAppServer {
 
       // 3. GET /api/v1/dashboard/metrics
       if (method === 'GET' && path === '/api/v1/dashboard/metrics') {
-        const metrics = repo.getDashboardMetrics(user.role);
+        const metrics = repo.getDashboardMetrics(user.role, user.email);
         return jsonResponse({ metrics, user }, 200);
       }
 
@@ -147,7 +150,7 @@ export function createAppServer(options?: AppServerOptions): BLCAppServer {
           }
           if (user.role !== 'PEMOHON') throw new DomainError('Hanya pengaju yang dapat membuat pengajuan.', 403, 'FORBIDDEN_ROLE');
           const created = repo.createDocument({ ...body, ownerId: user.id }, user.fullName);
-          return jsonResponse({ document: created }, 201);
+          return jsonResponse({ document: visibleDocument(user, created) }, 201);
         }
       }
 
@@ -177,7 +180,7 @@ export function createAppServer(options?: AppServerOptions): BLCAppServer {
             { ...body, expectedVersion },
             user.fullName
           );
-          return jsonResponse({ document: updated }, 200);
+          return jsonResponse({ document: visibleDocument(user, updated) }, 200);
         }
       }
 
@@ -185,11 +188,13 @@ export function createAppServer(options?: AppServerOptions): BLCAppServer {
       const submitMatch = path.match(/^\/api\/v1\/documents\/([^/]+)\/submit$/);
       if (method === 'POST' && submitMatch) {
         const docId = decodeURIComponent(submitMatch[1]);
-        requireOwner(user, repo.getDocumentById(docId));
         const submission = repo.getDocumentById(docId);
-        const approverEmail = submission.stage1ApproverEmail?.trim().toLowerCase();
-        if (!approverEmail || approverEmail === user.email.toLowerCase() || SEEDED_USERS[approverEmail]?.role !== 'ATASAN') {
-          throw new DomainError('Pilih email atasan yang tersedia dan berbeda dari pengaju.', 422, 'INVALID_APPROVER');
+        requireOwner(user, submission);
+        if (submission.docType !== 'GR' && submission.docType !== 'PV') {
+          const approverEmail = submission.stage1ApproverEmail?.trim().toLowerCase();
+          if (!approverEmail || approverEmail === user.email.toLowerCase() || SEEDED_USERS[approverEmail]?.role !== 'ATASAN') {
+            throw new DomainError('Pilih email atasan yang tersedia dan berbeda dari pengaju.', 422, 'INVALID_APPROVER');
+          }
         }
         const body = await parseJsonBody<{ expectedVersion?: number }>(req);
         const idempotencyKey = req.headers.get('idempotency-key') || undefined;
@@ -198,7 +203,7 @@ export function createAppServer(options?: AppServerOptions): BLCAppServer {
           expectedVersion: body.expectedVersion,
           idempotencyKey,
         });
-        return jsonResponse({ document: submitted }, 200);
+        return jsonResponse({ document: visibleDocument(user, submitted) }, 200);
       }
 
       // 7. POST /api/v1/documents/:id/decisions
@@ -247,14 +252,16 @@ export function createAppServer(options?: AppServerOptions): BLCAppServer {
           );
         }
         const sourceDocId = decodeURIComponent(genPvMatch[1]);
-        const pv = repo.generatePvFromSource(sourceDocId, user.fullName);
-        return jsonResponse({ document: pv }, 201);
+        const body = await parseJsonBody<PvGenerationOptions>(req);
+        const pv = repo.generatePvFromSource(sourceDocId, user.fullName, body);
+        return jsonResponse({ document: visibleDocument(user, pv) }, 201);
       }
 
       const confirmRcMatch = path.match(/^\/api\/v1\/documents\/([^/]+)\/confirm-rc$/);
       if (method === 'POST' && confirmRcMatch) {
         if (user.role !== 'KEUANGAN') throw new DomainError('Hanya Finance yang dapat mengonfirmasi realisasi.', 403, 'FORBIDDEN_ROLE');
-        return jsonResponse({ document: repo.confirmRcSettlement(decodeURIComponent(confirmRcMatch[1]), user.fullName) });
+        const confirmed = repo.confirmRcSettlement(decodeURIComponent(confirmRcMatch[1]), user.fullName);
+        return jsonResponse({ document: visibleDocument(user, confirmed) });
       }
 
       // 9. POST /api/v1/payments/:pvId/record
@@ -270,7 +277,7 @@ export function createAppServer(options?: AppServerOptions): BLCAppServer {
         const pvId = decodeURIComponent(payMatch[1]);
         const body = await parseJsonBody<PVPaymentDetails>(req);
         const paidPv = repo.recordPvPayment(pvId, body, user.fullName);
-        return jsonResponse({ document: paidPv }, 200);
+        return jsonResponse({ document: visibleDocument(user, paidPv) }, 200);
       }
 
       // 10. POST /api/v1/documents/:id/attachments

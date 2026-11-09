@@ -27,14 +27,18 @@ import { DocumentDetailModal } from './components/DocumentDetailModal';
 import { DocumentList } from './components/DocumentList';
 import { ExportModal } from './components/ExportModal';
 import { FormAV } from './components/forms/FormAV';
+import { FormGR } from './components/forms/FormGR';
 import { FormPO } from './components/forms/FormPO';
 import { FormPR } from './components/forms/FormPR';
+import { FormPV, type PvGenerationPayload } from './components/forms/FormPV';
 import { FormPVPayment } from './components/forms/FormPVPayment';
 import { FormRB } from './components/forms/FormRB';
 import { FormRC } from './components/forms/FormRC';
 import { StaffBeranda } from './components/StaffBeranda';
+import { ModalDialog } from './components/ui/modal-dialog';
 import { SignInPage } from './components/ui/sign-in';
 import { branchOptions } from './domain/branches';
+import { displayPersonName } from './domain/display-name';
 import { api, clearApiToken, hasApiToken, setApiToken } from './api';
 import { createEmptyDocument } from './store/document-store';
 import './style.css';
@@ -42,6 +46,7 @@ import type {
   AnyDocument,
   AVDocument,
   DocType,
+  GRDocument,
   PODocument,
   PRDocument,
   PVDocument,
@@ -51,7 +56,57 @@ import type {
   UserRole,
 } from './types/document';
 
-export type WorkspaceTab = DocType | 'ALL' | 'BERANDA' | 'REGISTER' | 'HISTORY' | 'DOCS';
+export type WorkspaceTab =
+  | DocType
+  | 'ALL'
+  | 'BERANDA'
+  | 'REGISTER'
+  | 'HISTORY'
+  | 'DOCS'
+  | 'PENGAJUAN'
+  | 'DASHBOARD';
+
+export interface OperationNavItem {
+  id: 'DASHBOARD' | 'PENGAJUAN' | 'DOKUMEN';
+  label: string;
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+  tab: WorkspaceTab;
+  roles: UserRole[];
+}
+
+export function getVisibleOperationsNav(role: UserRole): OperationNavItem[] {
+  const allOps: OperationNavItem[] = [
+    {
+      id: 'DASHBOARD',
+      label: 'Dashboard',
+      icon: LayoutDashboard,
+      tab: 'DASHBOARD',
+      roles: ['ADMIN', 'AYU', 'BOD_HERY', 'BOD_HASHIMOTO'],
+    },
+    {
+      id: 'PENGAJUAN',
+      label: 'Pengajuan',
+      icon: Plus,
+      tab: 'PENGAJUAN',
+      roles: ['PEMOHON', 'ATASAN', 'ADMIN', 'AYU', 'BOD_HERY', 'BOD_HASHIMOTO', 'KEUANGAN'],
+    },
+    {
+      id: 'DOKUMEN',
+      label: 'Dokumen',
+      icon: FileText,
+      tab: 'ALL',
+      roles: ['ADMIN', 'BOD_HERY', 'BOD_HASHIMOTO', 'AYU', 'KEUANGAN'],
+    },
+  ];
+
+  return allOps.filter((item) => item.roles.includes(role));
+}
+
+export function getInitialWorkspaceTab(role: UserRole): WorkspaceTab {
+  return getVisibleOperationsNav(role).some((item) => item.id === 'DASHBOARD')
+    ? 'DASHBOARD'
+    : 'PENGAJUAN';
+}
 
 interface AuthAccount {
   id: string;
@@ -140,6 +195,13 @@ const APP_NAV_ITEMS: NavItem[] = [
     badgeCount: (docs) => docs.filter((d) => d.docType === 'PO').length,
   },
   {
+    id: 'GR',
+    label: 'Laporan Penerimaan (GR)',
+    icon: FileCheck2,
+    section: 'APPS',
+    badgeCount: (docs) => docs.filter((d) => d.docType === 'GR').length,
+  },
+  {
     id: 'AV',
     label: 'Cash Advance (AV)',
     icon: Banknote,
@@ -222,10 +284,7 @@ function App() {
   const [documents, setDocuments] = useState<AnyDocument[]>([]);
 
   const [activeTab, setActiveTab] = useState<WorkspaceTab>(() => {
-    if (authUser && !isExecutiveOrApproverRole(authUser.role)) {
-      return 'BERANDA';
-    }
-    return 'ALL';
+    return authUser ? getInitialWorkspaceTab(authUser.role) : 'PENGAJUAN';
   });
   const [notice, setNotice] = useState<string>('');
   const [formError, setFormError] = useState('');
@@ -234,6 +293,7 @@ function App() {
   const [activeFormType, setActiveFormType] = useState<DocType | null>(null);
   const [editingDoc, setEditingDoc] = useState<AnyDocument | null>(null);
   const [detailDoc, setDetailDoc] = useState<AnyDocument | null>(null);
+  const [generatingPvSource, setGeneratingPvSource] = useState<AnyDocument | null>(null);
   const [payingPv, setPayingPv] = useState<PVDocument | null>(null);
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -266,11 +326,7 @@ function App() {
     setAuthUser(account);
     localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(account));
     setLoginError('');
-    if (isExecutiveOrApproverRole(account.role)) {
-      setActiveTab('ALL');
-    } else {
-      setActiveTab('BERANDA');
-    }
+    setActiveTab(getInitialWorkspaceTab(account.role));
     setNotice('');
 
     void refreshDocs();
@@ -304,12 +360,12 @@ function App() {
   if (!authUser) {
     return (
       <SignInPage
-        title={<span className="font-black text-[#111C2D] tracking-tight">Masuk ke BLC Procurement</span>}
-        description="Mode demo: pilih akun contoh untuk mencoba ruang kerja. Login Microsoft 365 belum terhubung."
+        title="Portal Pengadaan & Keuangan"
+        description="Masuk menggunakan akun korporat Anda untuk pengajuan permohonan atau otorisasi berjenjang."
         heroImageSrc="/logo.png"
         errorMessage={loginError}
         quickAccounts={CORPORATE_ACCOUNTS.map((a) => ({
-          label: a.name,
+          label: a.role === 'ADMIN' ? a.name : displayPersonName(a.name),
           email: a.email,
           roleBadge: a.role === 'AYU' ? 'GM' : a.role.startsWith('BOD_') ? 'BOD' : a.role === 'KEUANGAN' ? 'FINANCE' : a.role === 'PEMOHON' ? 'PENGAJU' : a.role,
         }))}
@@ -339,8 +395,32 @@ function App() {
     setFormError('');
     if (parent.docType === 'PR' && parent.status === 'APPROVED') {
       const doc = createEmptyDocument('PO', parent.branch) as PODocument;
-      setEditingDoc({ ...doc, parentPrId: parent.id, title: `PO: ${parent.title}`, purpose: parent.purpose, subtotal: parent.subtotalAmount });
+      setEditingDoc({
+        ...doc,
+        parentPrId: parent.id,
+        title: `PO: ${parent.title}`,
+        purpose: parent.purpose,
+        subtotal: parent.subtotalAmount,
+        budgetType: parent.budgetType,
+        iamNumber: parent.iamNumber,
+        otherCosts: parent.otherCosts ?? 0,
+        discount: parent.discount ?? 0,
+        ppnRate: parent.ppnRate ?? 0.11,
+        pphRate: parent.pphRate ?? 0,
+        stage1ApproverEmail: parent.stage1ApproverEmail,
+      });
       setActiveFormType('PO');
+    } else if (parent.docType === 'PO' && (parent.status === 'APPROVED' || parent.status === 'PAID')) {
+      const doc = createEmptyDocument('GR', parent.branch) as GRDocument;
+      setEditingDoc({
+        ...doc,
+        parentPoId: parent.id,
+        parentPoNumber: parent.docNumber,
+        vendorName: parent.vendorName,
+        title: `Laporan Penerimaan: ${parent.title}`,
+        purpose: parent.purpose,
+      });
+      setActiveFormType('GR');
     } else if (parent.docType === 'AV' && parent.status === 'PAID') {
       const av = availableAvs.find((item) => item.id === parent.id);
       if (!av) return;
@@ -361,21 +441,36 @@ function App() {
     for (const attachment of pending) {
       await api(`/documents/${encodeURIComponent(doc.id)}/attachments`, 'POST', {
         originalName: attachment.name, mimeType: attachment.mimeType,
-        category: attachment.category === 'QUOTATION' || attachment.category === 'OTHER' ? 'SUPPORTING' : attachment.category,
+        category: attachment.category === 'OTHER' ? 'SUPPORTING' : attachment.category,
         contentBase64: attachment.dataUrl?.split(',')[1],
       });
+    }
+    if (doc.docType === 'GR') {
+      await api(`/documents/${encodeURIComponent(doc.id)}/submit`, 'POST', {});
     }
     await refreshDocs();
     setActiveFormType(null);
     setEditingDoc(null);
-    setNotice(`Draf dokumen ${saved.document.docNumber} berhasil disimpan.`);
+    setNotice(
+      doc.docType === 'GR'
+        ? `Laporan Penerimaan ${saved.document.docNumber} berhasil dicatat.`
+        : `Draf dokumen ${saved.document.docNumber} berhasil disimpan.`
+    );
     } catch (error) { setFormError(error instanceof Error ? error.message : 'Gagal menyimpan draf.'); }
   }
 
   async function handleSubmitDoc(docId: string) {
-    try { await api(`/documents/${encodeURIComponent(docId)}/submit`, 'POST', { expectedVersion: (documents.find((item) => item.id === docId) as (AnyDocument & { version?: number }) | undefined)?.version });
-    await refreshDocs();
-    setNotice(`Dokumen berhasil diajukan ke Tahap 1 (Atasan Langsung).`);
+    try {
+      const targetDoc = documents.find((item) => item.id === docId) as (AnyDocument & { version?: number }) | undefined;
+      await api(`/documents/${encodeURIComponent(docId)}/submit`, 'POST', { expectedVersion: targetDoc?.version });
+      await refreshDocs();
+      setNotice(
+        targetDoc?.docType === 'GR'
+          ? 'Laporan Penerimaan berhasil dicatat (Tanpa Persetujuan).'
+          : targetDoc?.docType === 'PV'
+          ? 'Payment Voucher berhasil diajukan ulang ke Ayu Martina.'
+          : 'Dokumen berhasil diajukan ke Tahap 1 (Atasan Langsung).'
+      );
     } catch (error) { setNotice(error instanceof Error ? error.message : 'Gagal mengajukan.'); }
   }
 
@@ -387,8 +482,8 @@ function App() {
     void role;
     try { await api(`/documents/${encodeURIComponent(docId)}/decisions`, 'POST', { decision: 'APPROVE', comment, expectedVersion: (documents.find((item) => item.id === docId) as (AnyDocument & { version?: number }) | undefined)?.version });
     await refreshDocs();
-    setNotice(`Persetujuan berhasil dicatat oleh ${authUser?.name}.`);
-    } catch (error) { setNotice(error instanceof Error ? error.message : 'Gagal menyetujui.'); }
+    setNotice(`Persetujuan berhasil dicatat oleh ${displayPersonName(authUser?.name)}.`);
+    } catch (error) { throw error instanceof Error ? error : new Error('Gagal menyetujui.'); }
   }
 
   async function handleRejectDoc(
@@ -400,15 +495,32 @@ function App() {
     try { await api(`/documents/${encodeURIComponent(docId)}/decisions`, 'POST', { decision: 'REJECT', comment, expectedVersion: (documents.find((item) => item.id === docId) as (AnyDocument & { version?: number }) | undefined)?.version });
     await refreshDocs();
     setNotice(`Dokumen ditolak dan dikembalikan ke Draf untuk revisi pemohon.`);
-    } catch (error) { setNotice(error instanceof Error ? error.message : 'Gagal mengembalikan dokumen.'); }
+    } catch (error) { throw error instanceof Error ? error : new Error('Gagal mengembalikan dokumen.'); }
   }
 
-  async function handleGeneratePv(sourceDocId: string) {
-    try { const result = await api<{ document: PVDocument }>(`/documents/${encodeURIComponent(sourceDocId)}/generate-pv`, 'POST', {});
-    await refreshDocs();
-    setNotice(`Payment Voucher ${result.document.docNumber} berhasil dibuat dan masuk antrean pembayaran.`);
-    setActiveTab('PV');
-    } catch (error) { setNotice(error instanceof Error ? error.message : 'Gagal membuat PV.'); }
+  function handleOpenGeneratePv(sourceDocId: string) {
+    const src = documents.find((d) => d.id === sourceDocId);
+    if (src) {
+      setGeneratingPvSource(src);
+    }
+  }
+
+  async function handleConfirmGeneratePv(sourceDocId: string, options: PvGenerationPayload) {
+    try {
+      const result = await api<{ document: PVDocument }>(
+        `/documents/${encodeURIComponent(sourceDocId)}/generate-pv`,
+        'POST',
+        options
+      );
+      await refreshDocs();
+      setGeneratingPvSource(null);
+      setNotice(
+        `Payment Voucher ${result.document.docNumber} berhasil diajukan dan menunggu persetujuan Ayu Martina, Hery Sugiarto, dan Koji Hashimoto.`
+      );
+      setActiveTab('PV');
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : 'Gagal membuat PV.');
+    }
   }
 
   async function handleRecordPvPayment(pvId: string, details: PVPaymentDetails) {
@@ -428,7 +540,16 @@ function App() {
   }
 
   const availablePrs = documents.filter(
-    (d): d is PRDocument => d.docType === 'PR' && d.status === 'APPROVED'
+    (d): d is PRDocument =>
+      d.docType === 'PR' &&
+      d.status === 'APPROVED' &&
+      !documents.some(
+        (po) =>
+          po.docType === 'PO' &&
+          po.id !== editingDoc?.id &&
+          po.status !== 'REJECTED' &&
+          (po as PODocument).parentPrId === d.id
+      )
   );
   const availableAvs = documents.filter((d): d is AVDocument =>
     d.docType === 'AV' && d.status === 'PAID' && d.ownerId === authUser.id &&
@@ -467,7 +588,7 @@ function App() {
     <div className="shell">
       <datalist id="branch-options">{branchOptions(documents.map((doc) => doc.branch)).map((branch) => <option key={branch} value={branch} />)}</datalist>
       {/* =====================================================================
-          SPIKE NEXT.JS PRO FLOATING ROUNDED SIDEBAR
+          BLC CAREAADY CORPORATE SIDEBAR
          ===================================================================== */}
       <aside className="sidebar">
         <div className="server-status" style={{ padding: '10px 22px 0', fontSize: '12px', color: '#5A6A85' }}>Mode uji · Data tersimpan di server lokal</div>
@@ -524,21 +645,31 @@ function App() {
           <span>{mobileMenuOpen ? 'Tutup menu navigasi' : 'Buka menu navigasi'}</span>
         </button>
         <div id="main-navigation" className={`sidebar-navigation ${mobileMenuOpen ? 'is-open' : ''}`}>
-        {/* Section: HOME */}
-        <div className="nav-label">HOME</div>
-        <nav aria-label="Menu Utama">
-          {homeNavItems.map((item) => {
+        {/* Section: OPERATIONS (Elera Architecture per User Specification) */}
+        <div className="nav-label">OPERATIONS</div>
+        <nav aria-label="Menu Operations">
+          {getVisibleOperationsNav(authUser.role).map((item) => {
             const Icon = item.icon;
-            const isActive = activeTab === item.id;
-            const count = item.badgeCount ? item.badgeCount(documents) : undefined;
+            const isActive =
+              (item.id === 'DASHBOARD' && activeTab === 'DASHBOARD') ||
+              (item.id === 'PENGAJUAN' && (activeTab === 'PENGAJUAN' || activeTab === 'BERANDA')) ||
+              (item.id === 'DOKUMEN' && (activeTab === 'ALL' || ['PR', 'PO', 'GR', 'AV', 'RB', 'RC', 'PV'].includes(activeTab)));
+            const badge =
+              item.id === 'DASHBOARD'
+                ? documents.filter((d) => d.status === 'IN_REVIEW').length
+                : item.id === 'DOKUMEN'
+                ? documents.length
+                : undefined;
+
             return (
               <a
                 key={item.id}
                 href={`#${item.id}`}
                 className={isActive ? 'nav-active' : ''}
+                aria-current={isActive ? 'page' : undefined}
                 onClick={(e) => {
                   e.preventDefault();
-                  setActiveTab(item.id);
+                  setActiveTab(item.tab);
                   setMobileMenuOpen(false);
                 }}
                 style={{ justifyContent: 'space-between' }}
@@ -547,70 +678,17 @@ function App() {
                   <Icon size={18} />
                   <span>{item.label}</span>
                 </div>
-                {count !== undefined && (
-                  <span
-                    style={{
-                      fontSize: '11px',
-                      padding: '2px 8px',
-                      borderRadius: '20px',
-                      background: isActive ? '#E51937' : '#F0F5F9',
-                      color: isActive ? '#FFFFFF' : '#5A6A85',
-                      fontWeight: 800,
-                    }}
-                  >
-                    {count}
-                  </span>
+                {badge !== undefined && (
+                  <span className="s-count">{badge}</span>
                 )}
               </a>
             );
           })}
         </nav>
 
-        {/* Section: MODUL DOKUMEN */}
+        {/* Section: DOKUMEN & AUDIT */}
         <div className="nav-label" style={{ marginTop: '18px' }}>
-          MODUL DOKUMEN
-        </div>
-        <nav aria-label="Navigasi jenis dokumen">
-          {APP_NAV_ITEMS.map((item) => {
-            const Icon = item.icon;
-            const count = item.badgeCount ? item.badgeCount(documents) : 0;
-            const isActive = activeTab === item.id;
-            return (
-              <a
-                key={item.id}
-                href={`#${item.id}`}
-                className={isActive ? 'nav-active' : ''}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setActiveTab(item.id);
-                  setMobileMenuOpen(false);
-                }}
-                style={{ justifyContent: 'space-between' }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <Icon size={18} />
-                  <span>{item.label}</span>
-                </div>
-                <span
-                  style={{
-                    fontSize: '11px',
-                    padding: '2px 8px',
-                    borderRadius: '20px',
-                    background: isActive ? '#E51937' : '#F0F5F9',
-                    color: isActive ? '#FFFFFF' : '#5A6A85',
-                    fontWeight: 800,
-                  }}
-                >
-                  {count}
-                </span>
-              </a>
-            );
-          })}
-        </nav>
-
-        {/* Section: ARSIP PERSETUJUAN */}
-        <div className="nav-label" style={{ marginTop: '18px' }}>
-          ARSIP PERSETUJUAN
+          DOKUMEN & AUDIT
         </div>
         <nav aria-label="Register, Riwayat, dan Pustaka Dokumen">
           {SHAREPOINT_NAV_ITEMS.map((item) => {
@@ -622,6 +700,7 @@ function App() {
                 key={item.id}
                 href={`#${item.id}`}
                 className={isActive ? 'nav-active' : ''}
+                aria-current={isActive ? 'page' : undefined}
                 onClick={(e) => {
                   e.preventDefault();
                   setActiveTab(item.id);
@@ -633,18 +712,7 @@ function App() {
                   <Icon size={18} />
                   <span>{item.label}</span>
                 </div>
-                <span
-                  style={{
-                    fontSize: '11px',
-                    padding: '2px 8px',
-                    borderRadius: '20px',
-                    background: isActive ? '#E51937' : '#F0F5F9',
-                    color: isActive ? '#FFFFFF' : '#5A6A85',
-                    fontWeight: 800,
-                  }}
-                >
-                  {count}
-                </span>
+                <span className="s-count">{count}</span>
               </a>
             );
           })}
@@ -667,10 +735,7 @@ function App() {
         >
           <div style={{ minWidth: 0 }}>
             <div style={{ fontSize: '13px', fontWeight: 800, color: '#111C2D', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {authUser.name}
-            </div>
-            <div style={{ fontSize: '11px', fontWeight: 700, color: '#5A6A85' }}>
-              {authUser.roleTitle}
+              {authUser.role === 'ADMIN' ? authUser.name : displayPersonName(authUser.name)}
             </div>
           </div>
           <button
@@ -690,25 +755,130 @@ function App() {
          ===================================================================== */}
       <main className="main" id="workspace-main">
         <div className="content">
+          {/* =====================================================================
+              ELERA CORPORATE TOPBAR (Elera Architecture)
+             ===================================================================== */}
+          <header
+            className="topbar"
+            style={{
+              marginBottom: '20px',
+              borderRadius: 'var(--card-radius, 10px)',
+              border: '1px solid var(--border-clean, #ededeb)',
+              background: '#ffffff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '12px 20px',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+              <h1 style={{ fontSize: '17px', fontWeight: 800, margin: 0, color: '#191C1A' }}>
+                {activeTab === 'DASHBOARD'
+                  ? 'Cockpit Eksekutif & Telemetry'
+                  : activeTab === 'PENGAJUAN' || activeTab === 'BERANDA'
+                  ? 'Pengajuan & Pelacakan Alur'
+                  : activeTab === 'REGISTER'
+                  ? 'Approval Register'
+                  : activeTab === 'HISTORY'
+                  ? 'Approval History'
+                  : activeTab === 'DOCS'
+                  ? 'Approval Docs'
+                  : 'Dokumen Pengadaan'}
+              </h1>
+              <span className="s-badge gray">{authUser.branch}</span>
+              <span
+                className="s-badge"
+                style={{ background: '#F4F4F2', color: '#191C1A', fontWeight: 700 }}
+              >
+                {authUser.roleTitle}
+              </span>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                className="s-action"
+                onClick={() => setIsExportOpen(true)}
+                title="Ekspor rekap 13 kolom untuk Finance"
+              >
+                Ekspor Laporan (13 Kolom)
+              </button>
+            </div>
+          </header>
+
           {notice && (
-            <div className="notice" role="status">
-              <strong>Notifikasi Sistem:</strong> {notice}
+            <div
+              className="notice"
+              role="status"
+              style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+            >
+              <div><strong>Notifikasi Sistem:</strong> {notice}</div>
+              <button
+                type="button"
+                onClick={() => setNotice('')}
+                aria-label="Tutup notifikasi"
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '4px 8px',
+                  fontSize: '16px',
+                  lineHeight: 1,
+                  color: 'inherit',
+                }}
+              >
+                &times;
+              </button>
             </div>
           )}
 
-          {/* VIEW 1: BERANDA CAREADY (Default for PEMOHON) */}
-          {(activeTab === 'BERANDA' || (!canSeeExecutiveDashboard && activeTab === 'ALL')) && (
+          {/* VIEW 0: EXECUTIVE DASHBOARD COCKPIT (Admin, GM, BoD) */}
+          {activeTab === 'DASHBOARD' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div className="page-heading">
+                <div>
+                  <p style={{ color: '#8A8F89', fontSize: '13px', margin: '4px 0 0' }}>
+                    Pemantauan alur pengadaan, percepatan otorisasi berjenjang, dan ringkasan anggaran.
+                  </p>
+                </div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    type="button"
+                    className="s-action s-action-caready"
+                    onClick={() => setActiveTab('ALL')}
+                  >
+                    Buka Register Dokumen
+                  </button>
+                </div>
+              </div>
+
+              <BentoMetrics
+                documents={documents}
+                activeRole={activeRole}
+                onSelectTab={(type) => setActiveTab(type)}
+              />
+
+              <div style={{ marginTop: '12px' }}>
+                <ApprovalRegisterView documents={documents} onOpenDetail={setDetailDoc} />
+              </div>
+            </div>
+          )}
+
+          {/* VIEW 1: PENGAJUAN (Staff Beranda - Semua Role) */}
+          {(activeTab === 'PENGAJUAN' || activeTab === 'BERANDA') && (
             <StaffBeranda
-              userName={authUser.name}
+              userName={authUser.role === 'ADMIN' ? authUser.name : displayPersonName(authUser.name)}
               userId={authUser.id}
               userEmail={authUser.email}
               userBranch={authUser.branch}
+              activeRole={activeRole}
               documents={documents}
               onCreateDoc={handleCreateDoc}
               onOpenDetail={setDetailDoc}
               onEditDoc={handleEditDoc}
               onSubmitDoc={handleSubmitDoc}
-              onGeneratePv={handleGeneratePv}
+              onGeneratePv={handleOpenGeneratePv}
               onPayPv={setPayingPv}
               onCreateRelated={handleCreateRelated}
               onConfirmRc={handleConfirmRc}
@@ -735,6 +905,7 @@ function App() {
           {/* VIEW 5: EXECUTIVE DASHBOARD ('ALL') OR SPECIFIC MODULE */}
           {(activeTab === 'PR' ||
             activeTab === 'PO' ||
+            activeTab === 'GR' ||
             activeTab === 'AV' ||
             activeTab === 'RB' ||
             activeTab === 'RC' ||
@@ -766,6 +937,13 @@ function App() {
                       <button
                         type="button"
                         className="secondary"
+                        onClick={() => handleCreateDoc('GR')}
+                      >
+                        <Plus size={15} /> Catat GR
+                      </button>
+                      <button
+                        type="button"
+                        className="secondary"
                         onClick={() => handleCreateDoc('AV')}
                       >
                         <Plus size={15} /> Buat AV
@@ -789,19 +967,12 @@ function App() {
                 </div>
               </div>
 
-              {canSeeExecutiveDashboard && activeTab === 'ALL' && (
-                <BentoMetrics
-                  documents={documents}
-                  activeRole={activeRole}
-                  onSelectTab={(tab) => setActiveTab(tab)}
-                />
-              )}
-
               <DocumentList
                 documents={documents}
                 activeTab={
                   activeTab === 'PR' ||
                   activeTab === 'PO' ||
+                  activeTab === 'GR' ||
                   activeTab === 'AV' ||
                   activeTab === 'RB' ||
                   activeTab === 'RC' ||
@@ -811,14 +982,16 @@ function App() {
                 }
                 activeRole={activeRole}
                 activeUserId={authUser.id}
+                activeUserEmail={authUser.email}
                 onOpenDetail={setDetailDoc}
                 onEditDoc={handleEditDoc}
                 onSubmitDoc={handleSubmitDoc}
-                onGeneratePv={handleGeneratePv}
+                onGeneratePv={handleOpenGeneratePv}
                 onPayPv={setPayingPv}
                 onCreateRelated={handleCreateRelated}
                 onConfirmRc={handleConfirmRc}
                 onOpenExport={() => setIsExportOpen(true)}
+                onSelectTab={(tab) => setActiveTab(tab)}
               />
             </>
           )}
@@ -827,280 +1000,198 @@ function App() {
 
       {/* Creation / Edit Modals */}
       {activeFormType === 'PR' && editingDoc && (
-        <dialog
-          className="modal"
-          open
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              setActiveFormType(null);
-              setEditingDoc(null);
-            }
-          }}
-          onCancel={(e) => {
-            e.preventDefault();
+        <ModalDialog
+          isOpen={true}
+          title="Formulir Draf PR"
+          errorMessage={formError}
+          onClose={() => {
             setActiveFormType(null);
             setEditingDoc(null);
           }}
         >
-          <section className="drawer">
-            <div className="drawer-head">
-              <div>
-                <h2>Formulir Draf PR</h2>
-              </div>
-              <button
-                className="close"
-                aria-label="Tutup formulir"
-                type="button"
-                onClick={() => {
-                  setActiveFormType(null);
-                  setEditingDoc(null);
-                }}
-              >
-                <X size={18} />
-              </button>
-            </div>
-            {formError && <div className="notice error-notice" role="alert">{formError}</div>}
-            <FormPR
-              initialDoc={editingDoc as PRDocument}
-              onSave={handleSaveDoc}
-              onClose={() => {
-                setActiveFormType(null);
-                setEditingDoc(null);
-              }}
-            />
-          </section>
-        </dialog>
+          <FormPR
+            initialDoc={editingDoc as PRDocument}
+            onSave={handleSaveDoc}
+            onClose={() => {
+              setActiveFormType(null);
+              setEditingDoc(null);
+            }}
+          />
+        </ModalDialog>
       )}
 
       {activeFormType === 'PO' && editingDoc && (
-        <dialog
-          className="modal"
-          open
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              setActiveFormType(null);
-              setEditingDoc(null);
-            }
-          }}
-          onCancel={(e) => {
-            e.preventDefault();
+        <ModalDialog
+          isOpen={true}
+          title="Formulir Draf PO"
+          maxWidth="min(680px, 100%)"
+          errorMessage={formError}
+          onClose={() => {
             setActiveFormType(null);
             setEditingDoc(null);
           }}
         >
-          <section className="drawer" style={{ width: 'min(680px, 100%)' }}>
-            <div className="drawer-head">
-              <div>
-                <h2>Formulir Draf PO</h2>
-              </div>
-              <button
-                className="close"
-                aria-label="Tutup formulir"
-                type="button"
-                onClick={() => {
-                  setActiveFormType(null);
-                  setEditingDoc(null);
-                }}
-              >
-                <X size={18} />
-              </button>
-            </div>
-            {formError && <div className="notice error-notice" role="alert">{formError}</div>}
-            <FormPO
-              initialDoc={editingDoc as PODocument}
-              availablePrs={availablePrs}
-              onSave={handleSaveDoc}
-              onClose={() => {
-                setActiveFormType(null);
-                setEditingDoc(null);
-              }}
-            />
-          </section>
-        </dialog>
+          <FormPO
+            initialDoc={editingDoc as PODocument}
+            availablePrs={availablePrs}
+            onSave={handleSaveDoc}
+            onClose={() => {
+              setActiveFormType(null);
+              setEditingDoc(null);
+            }}
+          />
+        </ModalDialog>
       )}
 
       {activeFormType === 'AV' && editingDoc && (
-        <dialog
-          className="modal"
-          open
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              setActiveFormType(null);
-              setEditingDoc(null);
-            }
-          }}
-          onCancel={(e) => {
-            e.preventDefault();
+        <ModalDialog
+          isOpen={true}
+          title="Formulir Draf AV"
+          errorMessage={formError}
+          onClose={() => {
             setActiveFormType(null);
             setEditingDoc(null);
           }}
         >
-          <section className="drawer">
-            <div className="drawer-head">
-              <div>
-                <h2>Formulir Draf AV</h2>
-              </div>
-              <button
-                className="close"
-                aria-label="Tutup formulir"
-                type="button"
-                onClick={() => {
-                  setActiveFormType(null);
-                  setEditingDoc(null);
-                }}
-              >
-                <X size={18} />
-              </button>
-            </div>
-            {formError && <div className="notice error-notice" role="alert">{formError}</div>}
-            <FormAV
-              initialDoc={editingDoc as AVDocument}
-              availablePos={documents.filter((d): d is PODocument => d.docType === 'PO' && d.status === 'APPROVED')}
-              onSave={handleSaveDoc}
-              onClose={() => {
-                setActiveFormType(null);
-                setEditingDoc(null);
-              }}
-            />
-          </section>
-        </dialog>
+          <FormAV
+            initialDoc={editingDoc as AVDocument}
+            availablePos={documents.filter((d): d is PODocument => d.docType === 'PO' && d.status === 'APPROVED')}
+            onSave={handleSaveDoc}
+            onClose={() => {
+              setActiveFormType(null);
+              setEditingDoc(null);
+            }}
+          />
+        </ModalDialog>
       )}
 
       {activeFormType === 'RB' && editingDoc && (
-        <dialog
-          className="modal"
-          open
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              setActiveFormType(null);
-              setEditingDoc(null);
-            }
-          }}
-          onCancel={(e) => {
-            e.preventDefault();
+        <ModalDialog
+          isOpen={true}
+          title="Formulir Draf RB"
+          errorMessage={formError}
+          onClose={() => {
             setActiveFormType(null);
             setEditingDoc(null);
           }}
         >
-          <section className="drawer">
-            <div className="drawer-head">
-              <div>
-                <h2>Formulir Draf RB</h2>
-              </div>
-              <button
-                className="close"
-                aria-label="Tutup formulir"
-                type="button"
-                onClick={() => {
-                  setActiveFormType(null);
-                  setEditingDoc(null);
-                }}
-              >
-                <X size={18} />
-              </button>
-            </div>
-            {formError && <div className="notice error-notice" role="alert">{formError}</div>}
-            <FormRB
-              initialDoc={editingDoc as RBDocument}
-              onSave={handleSaveDoc}
-              onClose={() => {
-                setActiveFormType(null);
-                setEditingDoc(null);
-              }}
-            />
-          </section>
-        </dialog>
+          <FormRB
+            initialDoc={editingDoc as RBDocument}
+            onSave={handleSaveDoc}
+            onClose={() => {
+              setActiveFormType(null);
+              setEditingDoc(null);
+            }}
+          />
+        </ModalDialog>
       )}
 
       {activeFormType === 'RC' && editingDoc && (
-        <dialog
-          className="modal"
-          open
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              setActiveFormType(null);
-              setEditingDoc(null);
-            }
-          }}
-          onCancel={(e) => {
-            e.preventDefault();
+        <ModalDialog
+          isOpen={true}
+          title="Formulir Draf RC"
+          maxWidth="min(640px, 100%)"
+          errorMessage={formError}
+          onClose={() => {
             setActiveFormType(null);
             setEditingDoc(null);
           }}
         >
-          <section className="drawer" style={{ width: 'min(640px, 100%)' }}>
-            <div className="drawer-head">
-              <div>
-                <h2>Formulir Draf RC</h2>
-              </div>
-              <button
-                className="close"
-                aria-label="Tutup formulir"
-                type="button"
-                onClick={() => {
-                  setActiveFormType(null);
-                  setEditingDoc(null);
-                }}
-              >
-                <X size={18} />
-              </button>
-            </div>
-            {formError && <div className="notice error-notice" role="alert">{formError}</div>}
-            <FormRC
-              initialDoc={editingDoc as RCDocument}
-              availableAvs={availableAvs}
-              onSave={handleSaveDoc}
-              onClose={() => {
-                setActiveFormType(null);
-                setEditingDoc(null);
-              }}
-            />
-          </section>
-        </dialog>
+          <FormRC
+            initialDoc={editingDoc as RCDocument}
+            availableAvs={availableAvs}
+            onSave={handleSaveDoc}
+            onClose={() => {
+              setActiveFormType(null);
+              setEditingDoc(null);
+            }}
+          />
+        </ModalDialog>
+      )}
+
+      {activeFormType === 'GR' && editingDoc && (
+        <ModalDialog
+          isOpen={true}
+          title="Formulir Laporan Penerimaan (GR)"
+          maxWidth="min(640px, 100%)"
+          errorMessage={formError}
+          onClose={() => {
+            setActiveFormType(null);
+            setEditingDoc(null);
+          }}
+        >
+          <FormGR
+            initialDoc={editingDoc as GRDocument}
+            availablePos={documents.filter(
+              (d): d is PODocument =>
+                d.docType === 'PO' && (d.status === 'APPROVED' || d.status === 'PAID')
+            )}
+            onSave={handleSaveDoc}
+            onClose={() => {
+              setActiveFormType(null);
+              setEditingDoc(null);
+            }}
+          />
+        </ModalDialog>
+      )}
+
+      {generatingPvSource && (
+        <ModalDialog
+          isOpen={true}
+          title="Penerbitan & Pengajuan Payment Voucher (PV)"
+          maxWidth="min(660px, 100%)"
+          onClose={() => setGeneratingPvSource(null)}
+        >
+          <FormPV
+            sourceDoc={generatingPvSource}
+            linkedGrs={documents.filter(
+              (d): d is GRDocument =>
+                d.docType === 'GR' && d.parentPoId === generatingPvSource.id
+            )}
+            alreadyCommittedOnPo={
+              generatingPvSource.docType === 'PO'
+                ? documents.reduce((sum, d) => {
+                    if (d.status === 'REJECTED' || d.status === 'DRAFT') return sum;
+                    if (d.docType === 'PV' && d.sourceDocId === generatingPvSource.id) {
+                      return sum + d.netAmountToPay;
+                    }
+                    if (d.docType === 'AV' && d.parentPoId === generatingPvSource.id) {
+                      return sum + d.amount;
+                    }
+                    return sum;
+                  }, 0)
+                : 0
+            }
+            onGenerate={handleConfirmGeneratePv}
+            onClose={() => setGeneratingPvSource(null)}
+          />
+        </ModalDialog>
       )}
 
       {payingPv && (
-        <dialog
-          className="modal"
-          open
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setPayingPv(null);
-          }}
-          onCancel={(e) => {
-            e.preventDefault();
-            setPayingPv(null);
-          }}
+        <ModalDialog
+          isOpen={true}
+          title="Eksekusi Pembayaran PV"
+          maxWidth="min(600px, 100%)"
+          onClose={() => setPayingPv(null)}
         >
-          <section className="drawer" style={{ width: 'min(600px, 100%)' }}>
-            <div className="drawer-head">
-              <div>
-                <h2>Eksekusi Pembayaran PV</h2>
-              </div>
-              <button
-                className="close"
-                aria-label="Tutup formulir"
-                type="button"
-                onClick={() => setPayingPv(null)}
-              >
-                <X size={18} />
-              </button>
-            </div>
-            <FormPVPayment
-              pv={payingPv}
-              onRecordPayment={handleRecordPvPayment}
-              onClose={() => setPayingPv(null)}
-            />
-          </section>
-        </dialog>
+          <FormPVPayment
+            pv={payingPv}
+            onRecordPayment={handleRecordPvPayment}
+            onClose={() => setPayingPv(null)}
+          />
+        </ModalDialog>
       )}
 
       {detailDoc && (
         <DocumentDetailModal
           document={detailDoc}
+          allDocuments={documents}
           activeRole={activeRole}
+          activeUserId={authUser.id}
+          activeUserEmail={authUser.email}
           onClose={() => {
             setDetailDoc(null);
-            refreshDocs();
           }}
           onApprove={handleApproveDoc}
           onReject={handleRejectDoc}
@@ -1117,8 +1208,11 @@ function App() {
   );
 }
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>
-);
+const rootEl = typeof document !== 'undefined' ? document.getElementById('root') : null;
+if (rootEl) {
+  createRoot(rootEl).render(
+    <StrictMode>
+      <App />
+    </StrictMode>
+  );
+}

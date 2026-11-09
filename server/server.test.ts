@@ -133,6 +133,11 @@ describe('BLC Procurement Production Backend API & Domain Rules', () => {
     expect(pv.grossAmount).toBe(100000);
     expect(pv.pphDeduction).toBe(2000);
     expect(pv.netAmountToPay).toBe(98000);
+    expect(pv.status).toBe('IN_REVIEW');
+    expect(pv.currentStage).toBe('AYU');
+    for (const token of [gm, hery, hashimoto]) {
+      expect((await apiCall(`/api/v1/documents/${pv.id}/decisions`, { method: 'POST', token, body: { decision: 'APPROVE' } })).status).toBe(200);
+    }
     expect((await apiCall(`/api/v1/payments/${pv.id}/record`, { method: 'POST', token: finance, body: { paidAt: '2026-11-08', sourceBank: 'Dummy', referenceNumber: 'TEST' } })).status).toBe(200);
     const rcCreated = await apiCall('/api/v1/documents', { method: 'POST', token: applicant, body: { docType: 'RC', title: 'RC dummy', parentAvId: av.id, avOriginalAmount: 1, realizedAmount: 98000, activityCompletedDate: '2026-11-08', submissionDeadline: '2026-11-10' } });
     const rc = (await rcCreated.json()).document;
@@ -489,8 +494,8 @@ describe('BLC Procurement Production Backend API & Domain Rules', () => {
     });
     expect(dupPvRes.status).toBe(409);
 
-    // Record payment on PV
-    const payRes = await apiCall(`/api/v1/payments/${pv.id}/record`, {
+    // Recording payment before PV is approved by Ayu & BoD must fail with 422 PV_NOT_APPROVED
+    const prematurePayRes = await apiCall(`/api/v1/payments/${pv.id}/record`, {
       method: 'POST',
       token: keuanganToken,
       body: {
@@ -499,10 +504,37 @@ describe('BLC Procurement Production Backend API & Domain Rules', () => {
         referenceNumber: 'TRX-20261107-99182',
       },
     });
+    expect(prematurePayRes.status).toBe(422);
+    expect((await prematurePayRes.json()).code).toBe('PV_NOT_APPROVED');
+
+    // Approve PV through Ayu -> Hery & Hashimoto
+    for (const token of [ayuToken, heryToken, hashimotoToken]) {
+      const decRes = await apiCall(`/api/v1/documents/${pv.id}/decisions`, {
+        method: 'POST',
+        token,
+        body: { decision: 'APPROVE', comment: 'Approve PV' },
+      });
+      expect(decRes.status).toBe(200);
+    }
+
+    // Record payment on PV
+    const payRes = await apiCall(`/api/v1/payments/${pv.id}/record`, {
+      method: 'POST',
+      token: keuanganToken,
+      body: {
+        paidAt: '2026-11-07T09:00:00.000Z',
+        sourceBank: 'BCA Corporate Giro',
+        paidAmount: 27_250_000,
+        referenceNumber: 'TRX-20261107-99182',
+      },
+    });
     expect(payRes.status).toBe(200);
     const paidPv = (await payRes.json()).document;
     expect(paidPv.status).toBe('PAID');
     expect(paidPv.paymentStatus).toBe('PAID');
+    // Verify auditLog comment does not leak raw sourceBank
+    const paymentLog = paidPv.auditLog.find((l: { action: string }) => l.action === 'RECORD_PAYMENT');
+    expect(paymentLog?.comment).not.toContain('BCA Corporate Giro');
 
     // Verify parent PO is now also marked PAID
     const parentRes = await apiCall('/api/v1/documents/seed-po-01', {
@@ -556,5 +588,367 @@ describe('BLC Procurement Production Backend API & Domain Rules', () => {
     expect(downloadRes.headers.get('x-sha256-hash')).toBe(expectedHash);
     const downloadedBuf = Buffer.from(await downloadRes.arrayBuffer());
     expect(downloadedBuf.equals(pngPayload)).toBe(true);
+  });
+
+  it('8. strips system/workflow fields on POST and PUT to prevent mass-assignment (Ponytail #1)', async () => {
+    const pemohonToken = await loginAs('PEMOHON');
+    const createRes = await apiCall('/api/v1/documents', {
+      method: 'POST',
+      token: pemohonToken,
+      body: {
+        docType: 'PR',
+        title: 'PR Uji Mass Assignment',
+        branch: 'Bekasi',
+        subtotalAmount: 1_000_000,
+        status: 'APPROVED',
+        currentStage: 'BOD',
+        docNumber: 'PR-HACKED-9999',
+      },
+    });
+    expect(createRes.status).toBe(201);
+    const created = (await createRes.json()).document;
+    expect(created.status).toBe('DRAFT');
+    expect(created.currentStage).toBe('ATASAN');
+    expect(created.docNumber).not.toBe('PR-HACKED-9999');
+
+    const updateRes = await apiCall(`/api/v1/documents/${created.id}`, {
+      method: 'PUT',
+      token: pemohonToken,
+      body: {
+        title: 'PR Uji Mass Assignment Updated',
+        status: 'PAID',
+        currentStage: 'BOD',
+        docNumber: 'PR-HACKED-8888',
+      },
+    });
+    expect(updateRes.status).toBe(200);
+    const updated = (await updateRes.json()).document;
+    expect(updated.status).toBe('DRAFT');
+    expect(updated.currentStage).toBe('ATASAN');
+    expect(updated.docNumber).toBe(created.docNumber);
+  });
+
+  it('9. enforces Rp 50,000,000 ceiling, 1 PR : 1 PO cardinality, PO <= PR subtotal, and blocks "realisasi" in PO', async () => {
+    const pemohonToken = await loginAs('PEMOHON');
+
+    // 9a. Exceeds Rp 50,000,000 ceiling
+    const overLimitPrRes = await apiCall('/api/v1/documents', {
+      method: 'POST',
+      token: pemohonToken,
+      body: {
+        docType: 'PR',
+        title: 'PR Alat Berat',
+        branch: 'Bekasi',
+        subtotalAmount: 55_000_000,
+        stage1ApproverEmail: 'atasan@blc.co.id',
+      },
+    });
+    const overLimitPr = (await overLimitPrRes.json()).document;
+    const submitOverRes = await apiCall(`/api/v1/documents/${overLimitPr.id}/submit`, {
+      method: 'POST',
+      token: pemohonToken,
+    });
+    expect(submitOverRes.status).toBe(422);
+    expect((await submitOverRes.json()).code).toBe('EXCEEDS_SYSTEM_LIMIT');
+
+    // 9b. Blocks "realisasi" in PO title/purpose
+    const realisasiPoRes = await apiCall('/api/v1/documents', {
+      method: 'POST',
+      token: pemohonToken,
+      body: {
+        docType: 'PO',
+        title: 'Realisasi Uang Muka Cabang',
+        branch: 'Bekasi',
+        vendorName: 'PT Dummy',
+        subtotal: 1_000_000,
+        paymentMethod: 'CASH',
+        stage1ApproverEmail: 'atasan@blc.co.id',
+      },
+    });
+    const realisasiPo = (await realisasiPoRes.json()).document;
+    const submitRealisasiPo = await apiCall(`/api/v1/documents/${realisasiPo.id}/submit`, {
+      method: 'POST',
+      token: pemohonToken,
+    });
+    expect(submitRealisasiPo.status).toBe(422);
+    expect((await submitRealisasiPo.json()).code).toBe('PO_REALIZATION_FORBIDDEN');
+
+    // 9c. Enforces 1 PR : 1 PO cardinality (seed-pr-02 is already referenced by seed-po-01)
+    const dupPoRes = await apiCall('/api/v1/documents', {
+      method: 'POST',
+      token: pemohonToken,
+      body: {
+        docType: 'PO',
+        title: 'PO Ganda untuk PR-02',
+        branch: 'Surabaya',
+        parentPrId: 'seed-pr-02',
+        vendorName: 'PT Kedua',
+        subtotal: 10_000_000,
+        paymentMethod: 'CASH',
+      },
+    });
+    expect(dupPoRes.status).toBe(409);
+    expect((await dupPoRes.json()).code).toBe('DUPLICATE_PO_FOR_PR');
+  });
+
+  it('10. supports GR (Laporan Penerimaan) without approval stages, requiring PHOTO for GOODS and BAST for SERVICE', async () => {
+    const pemohonToken = await loginAs('PEMOHON');
+    const ayuToken = await loginAs('AYU');
+    const heryToken = await loginAs('BOD_HERY');
+    const hashimotoToken = await loginAs('BOD_HASHIMOTO');
+
+    // Approve seed-po-01 first
+    for (const token of [ayuToken, heryToken, hashimotoToken]) {
+      await apiCall('/api/v1/documents/seed-po-01/decisions', {
+        method: 'POST',
+        token,
+        body: { decision: 'APPROVE', comment: 'Approve PO for GR' },
+      });
+    }
+
+    const grRes = await apiCall('/api/v1/documents', {
+      method: 'POST',
+      token: pemohonToken,
+      body: {
+        docType: 'GR',
+        title: 'Laporan Penerimaan Scissor Lift',
+        branch: 'Surabaya',
+        parentPoId: 'seed-po-01',
+        receiptType: 'GOODS',
+        receivedDate: '2026-11-09',
+        itemCondition: 'KURANG',
+        notes: 'Kurang 1 kabel konektor',
+      },
+    });
+    expect(grRes.status).toBe(201);
+    const gr = (await grRes.json()).document;
+
+    // Submitting GR without PHOTO attachment must fail
+    const noPhotoRes = await apiCall(`/api/v1/documents/${gr.id}/submit`, {
+      method: 'POST',
+      token: pemohonToken,
+    });
+    expect(noPhotoRes.status).toBe(422);
+    expect((await noPhotoRes.json()).code).toBe('GR_ATTACHMENT_REQUIRED');
+
+    // Upload PHOTO attachment and submit GR (no stage1ApproverEmail needed)
+    await apiCall(`/api/v1/documents/${gr.id}/attachments`, {
+      method: 'POST',
+      token: pemohonToken,
+      body: {
+        originalName: 'Photo_ScissorLift.png',
+        mimeType: 'image/png',
+        category: 'PHOTO',
+        contentBase64: Buffer.from('PHOTO-DATA').toString('base64'),
+      },
+    });
+
+    const submitGrRes = await apiCall(`/api/v1/documents/${gr.id}/submit`, {
+      method: 'POST',
+      token: pemohonToken,
+    });
+    expect(submitGrRes.status).toBe(200);
+    const submittedGr = (await submitGrRes.json()).document;
+    expect(submittedGr.status).toBe('APPROVED');
+    expect(submittedGr.requiresFollowUp).toBe(true);
+  });
+
+  it('11. supports partial/staged PO payment via PV and only marks PO as PAID when fully settled', async () => {
+    const ayuToken = await loginAs('AYU');
+    const heryToken = await loginAs('BOD_HERY');
+    const hashimotoToken = await loginAs('BOD_HASHIMOTO');
+    const keuanganToken = await loginAs('KEUANGAN');
+
+    // Approve seed-po-01 (totalAmount = 27,250,000)
+    for (const token of [ayuToken, heryToken, hashimotoToken]) {
+      await apiCall('/api/v1/documents/seed-po-01/decisions', {
+        method: 'POST',
+        token,
+        body: { decision: 'APPROVE', comment: 'Approve PO' },
+      });
+    }
+
+    // Generate Stage 1 PV (Termin 1: Rp 10,000,000 net)
+    const pv1Res = await apiCall('/api/v1/documents/seed-po-01/generate-pv', {
+      method: 'POST',
+      token: keuanganToken,
+      body: {
+        paymentDueDate: '2026-11-12',
+        plannedSourceAccount: 'BCA Operasional Pusat',
+        invoiceNumber: 'INV-TERM-01',
+        grossAmount: 10_000_000,
+        pphDeduction: 0,
+      },
+    });
+    expect(pv1Res.status).toBe(201);
+    const pv1 = (await pv1Res.json()).document;
+    expect(pv1.netAmountToPay).toBe(10_000_000);
+
+    for (const token of [ayuToken, heryToken, hashimotoToken]) {
+      await apiCall(`/api/v1/documents/${pv1.id}/decisions`, {
+        method: 'POST',
+        token,
+        body: { decision: 'APPROVE' },
+      });
+    }
+    await apiCall(`/api/v1/payments/${pv1.id}/record`, {
+      method: 'POST',
+      token: keuanganToken,
+      body: {
+        paidAt: '2026-11-09',
+        sourceBank: 'BCA Operasional Pusat',
+        paidAmount: 10_000_000,
+        referenceNumber: 'TRF-TERM-01',
+      },
+    });
+
+    // PO should still be APPROVED (remaining 17,250,000 unpaid)
+    const poAfterTerm1 = (await (await apiCall('/api/v1/documents/seed-po-01', { token: keuanganToken })).json()).document;
+    expect(poAfterTerm1.status).toBe('APPROVED');
+
+    // Generate Stage 2 PV for the remaining Rp 17,250,000
+    const pv2Res = await apiCall('/api/v1/documents/seed-po-01/generate-pv', {
+      method: 'POST',
+      token: keuanganToken,
+    });
+    expect(pv2Res.status).toBe(201);
+    const pv2 = (await pv2Res.json()).document;
+    expect(pv2.netAmountToPay).toBe(17_250_000);
+
+    for (const token of [ayuToken, heryToken, hashimotoToken]) {
+      await apiCall(`/api/v1/documents/${pv2.id}/decisions`, {
+        method: 'POST',
+        token,
+        body: { decision: 'APPROVE' },
+      });
+    }
+    await apiCall(`/api/v1/payments/${pv2.id}/record`, {
+      method: 'POST',
+      token: keuanganToken,
+      body: {
+        paidAt: '2026-11-10',
+        sourceBank: 'BCA Operasional Pusat',
+        paidAmount: 17_250_000,
+        referenceNumber: 'TRF-TERM-02',
+      },
+    });
+
+    // Now PO must be marked PAID
+    const poAfterTerm2 = (await (await apiCall('/api/v1/documents/seed-po-01', { token: keuanganToken })).json()).document;
+    expect(poAfterTerm2.status).toBe('PAID');
+  });
+
+  it('12. auto-fills EXACT RC and auto-confirms DEFICIT RC when its deficiency PV is paid', async () => {
+    const applicant = await loginAs('PEMOHON');
+    const supervisor = await loginAs('ATASAN');
+    const gm = await loginAs('AYU');
+    const hery = await loginAs('BOD_HERY');
+    const hashimoto = await loginAs('BOD_HASHIMOTO');
+    const finance = await loginAs('KEUANGAN');
+
+    // Create & pay an AV of Rp 1,000,000
+    const avRes = await apiCall('/api/v1/documents', {
+      method: 'POST',
+      token: applicant,
+      body: {
+        docType: 'AV',
+        title: 'AV Dinas',
+        branch: 'Bekasi',
+        amount: 1_000_000,
+        subtotal: 1_000_000,
+        disbursementMethod: 'CASH',
+        activityDate: '2026-11-08',
+        activityEndDate: '2026-11-09',
+        paymentDueDate: '2026-11-08',
+        stage1ApproverEmail: 'atasan@blc.co.id',
+      },
+    });
+    const av = (await avRes.json()).document;
+    await apiCall(`/api/v1/documents/${av.id}/submit`, { method: 'POST', token: applicant });
+    for (const token of [supervisor, gm, hery, hashimoto]) {
+      await apiCall(`/api/v1/documents/${av.id}/decisions`, { method: 'POST', token, body: { decision: 'APPROVE' } });
+    }
+    const avPv = (await (await apiCall(`/api/v1/documents/${av.id}/generate-pv`, { method: 'POST', token: finance })).json()).document;
+    for (const token of [gm, hery, hashimoto]) {
+      await apiCall(`/api/v1/documents/${avPv.id}/decisions`, { method: 'POST', token, body: { decision: 'APPROVE' } });
+    }
+    await apiCall(`/api/v1/payments/${avPv.id}/record`, {
+      method: 'POST',
+      token: finance,
+      body: { paidAt: '2026-11-08', sourceBank: 'BCA', referenceNumber: 'REF-AV-1' },
+    });
+
+    // Create DEFICIT RC (spent Rp 1,250,000 vs AV Rp 1,000,000)
+    const rcRes = await apiCall('/api/v1/documents', {
+      method: 'POST',
+      token: applicant,
+      body: {
+        docType: 'RC',
+        title: 'RC Defisit Dinas',
+        branch: 'Bekasi',
+        parentAvId: av.id,
+        avOriginalAmount: 1_000_000,
+        realizedAmount: 1_250_000,
+        subtotal: 1_250_000,
+        activityCompletedDate: '2026-11-09',
+        submissionDeadline: '2026-11-11',
+        stage1ApproverEmail: 'atasan@blc.co.id',
+        reimbursementBank: {
+          bankName: 'BCA',
+          accountNumber: '1234567890',
+          accountHolder: 'Dewi Lestari',
+        },
+      },
+    });
+    const rc = (await rcRes.json()).document;
+    expect(rc.outcomeType).toBe('DEFICIT');
+    await apiCall(`/api/v1/documents/${rc.id}/submit`, { method: 'POST', token: applicant });
+    for (const token of [supervisor, gm, hery, hashimoto]) {
+      await apiCall(`/api/v1/documents/${rc.id}/decisions`, { method: 'POST', token, body: { decision: 'APPROVE' } });
+    }
+
+    // Generate PV for RC_DEFICIT (Rp 250,000)
+    const rcPvRes = await apiCall(`/api/v1/documents/${rc.id}/generate-pv`, { method: 'POST', token: finance });
+    expect(rcPvRes.status).toBe(201);
+    const rcPv = (await rcPvRes.json()).document;
+    expect(rcPv.netAmountToPay).toBe(250_000);
+
+    for (const token of [gm, hery, hashimoto]) {
+      await apiCall(`/api/v1/documents/${rcPv.id}/decisions`, { method: 'POST', token, body: { decision: 'APPROVE' } });
+    }
+    await apiCall(`/api/v1/payments/${rcPv.id}/record`, {
+      method: 'POST',
+      token: finance,
+      body: { paidAt: '2026-11-10', sourceBank: 'BCA', paidAmount: 250_000, referenceNumber: 'REF-RC-DEF' },
+    });
+
+    // Verify RC is automatically PAID and financeConfirmedAt is populated
+    const settledRc = (await (await apiCall(`/api/v1/documents/${rc.id}`, { token: finance })).json()).document;
+    expect(settledRc.status).toBe('PAID');
+    expect(Boolean(settledRc.financeConfirmedAt)).toBe(true);
+  });
+
+  it('13. resets the other BoD status from PENDING to WAITING when one BoD rejects (Ponytail #4)', async () => {
+    const ayuToken = await loginAs('AYU');
+    const heryToken = await loginAs('BOD_HERY');
+
+    // Move seed-po-01 to BOD stage
+    await apiCall('/api/v1/documents/seed-po-01/decisions', {
+      method: 'POST',
+      token: ayuToken,
+      body: { decision: 'APPROVE', comment: 'Ke BoD' },
+    });
+
+    // Hery rejects
+    const rejRes = await apiCall('/api/v1/documents/seed-po-01/decisions', {
+      method: 'POST',
+      token: heryToken,
+      body: { decision: 'REJECT', comment: 'Revisi harga penawaran' },
+    });
+    expect(rejRes.status).toBe(200);
+    const rejectedDoc = (await rejRes.json()).document;
+    expect(rejectedDoc.status).toBe('DRAFT');
+    expect(rejectedDoc.approvalSteps.bod.heryStatus).toBe('REJECTED');
+    expect(rejectedDoc.approvalSteps.bod.hashimotoStatus).toBe('WAITING');
   });
 });
