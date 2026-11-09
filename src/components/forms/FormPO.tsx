@@ -4,11 +4,12 @@ import { OFFICIAL_BRANCHES } from '../../domain/branches';
 import { readAttachment } from '../../lib/read-attachment';
 import { formatCurrencyInput, parseCurrencyInput } from '../../lib/currency-format';
 import type { PODocument, PRDocument } from '../../types/document';
+import { ApproverSelect } from './ApproverSelect';
 
 export interface FormPOProps {
   initialDoc: PODocument;
   availablePrs: PRDocument[];
-  onSave: (doc: PODocument) => void;
+  onSave: (doc: PODocument, andSubmit?: boolean) => void | Promise<void>;
   onClose: () => void;
 }
 
@@ -24,7 +25,11 @@ export const FormPO: React.FC<FormPOProps> = ({
   onSave,
   onClose,
 }) => {
-  const [doc, setDoc] = useState<PODocument>(initialDoc);
+  const [doc, setDoc] = useState<PODocument>(() => ({
+    ...initialDoc,
+    stage1ApproverEmail: initialDoc.stage1ApproverEmail || 'atasan@blc.co.id',
+  }));
+  const [submitMode, setSubmitMode] = useState<'draft' | 'submit'>('draft');
   const [subtotalStr, setSubtotalStr] = useState<string>(formatCurrencyInput(initialDoc.subtotal));
   const [otherCostsStr, setOtherCostsStr] = useState<string>(formatCurrencyInput(initialDoc.otherCosts || 0));
   const [discountStr, setDiscountStr] = useState<string>(formatCurrencyInput(initialDoc.discount || 0));
@@ -106,8 +111,14 @@ export const FormPO: React.FC<FormPOProps> = ({
       }
     }
 
+    if (!doc.stage1ApproverEmail?.trim()) {
+      setError('Email Atasan Langsung wajib dipilih / diisi.');
+      return;
+    }
+
     onSave({
       ...doc,
+      stage1ApproverEmail: doc.stage1ApproverEmail || 'atasan@blc.co.id',
       budgetType: doc.budgetType ?? 'OPEX',
       subtotal: calc.subtotal,
       otherCosts: calc.otherCosts,
@@ -117,7 +128,7 @@ export const FormPO: React.FC<FormPOProps> = ({
       pphRate,
       pphAmount: calc.pphAmount,
       totalAmount: calc.totalAmount,
-    });
+    }, submitMode === 'submit');
   }
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -379,8 +390,11 @@ export const FormPO: React.FC<FormPOProps> = ({
           <div><label htmlFor="po-iam">Nomor IAM</label><input id="po-iam" value={doc.iamNumber ?? ''} onChange={(e) => setDoc({ ...doc, iamNumber: e.target.value })} /></div>
           <div><label htmlFor="po-contract">Nomor kontrak (jika ada)</label><input id="po-contract" value={doc.contractNumber ?? ''} onChange={(e) => setDoc({ ...doc, contractNumber: e.target.value })} /></div>
         </div>
-        <label htmlFor="po-approver">Email Atasan Langsung <span>*</span></label>
-        <input id="po-approver" type="email" value={doc.stage1ApproverEmail ?? ''} onChange={(e) => setDoc({ ...doc, stage1ApproverEmail: e.target.value })} placeholder="atasan@blc.co.id" />
+        <ApproverSelect
+          id="po-approver"
+          value={doc.stage1ApproverEmail}
+          onChange={(email) => setDoc({ ...doc, stage1ApproverEmail: email })}
+        />
         <p className="demo-attachment-note">Lampiran disimpan di server lokal saat draf disimpan.</p>
         <label htmlFor="po-attachment-file">Lampiran Penawaran Vendor (Quotation)</label>
         <input
@@ -400,8 +414,19 @@ export const FormPO: React.FC<FormPOProps> = ({
         <button type="button" className="secondary" onClick={onClose}>
           Batal
         </button>
-        <button type="submit" className="primary">
-          Simpan Draf PO <span aria-hidden="true">→</span>
+        <button
+          type="submit"
+          onClick={() => setSubmitMode('draft')}
+          className="secondary"
+        >
+          Simpan Draf
+        </button>
+        <button
+          type="submit"
+          onClick={() => setSubmitMode('submit')}
+          className="primary"
+        >
+          Ajukan ke Atasan Langsung <span aria-hidden="true">→</span>
         </button>
       </div>
     </form>

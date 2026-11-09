@@ -264,3 +264,182 @@ describe('Topbar Header Simplification (Feedback 3)', () => {
     ).toContain('Dokumen Pengadaan');
   });
 });
+
+describe('Task 5: End-to-End Role Integration, Tagged Approver Selection, and Direct Submission', () => {
+  it('approver dropdown defaults to atasan@blc.co.id and renders dual submit buttons in all forms', async () => {
+    const { FormPR } = await import('./components/forms/FormPR');
+    const { FormPO } = await import('./components/forms/FormPO');
+    const { FormAV } = await import('./components/forms/FormAV');
+    const { FormRB } = await import('./components/forms/FormRB');
+    const { FormRC } = await import('./components/forms/FormRC');
+
+    const prHtml = renderToStaticMarkup(
+      createElement(FormPR, {
+        initialDoc: createEmptyDocument('PR') as PRDocument,
+        onSave: () => {},
+        onClose: () => {},
+      })
+    );
+    expect(prHtml).toContain('id="pr-approver"');
+    expect(prHtml).toContain('Pak Hendra (Atasan Langsung) - atasan@blc.co.id');
+    expect(prHtml).toContain('Ayu Martina (GM / Penyetuju Tahap 2) - ayu@blc.co.id');
+    expect(prHtml).toContain('Simpan Draf');
+    expect(prHtml).toContain('Ajukan ke Atasan Langsung');
+
+    const poHtml = renderToStaticMarkup(
+      createElement(FormPO, {
+        initialDoc: createEmptyDocument('PO') as PODocument,
+        availablePrs: [],
+        onSave: () => {},
+        onClose: () => {},
+      })
+    );
+    expect(poHtml).toContain('id="po-approver"');
+    expect(poHtml).toContain('Pak Hendra (Atasan Langsung) - atasan@blc.co.id');
+    expect(poHtml).toContain('Simpan Draf');
+    expect(poHtml).toContain('Ajukan ke Atasan Langsung');
+
+    const avHtml = renderToStaticMarkup(
+      createElement(FormAV, {
+        initialDoc: createEmptyDocument('AV') as AVDocument,
+        availablePos: [],
+        onSave: () => {},
+        onClose: () => {},
+      })
+    );
+    expect(avHtml).toContain('id="av-approver"');
+    expect(avHtml).toContain('Pak Hendra (Atasan Langsung) - atasan@blc.co.id');
+    expect(avHtml).toContain('Simpan Draf');
+    expect(avHtml).toContain('Ajukan ke Atasan Langsung');
+
+    const rbHtml = renderToStaticMarkup(
+      createElement(FormRB, {
+        initialDoc: createEmptyDocument('RB') as any,
+        onSave: () => {},
+        onClose: () => {},
+      })
+    );
+    expect(rbHtml).toContain('id="rb-approver"');
+    expect(rbHtml).toContain('Pak Hendra (Atasan Langsung) - atasan@blc.co.id');
+    expect(rbHtml).toContain('Simpan Draf');
+    expect(rbHtml).toContain('Ajukan ke Atasan Langsung');
+
+    const rcHtml = renderToStaticMarkup(
+      createElement(FormRC, {
+        initialDoc: createEmptyDocument('RC') as RCDocument,
+        availableAvs: [],
+        onSave: () => {},
+        onClose: () => {},
+      })
+    );
+    expect(rcHtml).toContain('id="rc-approver"');
+    expect(rcHtml).toContain('Pak Hendra (Atasan Langsung) - atasan@blc.co.id');
+    expect(rcHtml).toContain('Simpan Draf');
+    expect(rcHtml).toContain('Ajukan ke Atasan Langsung');
+  });
+
+  it('submitting a draft document transitions status to SUBMITTED / IN_REVIEW with Stage 1 assigned to Hendra', async () => {
+    const storage = new MemoryStorage();
+    const pr = createEmptyDocument('PR', 'Pusat') as PRDocument;
+    pr.title = 'Pengadaan Meja Operasional';
+    pr.subtotalAmount = 3_000_000;
+    pr.stage1ApproverEmail = 'atasan@blc.co.id';
+    saveDocument(storage, pr);
+
+    const submitted = submitDocument(storage, pr.id, 'Dewi Pemohon');
+    expect(submitted.status).toBe('SUBMITTED');
+    expect(submitted.currentStage).toBe('ATASAN');
+    expect(submitted.stage1ApproverEmail).toBe('atasan@blc.co.id');
+    expect(submitted.approvalSteps.atasan.status).toBe('PENDING');
+    expect(submitted.approvalSteps.atasan.assignedTo).toBe('Atasan Langsung');
+    expect(submitted.approvalSteps.ayu.status).toBe('WAITING');
+
+    const { ProcurementRepository } = await import('../server/repository');
+    const repo = new ProcurementRepository({ seed: false });
+    const repoDoc = repo.createDocument(
+      {
+        docType: 'PR',
+        title: 'Pengadaan Laptop Operasional',
+        branch: 'Bekasi',
+        subtotalAmount: 10_000_000,
+        stage1ApproverEmail: 'atasan@blc.co.id',
+      },
+      'Dewi Pemohon'
+    );
+    const repoSubmitted = repo.submitDocument(repoDoc.id, 'Dewi Pemohon');
+    expect(repoSubmitted.status).toBe('SUBMITTED');
+    expect(repoSubmitted.currentStage).toBe('ATASAN');
+    expect(repoSubmitted.approvalSteps.atasan.assignedTo).toBe('Pak Hendra');
+    expect(repoSubmitted.approvalSteps.atasan.status).toBe('PENDING');
+  });
+
+  it('quick test role switcher in Topbar renders all 7 corporate accounts and switches active user tabs', async () => {
+    const { Topbar, CORPORATE_ACCOUNTS, getInitialWorkspaceTab, getVisibleOperationsNav } = await import('./main');
+
+    let switchedEmail = '';
+    const topbarHtml = renderToStaticMarkup(
+      createElement(Topbar, {
+        activeTab: 'PENGAJUAN',
+        onOpenExport: () => {},
+        currentUserEmail: 'pemohon@blc.co.id',
+        onSwitchAccount: (email: string) => { switchedEmail = email; },
+      })
+    );
+
+    expect(topbarHtml).toContain('test-role-switcher');
+    expect(topbarHtml).toContain('aria-label="Ganti Peran Uji"');
+    expect(topbarHtml).toContain('value="pemohon@blc.co.id"');
+
+    for (const acc of CORPORATE_ACCOUNTS) {
+      expect(topbarHtml).toContain(acc.email);
+      expect(topbarHtml).toContain(acc.name);
+      expect(topbarHtml).toContain(acc.roleTitle);
+    }
+
+    // Role tab navigation tests
+    expect(getInitialWorkspaceTab('PEMOHON')).toBe('PENGAJUAN');
+    expect(getVisibleOperationsNav('PEMOHON').map((n) => n.id)).toEqual(['PENGAJUAN']);
+
+    expect(getInitialWorkspaceTab('ATASAN')).toBe('PENGAJUAN');
+    expect(getVisibleOperationsNav('ATASAN').map((n) => n.id)).toEqual(['PENGAJUAN']);
+
+    expect(getInitialWorkspaceTab('AYU')).toBe('DASHBOARD');
+    expect(getVisibleOperationsNav('AYU').map((n) => n.id)).toEqual(['DASHBOARD', 'PENGAJUAN', 'DOKUMEN']);
+
+    expect(getInitialWorkspaceTab('BOD_HERY')).toBe('DASHBOARD');
+    expect(getVisibleOperationsNav('BOD_HERY').map((n) => n.id)).toEqual(['DASHBOARD', 'PENGAJUAN', 'DOKUMEN']);
+
+    expect(getInitialWorkspaceTab('BOD_HASHIMOTO')).toBe('DASHBOARD');
+    expect(getVisibleOperationsNav('BOD_HASHIMOTO').map((n) => n.id)).toEqual(['DASHBOARD', 'PENGAJUAN', 'DOKUMEN']);
+
+    expect(getInitialWorkspaceTab('KEUANGAN')).toBe('PENGAJUAN');
+    expect(getVisibleOperationsNav('KEUANGAN').map((n) => n.id)).toEqual(['PENGAJUAN', 'DOKUMEN']);
+
+    expect(getInitialWorkspaceTab('ADMIN')).toBe('DASHBOARD');
+    expect(getVisibleOperationsNav('ADMIN').map((n) => n.id)).toEqual(['DASHBOARD', 'PENGAJUAN', 'DOKUMEN']);
+  });
+
+  it('enhanced login page renders informative role descriptions for quick account cards', async () => {
+    const { SignInPage } = await import('./components/ui/sign-in');
+    const { CORPORATE_ACCOUNTS, ROLE_DESCRIPTIONS } = await import('./main');
+
+    const signInHtml = renderToStaticMarkup(
+      createElement(SignInPage, {
+        title: 'Portal Pengadaan & Keuangan',
+        quickAccounts: CORPORATE_ACCOUNTS.map((a) => ({
+          label: a.name,
+          email: a.email,
+          roleBadge: a.role,
+          description: ROLE_DESCRIPTIONS[a.role],
+        })),
+      })
+    );
+
+    expect(signInHtml).toContain('Staff Pemohon: Pengajuan dokumen baru PR/PO/AV/RB/RC');
+    expect(signInHtml).toContain('Atasan Tahap 1: Approval awal permohonan staf cabang');
+    expect(signInHtml).toContain('GM: Approval Tahap 2 &amp; Operasional Pengadaan');
+    expect(signInHtml).toContain('Direksi BoD: Otorisasi final dokumen material &amp; strategis');
+    expect(signInHtml).toContain('Keuangan: Verifikasi, penerbitan PV, dan pembayaran');
+    expect(signInHtml).toContain('Administrator: Akses penuh seluruh modul dan sistem');
+  });
+});

@@ -5,16 +5,21 @@ import { OFFICIAL_BRANCHES } from '../../domain/branches';
 import { formatCurrencyInput, parseCurrencyInput } from '../../lib/currency-format';
 import { TaxFields } from './TaxFields';
 import { readAttachment } from '../../lib/read-attachment';
+import { ApproverSelect } from './ApproverSelect';
 
 export interface FormAVProps {
   initialDoc: AVDocument;
   availablePos: PODocument[];
-  onSave: (doc: AVDocument) => void;
+  onSave: (doc: AVDocument, andSubmit?: boolean) => void | Promise<void>;
   onClose: () => void;
 }
 
 export const FormAV: React.FC<FormAVProps> = ({ initialDoc, availablePos, onSave, onClose }) => {
-  const [doc, setDoc] = useState<AVDocument>(initialDoc);
+  const [doc, setDoc] = useState<AVDocument>(() => ({
+    ...initialDoc,
+    stage1ApproverEmail: initialDoc.stage1ApproverEmail || 'atasan@blc.co.id',
+  }));
+  const [submitMode, setSubmitMode] = useState<'draft' | 'submit'>('draft');
   const [amountStr, setAmountStr] = useState<string>(formatCurrencyInput(initialDoc.subtotal ?? initialDoc.amount));
   const [error, setError] = useState<string>('');
 
@@ -64,11 +69,17 @@ export const FormAV: React.FC<FormAVProps> = ({ initialDoc, availablePos, onSave
       }
     }
 
+    if (!doc.stage1ApproverEmail?.trim()) {
+      setError('Email Atasan Langsung wajib dipilih / diisi.');
+      return;
+    }
+
     onSave({
       ...doc,
+      stage1ApproverEmail: doc.stage1ApproverEmail || 'atasan@blc.co.id',
       budgetType: doc.budgetType ?? 'OPEX',
       subtotal: calc.subtotal, amount: calc.totalAmount, ppnAmount: calc.ppnAmount, pphAmount: calc.pphAmount,
-    });
+    }, submitMode === 'submit');
   }
 
   return (
@@ -210,8 +221,11 @@ export const FormAV: React.FC<FormAVProps> = ({ initialDoc, availablePos, onSave
           try { const attachment = await readAttachment(file, 'OTHER'); setDoc((previous) => ({ ...previous, attachments: [...(previous.attachments ?? []), attachment] })); }
           catch { setError('Berkas tidak dapat dibaca.'); }
         }} />
-        <label htmlFor="av-approver">Email Atasan Langsung <span>*</span></label>
-        <input id="av-approver" type="email" value={doc.stage1ApproverEmail ?? ''} onChange={(e) => setDoc({ ...doc, stage1ApproverEmail: e.target.value })} placeholder="atasan@blc.co.id" />
+        <ApproverSelect
+          id="av-approver"
+          value={doc.stage1ApproverEmail}
+          onChange={(email) => setDoc({ ...doc, stage1ApproverEmail: email })}
+        />
         <label htmlFor="av-purpose">Rincian Tujuan & Keperluan Penggunaan Dana</label>
         <textarea
           id="av-purpose"
@@ -285,8 +299,19 @@ export const FormAV: React.FC<FormAVProps> = ({ initialDoc, availablePos, onSave
         <button type="button" className="secondary" onClick={onClose}>
           Batal
         </button>
-        <button type="submit" className="primary">
-          Simpan Draf AV <span aria-hidden="true">→</span>
+        <button
+          type="submit"
+          onClick={() => setSubmitMode('draft')}
+          className="secondary"
+        >
+          Simpan Draf
+        </button>
+        <button
+          type="submit"
+          onClick={() => setSubmitMode('submit')}
+          className="primary"
+        >
+          Ajukan ke Atasan Langsung <span aria-hidden="true">→</span>
         </button>
       </div>
     </form>

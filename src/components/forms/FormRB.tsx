@@ -5,10 +5,11 @@ import { calculatePoTotal } from '../../domain/calculations';
 import { OFFICIAL_BRANCHES } from '../../domain/branches';
 import { formatCurrencyInput, parseCurrencyInput } from '../../lib/currency-format';
 import { TaxFields } from './TaxFields';
+import { ApproverSelect } from './ApproverSelect';
 
 export interface FormRBProps {
   initialDoc: RBDocument;
-  onSave: (doc: RBDocument) => void;
+  onSave: (doc: RBDocument, andSubmit?: boolean) => void | Promise<void>;
   onClose: () => void;
 }
 
@@ -19,7 +20,11 @@ const rupiah = new Intl.NumberFormat('id-ID', {
 });
 
 export const FormRB: React.FC<FormRBProps> = ({ initialDoc, onSave, onClose }) => {
-  const [doc, setDoc] = useState<RBDocument>(initialDoc);
+  const [doc, setDoc] = useState<RBDocument>(() => ({
+    ...initialDoc,
+    stage1ApproverEmail: initialDoc.stage1ApproverEmail || 'atasan@blc.co.id',
+  }));
+  const [submitMode, setSubmitMode] = useState<'draft' | 'submit'>('draft');
   const [subtotalStr, setSubtotalStr] = useState<string>(formatCurrencyInput(initialDoc.subtotal));
   const [otherCostsStr, setOtherCostsStr] = useState<string>(formatCurrencyInput(initialDoc.otherCosts || 0));
   const [discountStr, setDiscountStr] = useState<string>(formatCurrencyInput(initialDoc.discount || 0));
@@ -65,8 +70,14 @@ export const FormRB: React.FC<FormRBProps> = ({ initialDoc, onSave, onClose }) =
       return;
     }
 
+    if (!doc.stage1ApproverEmail?.trim()) {
+      setError('Email Atasan Langsung wajib dipilih / diisi.');
+      return;
+    }
+
     onSave({
       ...doc,
+      stage1ApproverEmail: doc.stage1ApproverEmail || 'atasan@blc.co.id',
       budgetType: doc.budgetType ?? 'OPEX',
       paymentMethod: doc.paymentMethod ?? 'BANK_TRANSFER',
       subtotal,
@@ -76,7 +87,7 @@ export const FormRB: React.FC<FormRBProps> = ({ initialDoc, onSave, onClose }) =
       ppnAmount: calc.ppnAmount,
       pphAmount: calc.pphAmount,
       attachmentCount,
-    });
+    }, submitMode === 'submit');
   }
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -195,8 +206,11 @@ export const FormRB: React.FC<FormRBProps> = ({ initialDoc, onSave, onClose }) =
           <div><label htmlFor="rb-due">Tanggal jatuh tempo</label><input id="rb-due" type="date" value={doc.paymentDueDate ?? ''} onChange={(e) => setDoc({ ...doc, paymentDueDate: e.target.value })} /></div>
           <div><label htmlFor="rb-vendor">Nama toko / vendor</label><input id="rb-vendor" value={doc.vendorName ?? ''} onChange={(e) => setDoc({ ...doc, vendorName: e.target.value })} /></div>
         </div>
-        <label htmlFor="rb-approver">Email Atasan Langsung <span>*</span></label>
-        <input id="rb-approver" type="email" value={doc.stage1ApproverEmail ?? ''} onChange={(e) => setDoc({ ...doc, stage1ApproverEmail: e.target.value })} placeholder="atasan@blc.co.id" />
+        <ApproverSelect
+          id="rb-approver"
+          value={doc.stage1ApproverEmail}
+          onChange={(email) => setDoc({ ...doc, stage1ApproverEmail: email })}
+        />
         <label htmlFor="rb-purpose">Keterangan Aktivitas</label>
         <textarea
           id="rb-purpose"
@@ -289,8 +303,19 @@ export const FormRB: React.FC<FormRBProps> = ({ initialDoc, onSave, onClose }) =
         <button type="button" className="secondary" onClick={onClose}>
           Batal
         </button>
-        <button type="submit" className="primary">
-          Simpan Draf RB <span aria-hidden="true">→</span>
+        <button
+          type="submit"
+          onClick={() => setSubmitMode('draft')}
+          className="secondary"
+        >
+          Simpan Draf
+        </button>
+        <button
+          type="submit"
+          onClick={() => setSubmitMode('submit')}
+          className="primary"
+        >
+          Ajukan ke Atasan Langsung <span aria-hidden="true">→</span>
         </button>
       </div>
     </form>

@@ -108,7 +108,7 @@ export function getInitialWorkspaceTab(role: UserRole): WorkspaceTab {
     : 'PENGAJUAN';
 }
 
-interface AuthAccount {
+export interface AuthAccount {
   id: string;
   email: string;
   name: string;
@@ -117,7 +117,17 @@ interface AuthAccount {
   branch: string;
 }
 
-const CORPORATE_ACCOUNTS: AuthAccount[] = [
+export const ROLE_DESCRIPTIONS: Record<UserRole, string> = {
+  PEMOHON: 'Staff Pemohon: Pengajuan dokumen baru PR/PO/AV/RB/RC',
+  ATASAN: 'Atasan Tahap 1: Approval awal permohonan staf cabang',
+  AYU: 'GM: Approval Tahap 2 & Operasional Pengadaan',
+  BOD_HERY: 'Direksi BoD: Otorisasi final dokumen material & strategis',
+  BOD_HASHIMOTO: 'Direksi BoD: Otorisasi final dokumen material & strategis',
+  KEUANGAN: 'Keuangan: Verifikasi, penerbitan PV, dan pembayaran',
+  ADMIN: 'Administrator: Akses penuh seluruh modul dan sistem',
+};
+
+export const CORPORATE_ACCOUNTS: AuthAccount[] = [
   { id: 'usr-admin', email: 'admin@blc.co.id', name: 'Admin Lokal', role: 'ADMIN', roleTitle: 'Admin', branch: 'Bekasi' },
   {
     id: 'usr-pemohon',
@@ -270,9 +280,13 @@ function isExecutiveOrApproverRole(role: UserRole): boolean {
 export function Topbar({
   activeTab,
   onOpenExport,
+  currentUserEmail,
+  onSwitchAccount,
 }: {
   activeTab: WorkspaceTab;
   onOpenExport: () => void;
+  currentUserEmail?: string;
+  onSwitchAccount?: (email: string) => void;
 }) {
   const title =
     activeTab === 'DASHBOARD'
@@ -308,7 +322,40 @@ export function Topbar({
         </h1>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+        {onSwitchAccount && (
+          <div className="test-role-switcher" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <label
+              htmlFor="topbar-role-switcher"
+              style={{ fontSize: '12px', fontWeight: 700, color: '#4B5563', whiteSpace: 'nowrap' }}
+            >
+              Peran Uji:
+            </label>
+            <select
+              id="topbar-role-switcher"
+              aria-label="Ganti Peran Uji"
+              value={currentUserEmail}
+              onChange={(e) => onSwitchAccount(e.target.value)}
+              style={{
+                fontSize: '12px',
+                padding: '5px 10px',
+                borderRadius: '6px',
+                border: '1px solid #CBD5E1',
+                background: '#F8FAFC',
+                fontWeight: 600,
+                color: '#1E293B',
+                cursor: 'pointer',
+              }}
+            >
+              {CORPORATE_ACCOUNTS.map((acc) => (
+                <option key={acc.email} value={acc.email}>
+                  {acc.roleTitle}: {acc.name} ({acc.email})
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
         <button
           type="button"
           className="s-action"
@@ -584,6 +631,13 @@ export function App() {
     void completeLogin(account, password);
   }
 
+  async function handleSwitchAccount(email: string) {
+    const account = CORPORATE_ACCOUNTS.find((a) => a.email.toLowerCase() === email.toLowerCase());
+    if (account) {
+      await completeLogin(account, 'blc2026');
+    }
+  }
+
   function handleSignOut() {
     setAuthUser(null);
     localStorage.removeItem(AUTH_SESSION_KEY);
@@ -603,6 +657,7 @@ export function App() {
           label: a.role === 'ADMIN' ? a.name : displayPersonName(a.name),
           email: a.email,
           roleBadge: a.role === 'AYU' ? 'GM' : a.role.startsWith('BOD_') ? 'BOD' : a.role === 'KEUANGAN' ? 'FINANCE' : a.role === 'PEMOHON' ? 'PENGAJU' : a.role,
+          description: ROLE_DESCRIPTIONS[a.role],
         }))}
         onSignIn={handleSignInSubmit}
         onResetPassword={() => setLoginError('Kata sandi default pengujian: blc2026')}
@@ -665,44 +720,46 @@ export function App() {
     }
   }
 
-  async function handleSaveDoc(doc: AnyDocument) {
+  async function handleSaveDoc(doc: AnyDocument, andSubmit = false) {
     setFormError('');
     try {
-    const exists = documents.some((item) => item.id === doc.id);
-    const pending = (doc.attachments ?? []).filter((attachment) => attachment.dataUrl);
-    const payload = { ...doc, expectedVersion: (doc as AnyDocument & { version?: number }).version, attachments: (doc.attachments ?? []).filter((attachment) => !attachment.dataUrl) };
-    const saved = await api<{ document: AnyDocument }>(exists ? `/documents/${encodeURIComponent(doc.id)}` : '/documents', exists ? 'PUT' : 'POST', payload);
-    await refreshDocs();
-    for (const attachment of pending) {
-      await api(`/documents/${encodeURIComponent(doc.id)}/attachments`, 'POST', {
-        originalName: attachment.name, mimeType: attachment.mimeType,
-        category: attachment.category === 'OTHER' ? 'SUPPORTING' : attachment.category,
-        contentBase64: attachment.dataUrl?.split(',')[1],
-      });
-    }
-    if (doc.docType === 'GR') {
-      await api(`/documents/${encodeURIComponent(doc.id)}/submit`, 'POST', {});
-    }
-    await refreshDocs();
-    setActiveFormType(null);
-    setEditingDoc(null);
-    setNotice(
-      doc.docType === 'GR'
-        ? `Laporan Penerimaan ${saved.document.docNumber} berhasil dicatat.`
-        : `Draf dokumen ${saved.document.docNumber} berhasil disimpan.`
-    );
+      const exists = documents.some((item) => item.id === doc.id);
+      const pending = (doc.attachments ?? []).filter((attachment) => attachment.dataUrl);
+      const payload = { ...doc, expectedVersion: (doc as AnyDocument & { version?: number }).version, attachments: (doc.attachments ?? []).filter((attachment) => !attachment.dataUrl) };
+      const saved = await api<{ document: AnyDocument }>(exists ? `/documents/${encodeURIComponent(doc.id)}` : '/documents', exists ? 'PUT' : 'POST', payload);
+      await refreshDocs();
+      for (const attachment of pending) {
+        await api(`/documents/${encodeURIComponent(doc.id)}/attachments`, 'POST', {
+          originalName: attachment.name, mimeType: attachment.mimeType,
+          category: attachment.category === 'OTHER' ? 'SUPPORTING' : attachment.category,
+          contentBase64: attachment.dataUrl?.split(',')[1],
+        });
+      }
+      if (doc.docType === 'GR') {
+        await api(`/documents/${encodeURIComponent(doc.id)}/submit`, 'POST', {});
+        await refreshDocs();
+        setNotice(`Laporan Penerimaan ${saved.document.docNumber} berhasil dicatat.`);
+      } else if (andSubmit) {
+        await handleSubmitDoc(saved.document.id, (saved.document as any).version, saved.document.docType);
+      } else {
+        await refreshDocs();
+        setNotice(`Draf dokumen ${saved.document.docNumber} berhasil disimpan.`);
+      }
+      setActiveFormType(null);
+      setEditingDoc(null);
     } catch (error) { setFormError(error instanceof Error ? error.message : 'Gagal menyimpan draf.'); }
   }
 
-  async function handleSubmitDoc(docId: string) {
+  async function handleSubmitDoc(docId: string, version?: number, docType?: string) {
     try {
       const targetDoc = documents.find((item) => item.id === docId) as (AnyDocument & { version?: number }) | undefined;
-      await api(`/documents/${encodeURIComponent(docId)}/submit`, 'POST', { expectedVersion: targetDoc?.version });
+      await api(`/documents/${encodeURIComponent(docId)}/submit`, 'POST', { expectedVersion: version ?? targetDoc?.version });
       await refreshDocs();
+      const type = docType ?? targetDoc?.docType;
       setNotice(
-        targetDoc?.docType === 'GR'
+        type === 'GR'
           ? 'Laporan Penerimaan berhasil dicatat (Tanpa Persetujuan).'
-          : targetDoc?.docType === 'PV'
+          : type === 'PV'
           ? 'Payment Voucher berhasil diajukan ulang ke Ayu Martina.'
           : 'Dokumen berhasil diajukan ke Tahap 1 (Atasan Langsung).'
       );
@@ -848,6 +905,8 @@ export function App() {
           <Topbar
             activeTab={activeTab}
             onOpenExport={() => setIsExportOpen(true)}
+            currentUserEmail={authUser.email}
+            onSwitchAccount={handleSwitchAccount}
           />
 
           {notice && (

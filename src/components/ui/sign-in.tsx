@@ -6,7 +6,12 @@ export interface SignInPageProps {
   description?: React.ReactNode;
   heroImageSrc?: string;
   errorMessage?: string;
-  quickAccounts?: Array<{ label: string; email: string; roleBadge: string }>;
+  quickAccounts?: Array<{
+    label: string;
+    email: string;
+    roleBadge: string;
+    description?: string;
+  }>;
   onQuickSelect?: (email: string) => void;
   onSignIn?: (event: React.FormEvent<HTMLFormElement>) => void;
   onResetPassword?: () => void;
@@ -121,7 +126,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({
               <div className="text-[11px] font-bold text-[#4B5563] uppercase tracking-wider mb-2">
                 Pilih Cepat Profil Pengujian (Klik untuk Mengisi Kredensial):
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 {quickAccounts.map((acc) => {
                   const active = emailInput === acc.email;
                   return (
@@ -133,22 +138,33 @@ export const SignInPage: React.FC<SignInPageProps> = ({
                         setPasswordInput('blc2026');
                         onQuickSelect?.(acc.email);
                       }}
-                      className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer border ${
+                      className={`flex flex-col text-left p-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer border ${
                         active
                           ? 'bg-[#FDF2F4] border-[#E51937] text-[#E51937] shadow-xs'
                           : 'bg-[#F8FAFC] border-[#E2E8F0] text-[#374151] hover:bg-white hover:border-[#CBD5E1]'
                       }`}
                     >
-                      <span className="truncate">{acc.label}</span>
-                      <span
-                        className={`text-[10px] px-1.5 py-0.5 rounded font-mono font-bold shrink-0 ml-1.5 ${
-                          active
-                            ? 'bg-[#E51937] text-white'
-                            : 'bg-[#E2E8F0] text-[#4B5563]'
-                        }`}
-                      >
-                        {acc.roleBadge}
-                      </span>
+                      <div className="flex items-center justify-between w-full">
+                        <span className="truncate">{acc.label}</span>
+                        <span
+                          className={`text-[10px] px-1.5 py-0.5 rounded font-mono font-bold shrink-0 ml-1.5 ${
+                            active
+                              ? 'bg-[#E51937] text-white'
+                              : 'bg-[#E2E8F0] text-[#4B5563]'
+                          }`}
+                        >
+                          {acc.roleBadge}
+                        </span>
+                      </div>
+                      {acc.description && (
+                        <span
+                          className={`text-[11px] font-normal mt-1 leading-snug line-clamp-2 ${
+                            active ? 'text-[#B81428]' : 'text-[#6B7280]'
+                          }`}
+                        >
+                          {acc.description}
+                        </span>
+                      )}
                     </button>
                   );
                 })}

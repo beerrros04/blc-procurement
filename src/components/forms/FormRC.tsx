@@ -4,11 +4,12 @@ import { addWorkingDays } from '../../domain/working-days';
 import { readAttachment } from '../../lib/read-attachment';
 import { formatCurrencyInput, parseCurrencyInput } from '../../lib/currency-format';
 import type { AVDocument, RCDocument } from '../../types/document';
+import { ApproverSelect } from './ApproverSelect';
 
 export interface FormRCProps {
   initialDoc: RCDocument;
   availableAvs: AVDocument[];
-  onSave: (doc: RCDocument) => void;
+  onSave: (doc: RCDocument, andSubmit?: boolean) => void | Promise<void>;
   onClose: () => void;
 }
 
@@ -24,7 +25,11 @@ export const FormRC: React.FC<FormRCProps> = ({
   onSave,
   onClose,
 }) => {
-  const [doc, setDoc] = useState<RCDocument>(initialDoc);
+  const [doc, setDoc] = useState<RCDocument>(() => ({
+    ...initialDoc,
+    stage1ApproverEmail: initialDoc.stage1ApproverEmail || 'atasan@blc.co.id',
+  }));
+  const [submitMode, setSubmitMode] = useState<'draft' | 'submit'>('draft');
   const [realizedStr, setRealizedStr] = useState<string>(
     formatCurrencyInput(initialDoc.subtotal ?? initialDoc.realizedAmount)
   );
@@ -104,14 +109,20 @@ export const FormRC: React.FC<FormRCProps> = ({
       }
     }
 
+    if (!doc.stage1ApproverEmail?.trim()) {
+      setError('Email Atasan Langsung wajib dipilih / diisi.');
+      return;
+    }
+
     onSave({
       ...doc,
+      stage1ApproverEmail: doc.stage1ApproverEmail || 'atasan@blc.co.id',
       budgetType: doc.budgetType ?? 'OPEX',
       subtotal: Number(realizedStr) || 0,
       realizedAmount: outcome.realizedAmount,
       balanceAmount: outcome.balanceAmount,
       outcomeType: outcome.outcomeType,
-    });
+    }, submitMode === 'submit');
   }
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -369,8 +380,11 @@ export const FormRC: React.FC<FormRCProps> = ({
           </div>
         )}
 
-        <label htmlFor="rc-approver">Email Atasan Langsung <span>*</span></label>
-        <input id="rc-approver" type="email" value={doc.stage1ApproverEmail ?? ''} onChange={(e) => setDoc({ ...doc, stage1ApproverEmail: e.target.value })} placeholder="atasan@blc.co.id" />
+        <ApproverSelect
+          id="rc-approver"
+          value={doc.stage1ApproverEmail}
+          onChange={(email) => setDoc({ ...doc, stage1ApproverEmail: email })}
+        />
         <label htmlFor="rc-purpose">Ringkasan Laporan Realisasi</label>
         <textarea
           id="rc-purpose"
@@ -385,8 +399,19 @@ export const FormRC: React.FC<FormRCProps> = ({
         <button type="button" className="secondary" onClick={onClose}>
           Batal
         </button>
-        <button type="submit" className="primary">
-          Simpan Draf RC <span aria-hidden="true">→</span>
+        <button
+          type="submit"
+          onClick={() => setSubmitMode('draft')}
+          className="secondary"
+        >
+          Simpan Draf
+        </button>
+        <button
+          type="submit"
+          onClick={() => setSubmitMode('submit')}
+          className="primary"
+        >
+          Ajukan ke Atasan Langsung <span aria-hidden="true">→</span>
         </button>
       </div>
     </form>

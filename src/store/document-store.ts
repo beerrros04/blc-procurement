@@ -40,6 +40,7 @@ export function createEmptyDocument(type: DocType, branch: string = 'Bekasi'): A
     branch,
     purpose: '',
     status: 'DRAFT' as const,
+    stage1ApproverEmail: 'atasan@blc.co.id',
     createdAt: nowIso,
     updatedAt: nowIso,
     currentStage: 'ATASAN' as ApprovalStage,

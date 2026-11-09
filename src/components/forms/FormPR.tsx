@@ -5,15 +5,20 @@ import { OFFICIAL_BRANCHES } from '../../domain/branches';
 import { readAttachment } from '../../lib/read-attachment';
 import { formatCurrencyInput, parseCurrencyInput } from '../../lib/currency-format';
 import { TaxFields } from './TaxFields';
+import { ApproverSelect } from './ApproverSelect';
 
 export interface FormPRProps {
   initialDoc: PRDocument;
-  onSave: (doc: PRDocument) => void;
+  onSave: (doc: PRDocument, andSubmit?: boolean) => void | Promise<void>;
   onClose: () => void;
 }
 
 export const FormPR: React.FC<FormPRProps> = ({ initialDoc, onSave, onClose }) => {
-  const [doc, setDoc] = useState<PRDocument>(initialDoc);
+  const [doc, setDoc] = useState<PRDocument>(() => ({
+    ...initialDoc,
+    stage1ApproverEmail: initialDoc.stage1ApproverEmail || 'atasan@blc.co.id',
+  }));
+  const [submitMode, setSubmitMode] = useState<'draft' | 'submit'>('draft');
   const [amountStr, setAmountStr] = useState<string>(formatCurrencyInput(initialDoc.subtotalAmount));
   const [error, setError] = useState<string>('');
 
@@ -50,15 +55,20 @@ export const FormPR: React.FC<FormPRProps> = ({ initialDoc, onSave, onClose }) =
       setError('Nilai total pengajuan melebihi batas sistem Rp 50.000.000. Pengajuan di atas batas ini menggunakan prosedur manual.');
       return;
     }
+    if (!doc.stage1ApproverEmail?.trim()) {
+      setError('Email Atasan Langsung wajib dipilih / diisi.');
+      return;
+    }
 
     onSave({
       ...doc,
+      stage1ApproverEmail: doc.stage1ApproverEmail || 'atasan@blc.co.id',
       subtotalAmount: amount,
       isIamRequired,
       ppnAmount: calc.ppnAmount,
       pphAmount: calc.pphAmount,
       totalAmount: calc.totalAmount,
-    });
+    }, submitMode === 'submit');
   }
 
   return (
@@ -195,8 +205,11 @@ export const FormPR: React.FC<FormPRProps> = ({ initialDoc, onSave, onClose }) =
           </div>
         )}
 
-        <label htmlFor="pr-approver">Email Atasan Langsung <span>*</span></label>
-        <input id="pr-approver" type="email" value={doc.stage1ApproverEmail ?? ''} onChange={(e) => setDoc({ ...doc, stage1ApproverEmail: e.target.value })} placeholder="atasan@blc.co.id" />
+        <ApproverSelect
+          id="pr-approver"
+          value={doc.stage1ApproverEmail}
+          onChange={(email) => setDoc({ ...doc, stage1ApproverEmail: email })}
+        />
         <label htmlFor="pr-notes">Catatan Tambahan</label>
         <textarea
           id="pr-notes"
@@ -211,8 +224,19 @@ export const FormPR: React.FC<FormPRProps> = ({ initialDoc, onSave, onClose }) =
         <button type="button" className="secondary" onClick={onClose}>
           Batal
         </button>
-        <button type="submit" className="primary">
-          Simpan Draf PR <span aria-hidden="true">→</span>
+        <button
+          type="submit"
+          onClick={() => setSubmitMode('draft')}
+          className="secondary"
+        >
+          Simpan Draf
+        </button>
+        <button
+          type="submit"
+          onClick={() => setSubmitMode('submit')}
+          className="primary"
+        >
+          Ajukan ke Atasan Langsung <span aria-hidden="true">→</span>
         </button>
       </div>
     </form>
