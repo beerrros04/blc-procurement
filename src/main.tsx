@@ -267,6 +267,61 @@ function isExecutiveOrApproverRole(role: UserRole): boolean {
   );
 }
 
+export function Topbar({
+  activeTab,
+  onOpenExport,
+}: {
+  activeTab: WorkspaceTab;
+  onOpenExport: () => void;
+}) {
+  const title =
+    activeTab === 'DASHBOARD'
+      ? 'Cockpit Eksekutif & Telemetry'
+      : activeTab === 'PENGAJUAN' || activeTab === 'BERANDA'
+      ? 'Pengajuan & Pelacakan Alur'
+      : activeTab === 'REGISTER'
+      ? 'Approval Register'
+      : activeTab === 'HISTORY'
+      ? 'Approval History'
+      : activeTab === 'DOCS'
+      ? 'Approval Docs'
+      : 'Dokumen Pengadaan';
+
+  return (
+    <header
+      className="topbar"
+      style={{
+        marginBottom: '20px',
+        borderRadius: 'var(--card-radius, 10px)',
+        border: '1px solid var(--border-clean, #ededeb)',
+        background: '#ffffff',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '12px 20px',
+        boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+        <h1 style={{ fontSize: '18px', fontWeight: 800, margin: 0, color: '#191C1A' }}>
+          {title}
+        </h1>
+      </div>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+        <button
+          type="button"
+          className="s-action"
+          onClick={onOpenExport}
+          title="Ekspor rekap 13 kolom untuk Finance"
+        >
+          Ekspor Laporan (13 Kolom)
+        </button>
+      </div>
+    </header>
+  );
+}
+
 function App() {
   const [authUser, setAuthUser] = useState<AuthAccount | null>(() => {
     try {
@@ -758,54 +813,10 @@ function App() {
           {/* =====================================================================
               ELERA CORPORATE TOPBAR (Elera Architecture)
              ===================================================================== */}
-          <header
-            className="topbar"
-            style={{
-              marginBottom: '20px',
-              borderRadius: 'var(--card-radius, 10px)',
-              border: '1px solid var(--border-clean, #ededeb)',
-              background: '#ffffff',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '12px 20px',
-              boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-              <h1 style={{ fontSize: '17px', fontWeight: 800, margin: 0, color: '#191C1A' }}>
-                {activeTab === 'DASHBOARD'
-                  ? 'Cockpit Eksekutif & Telemetry'
-                  : activeTab === 'PENGAJUAN' || activeTab === 'BERANDA'
-                  ? 'Pengajuan & Pelacakan Alur'
-                  : activeTab === 'REGISTER'
-                  ? 'Approval Register'
-                  : activeTab === 'HISTORY'
-                  ? 'Approval History'
-                  : activeTab === 'DOCS'
-                  ? 'Approval Docs'
-                  : 'Dokumen Pengadaan'}
-              </h1>
-              <span className="s-badge gray">{authUser.branch}</span>
-              <span
-                className="s-badge"
-                style={{ background: '#F4F4F2', color: '#191C1A', fontWeight: 700 }}
-              >
-                {authUser.roleTitle}
-              </span>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-              <button
-                type="button"
-                className="s-action"
-                onClick={() => setIsExportOpen(true)}
-                title="Ekspor rekap 13 kolom untuk Finance"
-              >
-                Ekspor Laporan (13 Kolom)
-              </button>
-            </div>
-          </header>
+          <Topbar
+            activeTab={activeTab}
+            onOpenExport={() => setIsExportOpen(true)}
+          />
 
           {notice && (
             <div

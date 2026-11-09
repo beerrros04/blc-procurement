@@ -1,3 +1,5 @@
+import { createElement } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
   approveDocumentStage,
@@ -214,5 +216,51 @@ describe('Operations Navigation Role Filter (Elera Spec)', () => {
     const { getVisibleOperationsNav } = await import('./main');
     const nav = getVisibleOperationsNav('KEUANGAN');
     expect(nav.map((n) => n.id)).toEqual(['PENGAJUAN', 'DOKUMEN']);
+  });
+});
+
+describe('Topbar Header Simplification (Feedback 3)', () => {
+  it('renders clean workspace tab title without branch or roleTitle badges', async () => {
+    const { Topbar } = await import('./main');
+    const html = renderToStaticMarkup(
+      createElement(Topbar, {
+        activeTab: 'PENGAJUAN',
+        onOpenExport: () => {},
+      })
+    );
+    expect(html).toContain('Pengajuan &amp; Pelacakan Alur');
+    expect(html).not.toContain('Bekasi');
+    expect(html).not.toContain('Staff Pemohon');
+    expect(html).not.toContain('s-badge');
+    expect(html).toContain('font-size:18px');
+  });
+
+  it('renders corresponding title for other workspace tabs', async () => {
+    const { Topbar } = await import('./main');
+    expect(
+      renderToStaticMarkup(
+        createElement(Topbar, { activeTab: 'DASHBOARD', onOpenExport: () => {} })
+      )
+    ).toContain('Cockpit Eksekutif &amp; Telemetry');
+    expect(
+      renderToStaticMarkup(
+        createElement(Topbar, { activeTab: 'REGISTER', onOpenExport: () => {} })
+      )
+    ).toContain('Approval Register');
+    expect(
+      renderToStaticMarkup(
+        createElement(Topbar, { activeTab: 'HISTORY', onOpenExport: () => {} })
+      )
+    ).toContain('Approval History');
+    expect(
+      renderToStaticMarkup(
+        createElement(Topbar, { activeTab: 'DOCS', onOpenExport: () => {} })
+      )
+    ).toContain('Approval Docs');
+    expect(
+      renderToStaticMarkup(
+        createElement(Topbar, { activeTab: 'ALL', onOpenExport: () => {} })
+      )
+    ).toContain('Dokumen Pengadaan');
   });
 });
