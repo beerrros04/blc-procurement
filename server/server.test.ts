@@ -87,6 +87,22 @@ describe('BLC Procurement Production Backend API & Domain Rules', () => {
     expect((await result.json()).code).toBe('INVALID_APPROVER');
   });
 
+  it('resolves stage 1 assignedTo approver name from stage1ApproverEmail on creation', async () => {
+    const token = await loginAs('PEMOHON');
+    const created = await apiCall('/api/v1/documents', {
+      method: 'POST',
+      token,
+      body: {
+        docType: 'PR',
+        title: 'Uji Resolusi Nama Atasan',
+        stage1ApproverEmail: 'atasan@blc.co.id',
+      },
+    });
+    expect(created.status).toBe(201);
+    const body = await created.json();
+    expect(body.document.approvalSteps.atasan.assignedTo).toBe('Pak Hendra');
+  });
+
   it('requires a stored receipt when submitting reimbursement', async () => {
     const token = await loginAs('PEMOHON');
     const created = await apiCall('/api/v1/documents', { method: 'POST', token, body: { docType: 'RB', title: 'Klaim', paymentMethod: 'CASH', subtotal: 50000 } });

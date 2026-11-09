@@ -28,12 +28,32 @@ const KNOWN_NAMES: Record<string, string> = {
   'hendra': 'Hendra',
 };
 
-export function displayPersonName(raw: string | undefined): string {
+const KNOWN_EMAIL_NAMES: Record<string, string> = {
+  'atasan@blc.co.id': 'Pak Hendra',
+  'ayu@blc.co.id': 'Ayu Martina',
+  'pemohon@blc.co.id': 'Dewi Lestari',
+  'hery@blc.co.id': 'Hery Sugiarto',
+  'hashimoto@blc.co.id': 'Koji Hashimoto',
+  'keuangan@blc.co.id': 'Tim Keuangan & Treasury',
+  'admin@blc.co.id': 'Admin Lokal',
+};
+
+export function displayPersonName(raw?: string, approverEmail?: string): string {
+  const emailResolved = approverEmail ? KNOWN_EMAIL_NAMES[approverEmail.trim().toLowerCase()] : undefined;
+
   const value = raw?.trim();
-  if (!value || GENERIC_LABELS.has(value.toLocaleLowerCase('id-ID'))) return UNKNOWN_PERSON;
+  if (value && KNOWN_EMAIL_NAMES[value.toLowerCase()]) {
+    return KNOWN_EMAIL_NAMES[value.toLowerCase()];
+  }
+
+  if (!value || GENERIC_LABELS.has(value.toLocaleLowerCase('id-ID'))) {
+    return emailResolved ?? UNKNOWN_PERSON;
+  }
 
   const withoutKnownRole = value.replace(KNOWN_ROLE_SUFFIX, '').trim();
   const normalized = withoutKnownRole.toLocaleLowerCase('id-ID');
-  if (!normalized || GENERIC_LABELS.has(normalized)) return UNKNOWN_PERSON;
+  if (!normalized || GENERIC_LABELS.has(normalized)) {
+    return emailResolved ?? UNKNOWN_PERSON;
+  }
   return KNOWN_NAMES[normalized] ?? withoutKnownRole;
 }

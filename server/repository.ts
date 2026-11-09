@@ -22,6 +22,7 @@ import {
   calculateRcOutcome,
 } from '../src/domain/calculations';
 import { INITIAL_SEED_DOCUMENTS } from '../src/store/seed-data';
+import { SEEDED_USERS } from './auth';
 import type { StoredAttachment } from './storage';
 
 export class DomainError extends Error {
@@ -90,6 +91,16 @@ export interface PvGenerationOptions {
   pphDeduction?: number;
 }
 
+function resolveApproverName(email?: string): string {
+  if (!email) return 'Atasan Langsung';
+  const normalized = email.trim().toLowerCase();
+  const seeded = SEEDED_USERS[normalized];
+  if (seeded?.fullName) {
+    return seeded.fullName.replace(/\s*\([^)]*\)$/, '').trim();
+  }
+  return email;
+}
+
 // shortcut: JSON file persistence in .data/db.json, swap to pg Pool with db/schema.sql when PostgreSQL instance is provisioned
 export class ProcurementRepository {
   private readonly persistPath?: string;
@@ -135,6 +146,10 @@ export class ProcurementRepository {
       if (seedIds.has(document.id)) {
         if (!document.ownerId) { document.ownerId = 'usr-pemohon-01'; changed = true; }
         if (!document.stage1ApproverEmail) { document.stage1ApproverEmail = 'atasan@blc.co.id'; changed = true; }
+      }
+      if (document.stage1ApproverEmail && document.approvalSteps?.atasan?.assignedTo === 'Atasan Langsung') {
+        document.approvalSteps.atasan.assignedTo = resolveApproverName(document.stage1ApproverEmail);
+        changed = true;
       }
     }
     if (changed) this.flush();
@@ -472,7 +487,7 @@ export class ProcurementRepository {
         atasan: {
           stage: 'ATASAN' as const,
           label: 'Tahap 1: Atasan Langsung',
-          assignedTo: 'Atasan Langsung',
+          assignedTo: resolveApproverName(input.stage1ApproverEmail),
           status: 'WAITING' as const,
         },
         ayu: {
@@ -551,6 +566,21 @@ export class ProcurementRepository {
     const nowIso = new Date().toISOString();
     const safePatch = this.stripSystemFields(patch as Record<string, unknown>);
 
+    const stage1ApproverEmail =
+      safePatch.stage1ApproverEmail !== undefined
+        ? (safePatch.stage1ApproverEmail as string | undefined)
+        : current.stage1ApproverEmail;
+
+    const approvalSteps = {
+      ...current.approvalSteps,
+      atasan: {
+        ...current.approvalSteps.atasan,
+        assignedTo: stage1ApproverEmail
+          ? resolveApproverName(stage1ApproverEmail)
+          : current.approvalSteps.atasan.assignedTo,
+      },
+    };
+
     const updated: VersionedDocument = {
       ...current,
       ...safePatch,
@@ -560,7 +590,7 @@ export class ProcurementRepository {
       docType: current.docType,
       status: current.status,
       currentStage: current.currentStage,
-      approvalSteps: current.approvalSteps,
+      approvalSteps,
       createdAt: current.createdAt,
       updatedAt: nowIso,
       version: current.version + 1,
@@ -799,6 +829,9 @@ export class ProcurementRepository {
       doc.version += 1;
       doc.updatedAt = now;
 
+      if (doc.stage1ApproverEmail) {
+        doc.approvalSteps.atasan.assignedTo = resolveApproverName(doc.stage1ApproverEmail);
+      }
       doc.approvalSteps.atasan.status = 'PENDING';
       doc.approvalSteps.atasan.decisionAt = undefined;
       doc.approvalSteps.atasan.comment = undefined;

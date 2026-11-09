@@ -17,6 +17,14 @@ describe('displayPersonName', () => {
     }
   });
 
+  it('resolves approver name from approverEmail or raw email when raw is missing or generic', () => {
+    expect(displayPersonName(undefined, 'atasan@blc.co.id')).toBe('Pak Hendra');
+    expect(displayPersonName('Atasan Langsung', 'atasan@blc.co.id')).toBe('Pak Hendra');
+    expect(displayPersonName('atasan@blc.co.id')).toBe('Pak Hendra');
+    expect(displayPersonName(undefined, 'ayu@blc.co.id')).toBe('Ayu Martina');
+    expect(displayPersonName('', 'pemohon@blc.co.id')).toBe('Dewi Lestari');
+  });
+
   it('keeps unknown names intact without stripping meaningful text or guessing identities', () => {
     expect(displayPersonName('  Jane (Née Doe)  ')).toBe('Jane (Née Doe)');
     expect(displayPersonName('Ayu Puspita')).toBe('Ayu Puspita');
