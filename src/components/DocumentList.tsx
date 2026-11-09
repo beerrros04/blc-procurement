@@ -610,7 +610,7 @@ export const DocumentList: React.FC<DocumentListProps> = ({
                           {doc.itemCondition !== 'BAIK' ? `Perlu tindakan (${doc.itemCondition})` : 'Tanpa persetujuan · Baik'}
                         </span>
                       ) : (
-                        <ApprovalProgress document={doc} />
+                        <ApprovalProgress document={doc} compact />
                       )}
                     </td>
 

@@ -13,6 +13,11 @@ export interface ProgressStage {
     participants?: { name: string; status: StageDecision }[]
 }
 
+export interface ProgressIndicatorProps {
+    steps?: ProgressStage[]
+    compact?: boolean
+}
+
 export const progressStatusLabels: Record<StageDecision, string> = {
     WAITING: 'Belum dimulai', PENDING: 'Menunggu', APPROVED: 'Disetujui', REJECTED: 'Dikembalikan',
 }
@@ -24,7 +29,7 @@ export function completedProgress(statuses: StageDecision[]): number {
     return Math.max(0, completed - 1) / (statuses.length - 1) * 100
 }
 
-const ProgressIndicator = ({ steps }: { steps?: ProgressStage[] }) => {
+const ProgressIndicator = ({ steps, compact }: ProgressIndicatorProps) => {
     const [step, setStep] = useState(1)
     const [isExpanded, setIsExpanded] = useState(true)
     const reduceMotion = useReducedMotion()
@@ -47,27 +52,37 @@ const ProgressIndicator = ({ steps }: { steps?: ProgressStage[] }) => {
 
     if (steps) {
         return (
-            <div className="approval-capsule">
+            <div className={cn("approval-capsule", compact && "approval-capsule--compact")}>
             <div className="approval-capsule-track" aria-hidden="true" style={{ right: `calc(${100 / steps.length}% - 10px)` }}>
                 <motion.div className="approval-capsule-fill" initial={false}
                     animate={{ width: `${completedProgress(steps.map((stage) => stage.status))}%` }}
                     transition={reduceMotion ? { duration: 0 } : { duration: 0.25 }} />
             </div>
-            <ol className="approval-progress approval-progress--capsule" aria-label="Progres persetujuan">
-                {steps.map((stage) => (
-                    <li key={stage.id} className={`approval-progress-step is-${stage.status.toLowerCase()}`}>
-                        <span className="approval-progress-dot" aria-hidden="true">
-                            {stage.status === 'APPROVED' ? '✓' : stage.status === 'REJECTED' ? '×' : ''}
-                        </span>
-                        <span className="approval-progress-copy">
-                            <strong style={{ overflowWrap: 'anywhere' }}>{stage.name}</strong>
-                            <small>{stage.detail || progressStatusLabels[stage.status]}</small>
-                            {stage.participants?.map((person) => (
-                                <small key={person.name}>{person.name}: {progressStatusLabels[person.status]}</small>
-                            ))}
-                        </span>
-                    </li>
-                ))}
+            <ol className={cn("approval-progress approval-progress--capsule", compact && "approval-progress--compact")} aria-label="Progres persetujuan">
+                {steps.map((stage) => {
+                    const dotLabel = stage.detail ? `${stage.name} (${stage.detail})` : stage.name
+                    return (
+                        <li key={stage.id} className={`approval-progress-step is-${stage.status.toLowerCase()}`}>
+                            <span
+                                className="approval-progress-dot"
+                                aria-hidden={compact ? undefined : "true"}
+                                title={compact ? dotLabel : undefined}
+                                aria-label={compact ? dotLabel : undefined}
+                            >
+                                {stage.status === 'APPROVED' ? '✓' : stage.status === 'REJECTED' ? '×' : ''}
+                            </span>
+                            {!compact && (
+                                <span className="approval-progress-copy">
+                                    <strong style={{ overflowWrap: 'anywhere' }}>{stage.name}</strong>
+                                    <small>{stage.detail || progressStatusLabels[stage.status]}</small>
+                                    {stage.participants?.map((person) => (
+                                        <small key={person.name}>{person.name}: {progressStatusLabels[person.status]}</small>
+                                    ))}
+                                </span>
+                            )}
+                        </li>
+                    )
+                })}
             </ol>
             </div>
         )

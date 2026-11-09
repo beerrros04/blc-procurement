@@ -3,7 +3,12 @@ import type { BaseDocument, StageDecision } from '../types/document';
 import { displayPersonName } from '../domain/display-name';
 import ProgressIndicator, { type ProgressStage } from './ui/progress-indicator';
 
-export function ApprovalProgress({ document }: { document: BaseDocument }) {
+export interface ApprovalProgressProps {
+  document: BaseDocument;
+  compact?: boolean;
+}
+
+export function ApprovalProgress({ document, compact }: ApprovalProgressProps) {
   if (document.docType === 'GR') return <span>Tidak memerlukan persetujuan</span>;
   const { atasan, ayu, bod } = document.approvalSteps;
   const approvals = [bod.heryStatus, bod.hashimotoStatus];
@@ -19,5 +24,5 @@ export function ApprovalProgress({ document }: { document: BaseDocument }) {
         { name: 'Koji Hashimoto', status: bod.hashimotoStatus },
       ] },
   ];
-  return <ProgressIndicator steps={steps} />;
+  return <ProgressIndicator steps={steps} compact={compact} />;
 }

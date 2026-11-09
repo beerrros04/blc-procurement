@@ -81,4 +81,12 @@ describe('ApprovalProgress', () => {
     expect(html).toContain('Continue');
     expect(html).toContain('<button');
   });
+
+  it('renders compact mode with only visual dots and no verbose copy', () => {
+    const doc = structuredClone(INITIAL_SEED_DOCUMENTS[0]);
+    const html = renderToStaticMarkup(<ApprovalProgress document={doc} compact />);
+    expect(html).not.toContain('approval-progress-copy');
+    expect(html).not.toContain('Belum dimulai');
+    expect(html).toContain('approval-progress-dot');
+  });
 });
