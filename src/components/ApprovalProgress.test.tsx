@@ -86,7 +86,8 @@ describe('ApprovalProgress', () => {
     const doc = structuredClone(INITIAL_SEED_DOCUMENTS[0]);
     const html = renderToStaticMarkup(<ApprovalProgress document={doc} compact />);
     expect(html).not.toContain('approval-progress-copy');
-    expect(html).not.toContain('Belum dimulai');
+    expect(html).toContain('title="Ayu Martina: Belum dimulai"');
+    expect(html).toContain('role="img"');
     expect(html).toContain('approval-progress-dot');
   });
 });

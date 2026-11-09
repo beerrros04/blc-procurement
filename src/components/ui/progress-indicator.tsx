@@ -60,11 +60,13 @@ const ProgressIndicator = ({ steps, compact }: ProgressIndicatorProps) => {
             </div>
             <ol className={cn("approval-progress approval-progress--capsule", compact && "approval-progress--compact")} aria-label="Progres persetujuan">
                 {steps.map((stage) => {
-                    const dotLabel = stage.detail ? `${stage.name} (${stage.detail})` : stage.name
+                    const statusText = stage.detail || progressStatusLabels[stage.status]
+                    const dotLabel = `${stage.name}: ${statusText}`
                     return (
                         <li key={stage.id} className={`approval-progress-step is-${stage.status.toLowerCase()}`}>
                             <span
                                 className="approval-progress-dot"
+                                role={compact ? "img" : undefined}
                                 aria-hidden={compact ? undefined : "true"}
                                 title={compact ? dotLabel : undefined}
                                 aria-label={compact ? dotLabel : undefined}

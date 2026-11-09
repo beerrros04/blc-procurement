@@ -407,7 +407,7 @@ export const ApprovalRegisterView: React.FC<ApprovalRegisterViewProps> = ({
                   >
                     {rupiah.format(netPayableAmt)}
                   </td>
-                  <td data-label="Tahap"><ApprovalProgress document={doc} /></td>
+                  <td data-label="Tahap"><ApprovalProgress document={doc} compact /></td>
                   <td data-label="Status">
                     <span
                       style={{
