@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { AlertTriangle, Check, CheckCircle2, ShieldCheck, X } from 'lucide-react';
 import type {
   AnyDocument,
   AVDocument,
@@ -10,6 +11,7 @@ import type {
   UserRole,
 } from '../types/document';
 import { ApprovalStepper } from './ApprovalStepper';
+import { openAttachment } from '../api';
 
 export interface DocumentDetailModalProps {
   document: AnyDocument;
@@ -81,6 +83,9 @@ export const DocumentDetailModal: React.FC<DocumentDetailModalProps> = ({
     <dialog
       className="modal"
       open
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
       onCancel={(e) => {
         e.preventDefault();
         onClose();
@@ -89,12 +94,11 @@ export const DocumentDetailModal: React.FC<DocumentDetailModalProps> = ({
       <section className="drawer" style={{ width: 'min(720px, 100%)' }}>
         <div className="drawer-head">
           <div>
-            <div className="eyebrow">{document.docType} SPECIFICATION</div>
             <h2>{document.docNumber}</h2>
             <p>{document.title}</p>
           </div>
           <button className="close" type="button" onClick={onClose} aria-label="Tutup detail">
-            ×
+            <X size={18} />
           </button>
         </div>
 
@@ -117,6 +121,16 @@ export const DocumentDetailModal: React.FC<DocumentDetailModalProps> = ({
               <span>Tujuan / Keperluan:</span>
               <span>{document.purpose || '-'}</span>
             </div>
+            {document.attachments && document.attachments.length > 0 && (
+              <div className="form-summary-row">
+                <span>Lampiran Berkas:</span>
+                <span>{document.attachments.map((a) => (
+                  <button key={a.id} type="button" className="secondary" onClick={() => void openAttachment(a.id).catch(() => setError('Lampiran tidak dapat dibuka.'))}>
+                    {a.name} ({Math.ceil(a.size / 1024)} KB)
+                  </button>
+                ))}</span>
+              </div>
+            )}
 
             {document.docType === 'PR' && (
               <>
@@ -125,13 +139,14 @@ export const DocumentDetailModal: React.FC<DocumentDetailModalProps> = ({
                   <span>{(document as PRDocument).budgetType}</span>
                 </div>
                 <div className="form-summary-row">
-                  <span>Wajib Memo IAM (≥ Rp 5 Juta):</span>
-                  <span>{(document as PRDocument).isIamRequired ? 'Ya (Wajib)' : 'Tidak'}</span>
+                  <span>Perlu pemeriksaan IAM (≥ Rp 5 Juta):</span>
+                  <span>{(document as PRDocument).isIamRequired ? 'Periksa; aturan belum dikonfirmasi' : 'Di bawah ambang perkiraan'}</span>
                 </div>
                 <div className="form-summary-total">
                   <span>SUBTOTAL PR:</span>
                   <span>{rupiah.format((document as PRDocument).subtotalAmount)}</span>
                 </div>
+                {(document as PRDocument).totalAmount !== undefined && <div className="form-summary-row"><span>Perkiraan total:</span><strong>{rupiah.format((document as PRDocument).totalAmount ?? 0)}</strong></div>}
               </>
             )}
 
@@ -310,8 +325,14 @@ export const DocumentDetailModal: React.FC<DocumentDetailModalProps> = ({
                 >
                   Tolak (Kembalikan ke Draf)
                 </button>
-                <button type="button" className="primary" onClick={handleApprove}>
-                  Setujui Dokumen (Approve) <span aria-hidden="true">✔</span>
+                <button
+                  type="button"
+                  className="primary"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                  onClick={handleApprove}
+                >
+                  <Check size={16} />
+                  Setujui Dokumen (Approve)
                 </button>
               </div>
             </div>
@@ -319,7 +340,7 @@ export const DocumentDetailModal: React.FC<DocumentDetailModalProps> = ({
 
           {/* Audit Log History */}
           <div style={{ marginTop: '20px' }}>
-            <h4 style={{ margin: '0 0 10px', fontSize: '13px', color: '#254b38' }}>
+            <h4 style={{ margin: '0 0 10px', fontSize: '13px', color: 'var(--text-primary)' }}>
               Riwayat Log Audit & Jejak Persetujuan
             </h4>
             <ul className="audit-list">
@@ -327,9 +348,9 @@ export const DocumentDetailModal: React.FC<DocumentDetailModalProps> = ({
                 <li key={log.id} className="audit-item">
                   <div className="audit-item-head">
                     <span>
-                      {log.actor} — <span style={{ color: '#527563' }}>{log.action}</span>
+                      {log.actor} — <span style={{ color: 'var(--accent-ruby)' }}>{log.action}</span>
                     </span>
-                    <small style={{ color: '#8a9990' }}>
+                    <small style={{ color: 'var(--text-muted)' }}>
                       {new Intl.DateTimeFormat('id-ID', {
                         day: 'numeric',
                         month: 'short',
@@ -339,7 +360,7 @@ export const DocumentDetailModal: React.FC<DocumentDetailModalProps> = ({
                       }).format(new Date(log.timestamp))}
                     </small>
                   </div>
-                  {log.comment && <p style={{ margin: '4px 0 0', color: '#4a6355' }}>"{log.comment}"</p>}
+                  {log.comment && <p style={{ margin: '4px 0 0', color: 'var(--text-secondary)' }}>"{log.comment}"</p>}
                 </li>
               ))}
             </ul>

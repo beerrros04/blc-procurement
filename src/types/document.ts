@@ -2,6 +2,7 @@ export type DocType = 'PR' | 'PO' | 'AV' | 'RB' | 'RC' | 'PV';
 
 export type UserRole =
   | 'PEMOHON'
+  | 'ADMIN'
   | 'ATASAN'
   | 'AYU'
   | 'BOD_HERY'
@@ -52,8 +53,20 @@ export interface BankDetails {
   accountHolder: string;
 }
 
+export interface DocumentAttachment {
+  id: string;
+  name: string;
+  size: number;
+  mimeType: string;
+  category: 'IAM_MEMO' | 'QUOTATION' | 'RECEIPT' | 'REFUND_PROOF' | 'PAYMENT_PROOF' | 'OTHER';
+  uploadedAt: string;
+  dataUrl?: string;
+}
+
 export interface BaseDocument {
   id: string;
+  ownerId?: string;
+  stage1ApproverEmail?: string;
   docNumber: string;
   docType: DocType;
   title: string;
@@ -69,6 +82,15 @@ export interface BaseDocument {
     bod: BodParallelState;
   };
   auditLog: AuditLogEntry[];
+  attachments?: Array<{
+    id: string;
+    name: string;
+    size: number;
+    mimeType: string;
+    category: 'IAM_MEMO' | 'QUOTATION' | 'RECEIPT' | 'REFUND_PROOF' | 'PAYMENT_PROOF' | 'OTHER';
+    uploadedAt: string;
+    dataUrl?: string;
+  }>;
 }
 
 export interface PRDocument extends BaseDocument {
@@ -78,6 +100,15 @@ export interface PRDocument extends BaseDocument {
   isIamRequired: boolean;
   requiredDate?: string;
   notes?: string;
+  otherCosts?: number;
+  discount?: number;
+  ppnRate?: number;
+  pphRate?: number;
+  ppnAmount?: number;
+  pphAmount?: number;
+  totalAmount?: number;
+  iamNumber?: string;
+  prNumber?: string;
 }
 
 export interface PODocument extends BaseDocument {
@@ -96,14 +127,30 @@ export interface PODocument extends BaseDocument {
   pphAmount: number;
   totalAmount: number;
   requiredDate?: string;
+  iamNumber?: string;
+  contractNumber?: string;
+  vendorCode?: string;
+  paymentTerms?: string;
+  deliveryTerms?: string;
+  budgetType?: string;
 }
 
 export interface AVDocument extends BaseDocument {
   docType: 'AV';
   parentPoId?: string;
+  activityEndDate?: string;
   activityDate: string;
   paymentDueDate: string;
   amount: number;
+  subtotal?: number;
+  otherCosts?: number;
+  discount?: number;
+  ppnRate?: number;
+  pphRate?: number;
+  ppnAmount?: number;
+  pphAmount?: number;
+  budgetType?: string;
+  vendorName?: string;
   disbursementMethod: 'TRANSFER' | 'CASH';
   bankDetails?: BankDetails;
 }
@@ -118,12 +165,21 @@ export interface RBDocument extends BaseDocument {
   totalAmount: number;
   beneficiaryBank: BankDetails;
   attachmentCount: number;
+  budgetType?: string;
+  paymentDueDate?: string;
+  vendorName?: string;
+  ppnRate?: number;
+  pphRate?: number;
+  ppnAmount?: number;
+  pphAmount?: number;
+  paymentMethod?: 'BANK_TRANSFER' | 'CASH';
 }
 
 export type RcOutcomeType = 'SURPLUS' | 'DEFICIT' | 'EXACT';
 
 export interface RCDocument extends BaseDocument {
   docType: 'RC';
+  financeConfirmedAt?: string;
   parentAvId: string;
   avOriginalAmount: number;
   realizedAmount: number;
@@ -133,6 +189,10 @@ export interface RCDocument extends BaseDocument {
   reimbursementBank?: BankDetails;
   activityCompletedDate: string;
   submissionDeadline: string;
+  budgetType?: string;
+  subtotal?: number;
+  otherCosts?: number;
+  discount?: number;
 }
 
 export interface PVPaymentDetails {
@@ -153,6 +213,7 @@ export interface PVDocument extends BaseDocument {
   pphDeduction: number;
   netAmountToPay: number;
   paymentStatus: 'UNPAID' | 'PAID';
+  paymentMethod?: 'BANK_TRANSFER' | 'CASH';
   paymentDetails?: PVPaymentDetails;
 }
 

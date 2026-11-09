@@ -1,5 +1,6 @@
 import React from 'react';
 import type { BaseDocument, StageDecision } from '../types/document';
+import { ApprovalProgress } from './ApprovalProgress';
 
 export interface ApprovalStepperProps {
   document: BaseDocument;
@@ -44,14 +45,19 @@ export const ApprovalStepper: React.FC<ApprovalStepperProps> = ({ document }) =>
 
   return (
     <section className="stepper-section" aria-label="Alur Persetujuan">
-      <div className="stepper-header">
-        <h3 className="stepper-title">Progres Persetujuan Berjenjang</h3>
-        <span className="stepper-subtitle">
-          Status Dokumen:{' '}
-          <span className={`badge status-${document.status.toLowerCase()}`}>
-            {document.status}
+      <div className="stepper-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+        <div>
+          <h3 className="stepper-title">Progres Persetujuan Berjenjang</h3>
+          <span className="stepper-subtitle">
+            Status Dokumen:{' '}
+            <span className={`badge status-${document.status.toLowerCase()}`}>
+              {document.status}
+            </span>
           </span>
-        </span>
+        </div>
+        <div>
+          <ApprovalProgress document={document} />
+        </div>
       </div>
 
       <div className="stepper-track">
@@ -60,10 +66,9 @@ export const ApprovalStepper: React.FC<ApprovalStepperProps> = ({ document }) =>
           <div className="step-circle">1</div>
           <div className="step-content">
             <div className="step-title-row">
-              <strong>Tahap 1: Atasan Langsung</strong>
+              <strong>Tahap 1: Head</strong>
               <span className={`step-badge ${atasanBadge.className}`}>{atasanBadge.label}</span>
             </div>
-            <p className="step-actor">Penilai: {atasan.assignedTo}</p>
             {atasan.decisionAt && (
               <p className="step-time">Waktu: {formatDate(atasan.decisionAt)}</p>
             )}
@@ -78,10 +83,9 @@ export const ApprovalStepper: React.FC<ApprovalStepperProps> = ({ document }) =>
           <div className="step-circle">2</div>
           <div className="step-content">
             <div className="step-title-row">
-              <strong>Tahap 2: Bu Ayu</strong>
+              <strong>Tahap 2: GM</strong>
               <span className={`step-badge ${ayuBadge.className}`}>{ayuBadge.label}</span>
             </div>
-            <p className="step-actor">Verifikasi Keuangan & Kelayakan</p>
             {ayu.decisionAt && <p className="step-time">Waktu: {formatDate(ayu.decisionAt)}</p>}
             {ayu.comment && <blockquote className="step-comment">"{ayu.comment}"</blockquote>}
           </div>
@@ -99,7 +103,6 @@ export const ApprovalStepper: React.FC<ApprovalStepperProps> = ({ document }) =>
           <div className="step-content">
             <div className="step-title-row">
               <strong>Tahap 3: Direksi (BOD - Paralel)</strong>
-              <span className="step-dual-hint">Wajib keduanya menyetujui</span>
             </div>
 
             <div className="bod-parallel-box">

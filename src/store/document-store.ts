@@ -26,7 +26,7 @@ export function generateDocNumber(type: DocType, count: number): string {
   return `${type}-${yearMonth}-${seq}`;
 }
 
-export function createEmptyDocument(type: DocType, branch: string = 'Pusat'): AnyDocument {
+export function createEmptyDocument(type: DocType, branch: string = 'Bekasi'): AnyDocument {
   const nowIso = new Date().toISOString();
   const id = crypto.randomUUID();
   const docNumber = `${type}-${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}-${Math.floor(1000 + Math.random() * 9000)}`;

@@ -1,36 +1,97 @@
-# Paket kebutuhan BLC Procurement
+# BLC Procurement Lifecycle Management System (BLC CAREADY)
 
-**Status: draf untuk diskusi, 6 November 2026.** Paket ini belum merupakan spesifikasi produksi yang disetujui. Nama produk sementara. Gunakan sebagai dasar pembahasan bersama pemilik proses dan tim teknis.
+**Status:** Prototipe lokal untuk demonstrasi dan pengujian.  
+Aplikasi menggunakan akun demo dan backend lokal untuk uji coba. Dokumen disimpan dalam SQLite lokal dan lampiran pada filesystem server. Login Microsoft 365 dan SharePoint belum terhubung; jangan gunakan untuk data atau transaksi nyata.
 
-Dokumen dipulihkan dari isi percakapan sebelumnya agar tersedia di folder proyek lokal. Gambar sumber tersedia di [docs/media/Powerautomate](<docs/media/Powerautomate/>). DBD, BSD, dan IPD menggunakan definisi yang telah dikonfirmasi pengguna pada percakapan tersebut.
+---
 
-## Menjalankan pratinjau lokal
+## 1. Ringkasan Eksekutif & Brief Proyek Saat Ini
 
-Di folder ini jalankan `npm install` dan `npm run dev`, lalu buka alamat localhost yang ditampilkan. Jalankan `npm test` untuk uji validasi dan `npm run build` untuk memeriksa build.
+Sistem BLC Procurement menangani siklus hidup lengkap 6 jenis dokumen pengadaan dari inisiasi draf, otorisasi multi-tahap (Atasan → Bu Ayu / Finance → BoD Hery & Hashimoto), hingga pencairan dan pembayaran Payment Voucher:
 
-Implementasi saat ini hanya mencakup pratinjau pembuatan dan pengubahan draf PR, termasuk tujuan dan tanggal kebutuhan. Kedua kolom tambahan ini masih opsional pada tahap draf; aturan saat pengajuan belum ditentukan. Data contoh disimpan pada browser dan perangkat tersebut, tanpa akun, backend, database bersama, persetujuan, atau pembayaran. Jangan gunakan data perusahaan maupun transaksi nyata. Cakupan tahap pertama yang dipilih adalah procurement dan pembayaran; fungsi tersebut masih harus dibangun dan diuji sebelum aplikasi dapat digunakan secara operasional.
+1. **Purchase Request (PR):** Permintaan pengadaan barang/jasa cabang/pusat dengan validasi ambang Memo IAM wajib (≥ Rp 5.000.000).
+2. **Purchase Order (PO):** Surat pesanan rekanan vendor terintegrasi dengan nomor PR asal, perincian rekening bank vendor, PPN 11%, dan diskon.
+3. **Cash Advance (AV):** Pengajuan uang muka operasional cabang dan tim lapangan.
+4. **Reimbursement (RB):** Penggantian dana talangan operasional karyawan.
+5. **Realization Cash Advance (RC):** Pertanggungjawaban dana uang muka (AV) dengan penghitungan otomatis surplus (setor balik ke kas) atau defisit (pembayaran kompensasi).
+6. **Payment Voucher (PV):** Pencairan dana pembayaran resmi oleh tim Keuangan lengkap dengan pencatatan nomor referensi bank dan metode pembayaran.
 
-## Dokumen
+---
 
-1. [PRD — Product Requirements](PRD.md): tujuan, pengguna, cakupan, kebutuhan dan kriteria penerimaan.
-2. [BSD — Business/System Design](BSD.md): proses, aturan, pengecualian, dan matriks keputusan.
-3. [TDD — Technical Design](TDD.md): arsitektur, pilihan teknologi, antarmuka dan operasional.
-4. [DBD — Database Design](DBD.md): model data, relasi, integritas dan migrasi.
-5. [IPD — Implementation Plan](IPD.md): fase, keluaran, ketergantungan, dan verifikasi. Ini roadmap awal; rincian tugas per file menyusul setelah keputusan desain.
-6. [Temuan email dan hak akses](TEMUAN-EMAIL-DAN-HAK-AKSES.md): bukti masukan pengguna, keputusan tingkat akses, rancangan otorisasi, dan pertanyaan alur yang belum dipastikan.
+## 2. Arsitektur Desain & Standar Antarmuka
 
-## Sumber dan cara membaca
+Antarmuka dibangun dengan pendekatan **Anti-AI-Slop & Human-Centered Professional Polish**:
+- **Design System Inspiration:** Menggabungkan struktur tata letak dashboard arsitektural *Spike Next.js Pro* dengan referensi UI Kit *NEXGEN Absensi System* (`docs/media/UI_UX SISTEM ABSENSI NEXGEN/`).
+- **Color Balance (Aturan 60-30-10):**
+  - **60% Surface Netral:** Background canvas `#F0F5F9`, card surface `#FFFFFF` beresolusi tinggi dengan sudut 18px–20px dan border halus `rgba(226, 232, 240, 0.9)`.
+  - **30% Struktural & Kontras:** Slate Navy gelap `#111C2D` untuk teks utama, `#4A5568` untuk deskripsi, dan `#F8FAFD` untuk panel aksi/footer.
+  - **10% Corporate Red Accent:** BLC Corporate Red `#E51937` (turunan logo BLC Caready `docs/media/logo/logo_hd_transparent.png`) untuk primary CTA, highlight metrik prioritas, indikator tahap aktif, dan badge aksen.
+- **Centered Popup Modal Cards:**
+  - Seluruh formulir inisiasi, pengubahan dokumen, eksekusi pembayaran PV, dan dialog rincian dokumen ditampilkan sebagai kartu popup mengambang di tengah layar (*centered popup card*).
+  - Latar belakang menggunakan overlay darkened backdrop blur (`rgba(15, 23, 42, 0.62)` dengan `backdrop-filter: blur(8px)`).
+  - Header dan footer aksi (*fixed sticky*), isi form scrollable halus dengan sleek custom scrollbar, animasi masuk *modalScaleUp*, dan dismissibility saat klik di luar kartu (backdrop click) atau Escape.
+- **Tipografi:** Keluarga huruf Lato (Regular, Medium, Semibold, Bold) terstandarisasi dari H1 hingga caption.
+- **Ikonografi & Emotikon:** 100% menggunakan pustaka vektor Lucide React murni tanpa emoji kartun slop.
 
-- Gambar arsip Powerautomate.zip: beranda, daftar, formulir, riwayat persetujuan, dan rangkaian email hingga 4 November 2026. Ini adalah snapshot, bukan akses langsung atau ekspor definisi flow. Email berisi aturan historis dan perubahan; penerapan akhir perlu diuji.
-- Diskusi pengguna: sistem saat ini berjalan; tujuan utamanya meningkatkan fleksibilitas dan UI/UX, membangun atas konsep awal, serta mengurangi ketergantungan pada eWeb/Odoo dan persetujuan kertas. Tidak ada keluhan kegagalan operasional saat ini.
-- Acuan UI/UX: chat "Add Leonxlnx taste skill" menunjukkan pemasangan pada workspace Windows lain; karena file versi tersebut tidak tersedia di lingkungan ini, panduan `design-taste-frontend` versi publik terkini dibaca dari https://github.com/Leonxlnx/taste-skill/blob/main/skills/taste-skill/SKILL.md pada 6 November 2026. Kesamaan versi dengan instalasi Windows belum terverifikasi. Prinsip yang relevan untuk aplikasi kerja dipakai: satu sistem visual, bahasa jelas, tepi dan jarak konsisten, responsif, focus/hover, reduced motion, dan kontras. Aturan landing page seperti hero satu layar, foto dekoratif, dan efek tidak dipaksakan ke aplikasi transaksi.
-- **Teramati** = didukung screenshot/email, **Usulan** = keputusan awal untuk ditinjau, **Perlu konfirmasi** = belum diketahui. Setiap angka kebijakan adalah snapshot, bukan rekomendasi mengubah kebijakan.
+---
 
-## Keputusan terpenting yang masih terbuka
+## 3. Fitur Utama Aplikasi
 
-1. Pengguna belum memiliki dokumen atau sketsa konsep terpisah; identitas merek dan standar visual masih perlu dirumuskan.
-2. Tahap pertama adalah pengadaan dan pembayaran; cakupan penggantian Odoo di luar tahap ini serta kebutuhan integrasi dan migrasi masih perlu dikonfirmasi.
-3. Matriks penyetuju seluruh jenis dokumen, cabang, nominal, delegasi, pengecualian, dan penanganan pengajuan lama. HR tingkat 1, Ayu tingkat 2 sekaligus Keuangan, serta Hery dan Hashimoto tingkat 3 telah diusulkan pengguna; keduanya diperlukan dan dapat paralel untuk RB/RC. Urutan lengkap RB/RC dan hak konfirmasi ganda Ayu belum pasti.
-4. Batas Rp50 juta adalah kebijakan atau batas solusi saat ini; dasar ambang Rp5 juta; aturan pajak dan pembulatan yang disahkan Keuangan.
-5. Pengguna memilih masuk menggunakan akun Microsoft 365. Hosting, persetujuan admin Microsoft, jumlah pengguna, SLA, retensi, sumber dana dan proses pembayaran, serta persyaratan legal bukti persetujuan masih perlu ditentukan.
-6. Panduan BLC Procurement versi 4, definisi flow dan data ekspor belum diterima. Verifikasi sebelum membekukan aturan atau migrasi.
+- **Akun demo per peran:** Pilih akun contoh pada halaman masuk untuk mencoba tampilan masing-masing peran. Ini bukan autentikasi atau otorisasi produksi.
+- **Bento Hero & Analytics Grid:** Kartu metrik KPI ringkas dengan visualisasi total pengeluaran aktif, persentase kelulusan SLA, filter status instan, dan quick draft action.
+- **Interactive Multi-Stage Approval Stepper:** Pelacak visual 3 tahap persetujuan (Atasan → Bu Ayu → BoD Hery & Hashimoto) dengan indikator dokumen di atas Rp 50 Juta (aturan persetujuan BoD paralel/sekuensial).
+- **Audit Log Trail:** Rekaman kronologis setiap aksi (Dibuat, Diajukan, Disetujui, Ditolak dengan alasan revisi, Dibayarkan) tersimpan transparan per dokumen.
+- **Ekspor:** Unduh CSV atau buka dialog cetak browser. Ekspor XLSX belum tersedia.
+- **FigCraft Native Asset:** Berkas desain native `blc_procurement_design_system.figcraft` dan screenshot preview di `docs/figcraft_previews/` untuk sinkronisasi tim desain.
+
+---
+
+## 4. Cara Menjalankan & Setup Setelah Clone
+
+### Prasyarat
+- Node.js dengan dukungan native `node:sqlite` (versi 22.13 atau lebih baru) dan npm.
+
+### Quick Start (Setup Cepat Setelah Download / Clone)
+```bash
+# 1. Masuk ke folder proyek
+cd blc-procurement
+
+# 2. Pasang semua dependensi
+npm install
+
+# 3. (Opsional) Salin template environment jika ingin custom port
+cp .env.example .env
+
+# 4. Jalankan Backend API Server (Terminal 1)
+npm run server
+# Server aktif di http://127.0.0.1:3002 (database SQLite & folder uploads otomatis dibuat di .data/)
+
+# 5. Jalankan Frontend Vite (Terminal 2)
+npm run dev
+# Buka aplikasi di http://127.0.0.1:5173
+```
+
+Aplikasi menggunakan akun demo yang tersedia langsung pada menu login switcher. API lokal menggunakan `http://127.0.0.1:3002`; database berada di `.data/blc-local.sqlite` dan lampiran di `.data/uploads`. Database dan direktori penyimpanan otomatis diinisialisasi saat pertama kali backend dijalankan.
+
+### Menjalankan Uji Coba Unit (Vitest)
+```bash
+npm test
+```
+Perintah ini menjalankan tes yang tersedia untuk frontend dan server prototipe.
+
+### Memeriksa TypeScript & Production Build
+```bash
+npm run build
+```
+Perintah ini memeriksa TypeScript dan membuat bundle Vite di folder `dist/`; build yang lulus tidak berarti integrasi produksi telah siap.
+
+---
+
+## 5. Dokumentasi Terkait
+
+- [design.md](design.md): Spesifikasi lengkap sistem desain BLC Procurement × NEXGEN & palet BLC Red.
+- [PRD.md](PRD.md): Product Requirements Document.
+- [BSD.md](BSD.md): Business & System Design (proses bisnis, batas otorisasi, dan matriks keputusan).
+- [TDD.md](TDD.md): Technical Design Document (arsitektur data dan komponen).
+- [DBD.md](DBD.md): Database Design (skema entitas dokumen dan audit trail).
+- [TEMUAN-EMAIL-DAN-HAK-AKSES.md](TEMUAN-EMAIL-DAN-HAK-AKSES.md): Bukti riwayat email operasional BLC Caready dan pemetaan kewenangan persetujuan.

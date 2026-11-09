@@ -7,7 +7,7 @@ export const INITIAL_SEED_DOCUMENTS: AnyDocument[] = [
     docNumber: 'PR-202611-0001',
     docType: 'PR',
     title: 'Pengadaan Perlengkapan Workstation Tim IT',
-    branch: 'Pusat',
+    branch: 'Bekasi',
     purpose: 'Kebutuhan monitor dan aksesoris tim developer',
     status: 'DRAFT',
     createdAt: '2026-11-05T08:30:00.000Z',
@@ -39,9 +39,27 @@ export const INITIAL_SEED_DOCUMENTS: AnyDocument[] = [
       {
         id: 'log-seed-1',
         timestamp: '2026-11-05T08:30:00.000Z',
-        actor: 'Staff Pemohon',
+        actor: 'Dewi Lestari (Pemohon Pusat)',
         action: 'CREATE_DRAFT',
-        comment: 'Draf PR dibuat',
+        comment: 'Draf PR dibuat beserta lampiran IAM',
+      },
+    ],
+    attachments: [
+      {
+        id: 'att-seed-pr01-1',
+        name: 'IAM_PR_202611_0001_Workstation_IT.pdf',
+        size: 428_500,
+        mimeType: 'application/pdf',
+        category: 'IAM_MEMO',
+        uploadedAt: '2026-11-05T08:30:00.000Z',
+      },
+      {
+        id: 'att-seed-pr01-2',
+        name: 'Quotation_Monitor_Dell_27Inch.pdf',
+        size: 315_200,
+        mimeType: 'application/pdf',
+        category: 'QUOTATION',
+        uploadedAt: '2026-11-05T08:31:00.000Z',
       },
     ],
   },
@@ -96,10 +114,49 @@ export const INITIAL_SEED_DOCUMENTS: AnyDocument[] = [
       },
       {
         id: 'log-seed-2b',
+        timestamp: '2026-11-01T11:00:00.000Z',
+        actor: 'Pak Hendra (Atasan)',
+        action: 'APPROVE_ATASAN',
+        comment: 'Sangat dibutuhkan untuk operasional lelang',
+      },
+      {
+        id: 'log-seed-2c',
+        timestamp: '2026-11-02T10:15:00.000Z',
+        actor: 'Bu Ayu (Verifikator)',
+        action: 'APPROVE_AYU',
+        comment: 'Anggaran CAPEX cabang tersedia',
+      },
+      {
+        id: 'log-seed-2d',
+        timestamp: '2026-11-03T09:30:00.000Z',
+        actor: 'Pak Hery (BoD)',
+        action: 'APPROVE_BOD_HERY',
+        comment: 'Disetujui',
+      },
+      {
+        id: 'log-seed-2e',
         timestamp: '2026-11-03T14:20:00.000Z',
-        actor: 'BOD Hashimoto',
-        action: 'APPROVE',
-        comment: 'Approved fully',
+        actor: 'Koji Hashimoto (BoD)',
+        action: 'APPROVE_BOD_HASHIMOTO',
+        comment: 'Approved, please proceed to PO',
+      },
+    ],
+    attachments: [
+      {
+        id: 'att-seed-pr02-1',
+        name: 'IAM_Genset_Surabaya_Signed.pdf',
+        size: 612_400,
+        mimeType: 'application/pdf',
+        category: 'IAM_MEMO',
+        uploadedAt: '2026-11-01T09:00:00.000Z',
+      },
+      {
+        id: 'att-seed-pr02-2',
+        name: 'Perbandingan_3_Vendor_Genset_15kVA.pdf',
+        size: 894_100,
+        mimeType: 'application/pdf',
+        category: 'QUOTATION',
+        uploadedAt: '2026-11-01T09:02:00.000Z',
       },
     ],
   },
@@ -155,9 +212,26 @@ export const INITIAL_SEED_DOCUMENTS: AnyDocument[] = [
       {
         id: 'log-seed-po1',
         timestamp: '2026-11-04T10:00:00.000Z',
-        actor: 'Staff Pemohon',
+        actor: 'Dewi Lestari (Pemohon)',
         action: 'SUBMIT',
         comment: 'PO diajukan untuk persetujuan',
+      },
+      {
+        id: 'log-seed-po2',
+        timestamp: '2026-11-04T15:30:00.000Z',
+        actor: 'Pak Hendra (Atasan)',
+        action: 'APPROVE_ATASAN',
+        comment: 'Vendor rekanan resmi',
+      },
+    ],
+    attachments: [
+      {
+        id: 'att-seed-po01-1',
+        name: 'Quotation_Final_PT_Sumber_Daya_Listrik.pdf',
+        size: 518_000,
+        mimeType: 'application/pdf',
+        category: 'QUOTATION',
+        uploadedAt: '2026-11-04T10:00:00.000Z',
       },
     ],
   },
@@ -187,25 +261,51 @@ export const INITIAL_SEED_DOCUMENTS: AnyDocument[] = [
         label: 'Tahap 1: Atasan',
         assignedTo: 'Kepala Satuan Pengawas',
         status: 'APPROVED',
+        decisionAt: '2026-10-28T13:00:00.000Z',
+        comment: 'Sesuai jadwal audit triwulan',
       },
       ayu: {
         stage: 'AYU',
         label: 'Tahap 2: Bu Ayu',
         assignedTo: 'Bu Ayu',
         status: 'APPROVED',
+        decisionAt: '2026-10-29T10:00:00.000Z',
+        comment: 'Plafon perjalanan dinas sesuai ketentuan',
       },
       bod: {
         heryStatus: 'APPROVED',
+        heryDecisionAt: '2026-10-30T09:00:00.000Z',
+        heryComment: 'OK',
         hashimotoStatus: 'APPROVED',
+        hashimotoDecisionAt: '2026-10-30T14:00:00.000Z',
+        hashimotoComment: 'Approved',
       },
     },
     auditLog: [
       {
         id: 'log-seed-av1',
         timestamp: '2026-10-31T11:00:00.000Z',
-        actor: 'Keuangan',
+        actor: 'Erika Ayu Fitriana (Keuangan)',
         action: 'RECORD_PAYMENT',
         comment: 'Dana uang muka ditransfer melalui PV-202610-0082',
+      },
+    ],
+    attachments: [
+      {
+        id: 'att-seed-av01-1',
+        name: 'Surat_Tugas_dan_Estimasi_Biaya_Audit_Semarang.pdf',
+        size: 274_300,
+        mimeType: 'application/pdf',
+        category: 'OTHER',
+        uploadedAt: '2026-10-28T09:00:00.000Z',
+      },
+      {
+        id: 'att-seed-av01-2',
+        name: 'Bukti_Transfer_Mandiri_AV_202611_0001.pdf',
+        size: 198_400,
+        mimeType: 'application/pdf',
+        category: 'PAYMENT_PROOF',
+        uploadedAt: '2026-10-31T11:00:00.000Z',
       },
     ],
   },
@@ -214,7 +314,7 @@ export const INITIAL_SEED_DOCUMENTS: AnyDocument[] = [
     docNumber: 'RB-202611-0001',
     docType: 'RB',
     title: 'Penggantian Konsumsi Lembur & Jamuan Klien',
-    branch: 'Pusat',
+    branch: 'Bekasi',
     purpose: 'Konsumsi meeting kerja sama leasing lelang',
     status: 'SUBMITTED',
     createdAt: '2026-11-06T14:00:00.000Z',
@@ -254,9 +354,27 @@ export const INITIAL_SEED_DOCUMENTS: AnyDocument[] = [
       {
         id: 'log-seed-rb1',
         timestamp: '2026-11-06T14:00:00.000Z',
-        actor: 'Dewi Pemohon',
+        actor: 'Dewi Lestari (Pemohon)',
         action: 'SUBMIT',
         comment: 'Klaim reimbursement diajukan',
+      },
+    ],
+    attachments: [
+      {
+        id: 'att-seed-rb01-1',
+        name: 'Struk_Konsumsi_Meeting_Leasing_05Nov.jpg',
+        size: 342_000,
+        mimeType: 'image/jpeg',
+        category: 'RECEIPT',
+        uploadedAt: '2026-11-06T14:00:00.000Z',
+      },
+      {
+        id: 'att-seed-rb01-2',
+        name: 'Daftar_Hadir_Peserta_Meeting_Leasing.pdf',
+        size: 156_000,
+        mimeType: 'application/pdf',
+        category: 'OTHER',
+        uploadedAt: '2026-11-06T14:01:00.000Z',
       },
     ],
   },
@@ -266,5 +384,23 @@ export function ensureSeedDataLoaded(storage: Storage): void {
   const existing = storage.getItem(WORKSPACE_STORAGE_KEY);
   if (!existing || existing === '[]') {
     storage.setItem(WORKSPACE_STORAGE_KEY, JSON.stringify(INITIAL_SEED_DOCUMENTS));
+    return;
+  }
+  try {
+    const parsed = JSON.parse(existing) as AnyDocument[];
+    let updated = false;
+    const merged = parsed.map((doc) => {
+      const seedMatch = INITIAL_SEED_DOCUMENTS.find((s) => s.id === doc.id);
+      if (seedMatch && (!doc.attachments || doc.attachments.length === 0) && seedMatch.attachments) {
+        updated = true;
+        return { ...doc, attachments: seedMatch.attachments };
+      }
+      return doc;
+    });
+    if (updated) {
+      storage.setItem(WORKSPACE_STORAGE_KEY, JSON.stringify(merged));
+    }
+  } catch {
+    // Ignore parse errors
   }
 }

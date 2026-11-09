@@ -52,14 +52,6 @@ export const FormPVPayment: React.FC<FormPVPaymentProps> = ({
   return (
     <form onSubmit={handleSubmit} noValidate>
       <div className="form-body">
-        <div className="form-intro">
-          <span>PV</span>
-          <div>
-            <strong>Pencatatan Pembayaran (Payment Voucher)</strong>
-            <p>Konfirmasi eksekusi transfer dana dari rekening perusahaan kepada pihak penerima.</p>
-          </div>
-        </div>
-
         {error && <div className="notice error-notice" role="alert">{error}</div>}
 
         <div className="form-summary-box">
@@ -76,10 +68,9 @@ export const FormPVPayment: React.FC<FormPVPaymentProps> = ({
             <strong>{pv.vendorOrPayeeName}</strong>
           </div>
           <div className="form-summary-row">
-            <span>Rekening Tujuan:</span>
+            <span>Tujuan Pembayaran:</span>
             <span>
-              {pv.beneficiaryBank.bankName} - {pv.beneficiaryBank.accountNumber} (a/n{' '}
-              {pv.beneficiaryBank.accountHolder})
+              {pv.paymentMethod === 'CASH' ? 'Tunai' : `${pv.beneficiaryBank.bankName} - ${pv.beneficiaryBank.accountNumber} (a/n ${pv.beneficiaryBank.accountHolder})`}
             </span>
           </div>
           <div className="form-summary-row">
@@ -98,7 +89,7 @@ export const FormPVPayment: React.FC<FormPVPaymentProps> = ({
 
         <div className="form-grid-2">
           <div>
-            <label htmlFor="pv-paid-date">Tanggal Eksekusi Transfer <span>*</span></label>
+            <label htmlFor="pv-paid-date">Tanggal Pembayaran <span>*</span></label>
             <input
               id="pv-paid-date"
               type="date"
@@ -107,7 +98,7 @@ export const FormPVPayment: React.FC<FormPVPaymentProps> = ({
             />
           </div>
           <div>
-            <label htmlFor="pv-source-bank">Rekening Sumber Perusahaan <span>*</span></label>
+            <label htmlFor="pv-source-bank">Sumber Dana / Rekening Perusahaan <span>*</span></label>
             <input
               id="pv-source-bank"
               value={sourceBank}
@@ -117,7 +108,7 @@ export const FormPVPayment: React.FC<FormPVPaymentProps> = ({
           </div>
         </div>
 
-        <label htmlFor="pv-ref-num">Nomor Referensi Transaksi Bank <span>*</span></label>
+        <label htmlFor="pv-ref-num">Nomor Referensi Pembayaran <span>*</span></label>
         <input
           id="pv-ref-num"
           value={referenceNumber}

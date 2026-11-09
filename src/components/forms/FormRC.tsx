@@ -1,5 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { calculateRcOutcome } from '../../domain/calculations';
+import { addWorkingDays } from '../../domain/working-days';
+import { readAttachment } from '../../lib/read-attachment';
 import type { AVDocument, RCDocument } from '../../types/document';
 
 export interface FormRCProps {
@@ -23,16 +25,16 @@ export const FormRC: React.FC<FormRCProps> = ({
 }) => {
   const [doc, setDoc] = useState<RCDocument>(initialDoc);
   const [realizedStr, setRealizedStr] = useState<string>(
-    String(initialDoc.realizedAmount || '')
+    String(initialDoc.subtotal ?? (initialDoc.realizedAmount || ''))
   );
   const [error, setError] = useState<string>('');
 
   const outcome = useMemo(() => {
     return calculateRcOutcome({
       avOriginalAmount: doc.avOriginalAmount,
-      realizedAmount: Number(realizedStr) || 0,
+      realizedAmount: Math.max(0, (Number(realizedStr) || 0) + (doc.otherCosts ?? 0) - (doc.discount ?? 0)),
     });
-  }, [doc.avOriginalAmount, realizedStr]);
+  }, [doc.avOriginalAmount, doc.otherCosts, doc.discount, realizedStr]);
 
   function handleAvSelect(avId: string) {
     const selectedAv = availableAvs.find((a) => a.id === avId);
@@ -43,6 +45,8 @@ export const FormRC: React.FC<FormRCProps> = ({
         title: `Realisasi AV: ${selectedAv.docNumber} - ${selectedAv.title}`,
         branch: selectedAv.branch,
         avOriginalAmount: selectedAv.amount,
+        activityCompletedDate: selectedAv.activityEndDate ?? prev.activityCompletedDate,
+        submissionDeadline: selectedAv.activityEndDate ? addWorkingDays(selectedAv.activityEndDate, 2) : prev.submissionDeadline,
       }));
     } else {
       setDoc((prev) => ({
@@ -54,10 +58,7 @@ export const FormRC: React.FC<FormRCProps> = ({
   }
 
   function handleDateChange(date: string) {
-    // Tambah 2 hari kerja sebagai batas penyerahan realisasi (H+2)
-    const baseDate = new Date(date);
-    baseDate.setDate(baseDate.getDate() + 2);
-    const deadline = baseDate.toISOString().slice(0, 10);
+    const deadline = addWorkingDays(date, 2);
 
     setDoc((prev) => ({
       ...prev,
@@ -100,23 +101,29 @@ export const FormRC: React.FC<FormRCProps> = ({
 
     onSave({
       ...doc,
+      budgetType: doc.budgetType ?? 'OPEX',
+      subtotal: Number(realizedStr) || 0,
       realizedAmount: outcome.realizedAmount,
       balanceAmount: outcome.balanceAmount,
       outcomeType: outcome.outcomeType,
     });
   }
 
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    let entry;
+    try { entry = await readAttachment(file, 'RECEIPT'); } catch { setError('Berkas tidak dapat dibaca.'); return; }
+    setDoc((prev) => ({
+      ...prev,
+      refundProofUrl: prev.refundProofUrl || file.name,
+      attachments: [...(prev.attachments || []), entry],
+    }));
+  }
+
   return (
     <form onSubmit={handleSubmit} noValidate>
       <div className="form-body">
-        <div className="form-intro">
-          <span>RC</span>
-          <div>
-            <strong>Informasi Realisasi Uang Muka (Realization Cash Advance)</strong>
-            <p>Pertanggungjawaban penggunaan dana uang muka operasional yang telah dicairkan.</p>
-          </div>
-        </div>
-
         {error && <div className="notice error-notice" role="alert">{error}</div>}
 
         <label htmlFor="rc-av-select">Pilih Dokumen Uang Muka (AV) Terbayar <span>*</span></label>
@@ -140,7 +147,7 @@ export const FormRC: React.FC<FormRCProps> = ({
               <input value={rupiah.format(doc.avOriginalAmount)} disabled readOnly />
             </div>
             <div>
-              <label htmlFor="rc-realized">Realisasi Pengeluaran Aktual <span>*</span></label>
+              <label htmlFor="rc-realized">Subtotal Realisasi <span>*</span></label>
               <div className="money">
                 <span>Rp</span>
                 <input
@@ -154,6 +161,12 @@ export const FormRC: React.FC<FormRCProps> = ({
             </div>
           </div>
         )}
+
+        {doc.parentAvId && <div className="form-grid-2">
+          <div><label htmlFor="rc-other">Biaya lain</label><input id="rc-other" type="number" min="0" value={doc.otherCosts ?? 0} onChange={(e) => setDoc({ ...doc, otherCosts: Number(e.target.value) })} /></div>
+          <div><label htmlFor="rc-discount">Diskon</label><input id="rc-discount" type="number" min="0" value={doc.discount ?? 0} onChange={(e) => setDoc({ ...doc, discount: Number(e.target.value) })} /></div>
+          <div><label htmlFor="rc-budget">Tipe anggaran</label><select id="rc-budget" value={doc.budgetType ?? 'OPEX'} onChange={(e) => setDoc({ ...doc, budgetType: e.target.value })}><option value="OPEX">OPEX</option><option value="CAPEX">CAPEX</option><option value="PROJECT">Project</option></select></div>
+        </div>}
 
         {/* Outcome Box */}
         {doc.parentAvId && (
@@ -228,6 +241,13 @@ export const FormRC: React.FC<FormRCProps> = ({
               onChange={(e) => setDoc({ ...doc, refundProofUrl: e.target.value })}
               placeholder="Contoh: Bukti Transfer Kas Masuk #TRF-RETURN-0921"
             />
+            <label htmlFor="rc-refund-file">Berkas bukti pengembalian <span>*</span></label>
+            <input id="rc-refund-file" type="file" accept=".pdf,.png,.jpg,.jpeg" onChange={async (event) => {
+              const file = event.target.files?.[0];
+              if (!file) return;
+              try { const attachment = await readAttachment(file, 'REFUND_PROOF'); setDoc((previous) => ({ ...previous, refundProofUrl: file.name, attachments: [...(previous.attachments ?? []).filter((item) => item.category !== 'REFUND_PROOF'), attachment] })); }
+              catch { setError('Bukti pengembalian tidak dapat dibaca.'); }
+            }} />
           </div>
         )}
 
@@ -291,6 +311,22 @@ export const FormRC: React.FC<FormRCProps> = ({
           </div>
         )}
 
+        <p className="demo-attachment-note">Lampiran disimpan di server lokal saat draf disimpan.</p>
+        <label htmlFor="rc-attachment-file">Lampiran Bukti Realisasi / Setor Sisa Dana</label>
+        <input
+          id="rc-attachment-file"
+          type="file"
+          accept=".pdf,.png,.jpg,.jpeg"
+          onChange={handleFileChange}
+        />
+        {doc.attachments && doc.attachments.length > 0 && (
+          <div className="help" style={{ marginTop: '6px' }}>
+            Terlampir: {doc.attachments.map((a) => `${a.name} (${Math.ceil(a.size / 1024)} KB)`).join(', ')}
+          </div>
+        )}
+
+        <label htmlFor="rc-approver">Email Atasan Langsung <span>*</span></label>
+        <input id="rc-approver" type="email" value={doc.stage1ApproverEmail ?? ''} onChange={(e) => setDoc({ ...doc, stage1ApproverEmail: e.target.value })} placeholder="atasan@blc.co.id" />
         <label htmlFor="rc-purpose">Ringkasan Laporan Realisasi</label>
         <textarea
           id="rc-purpose"

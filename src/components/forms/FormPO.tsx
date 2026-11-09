@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { calculatePoTotal } from '../../domain/calculations';
+import { readAttachment } from '../../lib/read-attachment';
 import type { PODocument, PRDocument } from '../../types/document';
 
 export interface FormPOProps {
@@ -70,14 +71,6 @@ export const FormPO: React.FC<FormPOProps> = ({
       return;
     }
 
-    // Aturan bisnis: Nilai >= Rp 5 juta kategori STANDARD wajib memiliki Parent PR
-    if (calc.totalAmount >= 5_000_000 && doc.poCategory === 'STANDARD' && !doc.parentPrId) {
-      setError(
-        'Untuk pengadaan standar bernilai ≥ Rp 5.000.000, dokumen induk PR (Purchase Request) wajib dipilih.'
-      );
-      return;
-    }
-
     // Aturan bisnis: Jika metode Transfer, wajib rekening bank lengkap
     if (doc.paymentMethod === 'BANK_TRANSFER') {
       const bank = doc.bankDetails;
@@ -89,6 +82,7 @@ export const FormPO: React.FC<FormPOProps> = ({
 
     onSave({
       ...doc,
+      budgetType: doc.budgetType ?? 'OPEX',
       subtotal: calc.subtotal,
       otherCosts: calc.otherCosts,
       discount: calc.discount,
@@ -100,17 +94,20 @@ export const FormPO: React.FC<FormPOProps> = ({
     });
   }
 
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    let entry;
+    try { entry = await readAttachment(file, 'QUOTATION'); } catch { setError('Berkas tidak dapat dibaca.'); return; }
+    setDoc((prev) => ({
+      ...prev,
+      attachments: [...(prev.attachments || []), entry],
+    }));
+  }
+
   return (
     <form onSubmit={handleSubmit} noValidate>
       <div className="form-body">
-        <div className="form-intro">
-          <span>PO</span>
-          <div>
-            <strong>Informasi Pesanan Pembelian (Purchase Order)</strong>
-            <p>Formulir penerbitan pesanan resmi kepada vendor rekanan terpilih.</p>
-          </div>
-        </div>
-
         {error && <div className="notice error-notice" role="alert">{error}</div>}
 
         <label htmlFor="po-pr-select">Rujukan Dokumen Induk (Purchase Request)</label>
@@ -126,6 +123,7 @@ export const FormPO: React.FC<FormPOProps> = ({
             </option>
           ))}
         </select>
+        <p className="help">Periksa kebutuhan PR induk; aturan ambang masih menunggu konfirmasi.</p>
 
         <div className="form-grid-2">
           <div>
@@ -146,6 +144,7 @@ export const FormPO: React.FC<FormPOProps> = ({
             <label htmlFor="po-branch">Cabang <span>*</span></label>
             <input
               id="po-branch"
+              list="branch-options"
               value={doc.branch}
               onChange={(e) => setDoc({ ...doc, branch: e.target.value })}
               placeholder="Contoh: Bandung"
@@ -289,7 +288,7 @@ export const FormPO: React.FC<FormPOProps> = ({
               value={String(ppnRate)}
               onChange={(e) => setPpnRate(Number(e.target.value))}
             >
-              <option value="0.11">11% (Standar Nasional)</option>
+              <option value="0.11">11% efektif (perkiraan)</option>
               <option value="0">0% (Bebas PPN / Non-PKP)</option>
             </select>
           </div>
@@ -334,6 +333,30 @@ export const FormPO: React.FC<FormPOProps> = ({
             <span>{rupiah.format(calc.totalAmount)}</span>
           </div>
         </div>
+
+        <div className="form-grid-2">
+          <div><label htmlFor="po-vendor-code">Kode vendor</label><input id="po-vendor-code" value={doc.vendorCode ?? ''} onChange={(e) => setDoc({ ...doc, vendorCode: e.target.value })} /></div>
+          <div><label htmlFor="po-budget">Tipe anggaran</label><select id="po-budget" value={doc.budgetType ?? 'OPEX'} onChange={(e) => setDoc({ ...doc, budgetType: e.target.value })}><option value="OPEX">OPEX</option><option value="CAPEX">CAPEX</option><option value="PROJECT">Project</option></select></div>
+          <div><label htmlFor="po-payment-terms">Syarat pembayaran</label><input id="po-payment-terms" value={doc.paymentTerms ?? ''} onChange={(e) => setDoc({ ...doc, paymentTerms: e.target.value })} /></div>
+          <div><label htmlFor="po-delivery-terms">Syarat pengiriman</label><input id="po-delivery-terms" value={doc.deliveryTerms ?? ''} onChange={(e) => setDoc({ ...doc, deliveryTerms: e.target.value })} /></div>
+          <div><label htmlFor="po-iam">Nomor IAM</label><input id="po-iam" value={doc.iamNumber ?? ''} onChange={(e) => setDoc({ ...doc, iamNumber: e.target.value })} /></div>
+          <div><label htmlFor="po-contract">Nomor kontrak (jika ada)</label><input id="po-contract" value={doc.contractNumber ?? ''} onChange={(e) => setDoc({ ...doc, contractNumber: e.target.value })} /></div>
+        </div>
+        <label htmlFor="po-approver">Email Atasan Langsung <span>*</span></label>
+        <input id="po-approver" type="email" value={doc.stage1ApproverEmail ?? ''} onChange={(e) => setDoc({ ...doc, stage1ApproverEmail: e.target.value })} placeholder="atasan@blc.co.id" />
+        <p className="demo-attachment-note">Lampiran disimpan di server lokal saat draf disimpan.</p>
+        <label htmlFor="po-attachment-file">Lampiran Penawaran Vendor (Quotation)</label>
+        <input
+          id="po-attachment-file"
+          type="file"
+          accept=".pdf,.png,.jpg,.jpeg"
+          onChange={handleFileChange}
+        />
+        {doc.attachments && doc.attachments.length > 0 && (
+          <div className="help" style={{ marginTop: '6px' }}>
+            Terlampir: {doc.attachments.map((a) => `${a.name} (${Math.ceil(a.size / 1024)} KB)`).join(', ')}
+          </div>
+        )}
       </div>
 
       <div className="form-actions">

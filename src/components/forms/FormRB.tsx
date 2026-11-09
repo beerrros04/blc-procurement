@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import type { RBDocument } from '../../types/document';
+import { readAttachment } from '../../lib/read-attachment';
+import { calculatePoTotal } from '../../domain/calculations';
+import { TaxFields } from './TaxFields';
 
 export interface FormRBProps {
   initialDoc: RBDocument;
@@ -24,7 +27,8 @@ export const FormRB: React.FC<FormRBProps> = ({ initialDoc, onSave, onClose }) =
   const subtotal = Number(subtotalStr) || 0;
   const otherCosts = Number(otherCostsStr) || 0;
   const discount = Number(discountStr) || 0;
-  const total = Math.max(0, subtotal + otherCosts - discount);
+  const calc = calculatePoTotal({ subtotal, otherCosts, discount, ppnRate: doc.ppnRate ?? 0, pphRate: doc.pphRate ?? 0 });
+  const total = calc.totalAmount;
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -46,32 +50,40 @@ export const FormRB: React.FC<FormRBProps> = ({ initialDoc, onSave, onClose }) =
     }
 
     const bank = doc.beneficiaryBank;
-    if (!bank.bankName.trim() || !bank.accountNumber.trim() || !bank.accountHolder.trim()) {
+    if ((doc.paymentMethod ?? 'BANK_TRANSFER') === 'BANK_TRANSFER' && (!bank.bankName.trim() || !bank.accountNumber.trim() || !bank.accountHolder.trim())) {
       setError('Rekening bank penerima penggantian biaya wajib diisi lengkap.');
       return;
     }
 
     onSave({
       ...doc,
+      budgetType: doc.budgetType ?? 'OPEX',
+      paymentMethod: doc.paymentMethod ?? 'BANK_TRANSFER',
       subtotal,
       otherCosts,
       discount,
       totalAmount: total,
+      ppnAmount: calc.ppnAmount,
+      pphAmount: calc.pphAmount,
       attachmentCount,
+    });
+  }
+
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    let entry;
+    try { entry = await readAttachment(file, 'RECEIPT'); } catch { setError('Berkas tidak dapat dibaca.'); return; }
+    setDoc((prev) => {
+      const next = [...(prev.attachments || []), entry];
+      setAttachmentCount(Math.max(attachmentCount, next.length));
+      return { ...prev, attachments: next };
     });
   }
 
   return (
     <form onSubmit={handleSubmit} noValidate>
       <div className="form-body">
-        <div className="form-intro">
-          <span>RB</span>
-          <div>
-            <strong>Informasi Penggantian Biaya (Reimbursement)</strong>
-            <p>Formulir klaim penggantian biaya operasional yang telah ditalangi karyawan.</p>
-          </div>
-        </div>
-
         {error && <div className="notice error-notice" role="alert">{error}</div>}
 
         <label htmlFor="rb-title">Judul Klaim Reimbursement <span>*</span></label>
@@ -87,6 +99,7 @@ export const FormRB: React.FC<FormRBProps> = ({ initialDoc, onSave, onClose }) =
             <label htmlFor="rb-branch">Cabang <span>*</span></label>
             <input
               id="rb-branch"
+              list="branch-options"
               value={doc.branch}
               onChange={(e) => setDoc({ ...doc, branch: e.target.value })}
               placeholder="Contoh: Surabaya"
@@ -157,6 +170,15 @@ export const FormRB: React.FC<FormRBProps> = ({ initialDoc, onSave, onClose }) =
           </div>
         </div>
 
+        <TaxFields prefix="rb" values={doc} onChange={(values) => setDoc({ ...doc, ...values })} />
+        <p className="help">PPN Rp {calc.ppnAmount.toLocaleString('id-ID')} · PPh Rp {calc.pphAmount.toLocaleString('id-ID')} · Perkiraan total Rp {calc.totalAmount.toLocaleString('id-ID')}</p>
+        <div className="form-grid-2">
+          <div><label htmlFor="rb-budget">Tipe anggaran</label><select id="rb-budget" value={doc.budgetType ?? 'OPEX'} onChange={(e) => setDoc({ ...doc, budgetType: e.target.value })}><option value="OPEX">OPEX</option><option value="CAPEX">CAPEX</option><option value="PROJECT">Project</option></select></div>
+          <div><label htmlFor="rb-due">Tanggal jatuh tempo</label><input id="rb-due" type="date" value={doc.paymentDueDate ?? ''} onChange={(e) => setDoc({ ...doc, paymentDueDate: e.target.value })} /></div>
+          <div><label htmlFor="rb-vendor">Nama toko / vendor</label><input id="rb-vendor" value={doc.vendorName ?? ''} onChange={(e) => setDoc({ ...doc, vendorName: e.target.value })} /></div>
+        </div>
+        <label htmlFor="rb-approver">Email Atasan Langsung <span>*</span></label>
+        <input id="rb-approver" type="email" value={doc.stage1ApproverEmail ?? ''} onChange={(e) => setDoc({ ...doc, stage1ApproverEmail: e.target.value })} placeholder="atasan@blc.co.id" />
         <label htmlFor="rb-purpose">Keterangan Aktivitas</label>
         <textarea
           id="rb-purpose"
@@ -166,7 +188,9 @@ export const FormRB: React.FC<FormRBProps> = ({ initialDoc, onSave, onClose }) =
           placeholder="Jelaskan keperluan pengeluaran..."
         />
 
-        <div className="form-summary-box">
+        <label htmlFor="rb-payment-method">Metode pembayaran</label>
+        <select id="rb-payment-method" value={doc.paymentMethod ?? 'BANK_TRANSFER'} onChange={(e) => setDoc({ ...doc, paymentMethod: e.target.value as 'BANK_TRANSFER' | 'CASH' })}><option value="BANK_TRANSFER">Transfer bank</option><option value="CASH">Tunai</option></select>
+        {(doc.paymentMethod ?? 'BANK_TRANSFER') === 'BANK_TRANSFER' && <div className="form-summary-box">
           <strong>Rekening Karyawan (Penerima Transfer Reimburse)</strong>
           <div className="form-grid-3" style={{ marginTop: '10px' }}>
             <div>
@@ -212,7 +236,7 @@ export const FormRB: React.FC<FormRBProps> = ({ initialDoc, onSave, onClose }) =
               />
             </div>
           </div>
-        </div>
+        </div>}
 
         <div className="form-grid-2">
           <div>
@@ -225,9 +249,20 @@ export const FormRB: React.FC<FormRBProps> = ({ initialDoc, onSave, onClose }) =
               onChange={(e) => setAttachmentCount(Math.max(1, Number(e.target.value) || 1))}
             />
           </div>
-          <div className="form-callout form-callout-info" style={{ marginTop: '24px' }}>
-            <strong>Aturan Bukti:</strong>
-            <p>Bukti kuitansi wajib pindaian scan/foto berwarna jelas dan terbaca nominalnya.</p>
+          <div>
+            <p className="demo-attachment-note">Lampiran disimpan di server lokal saat draf disimpan.</p>
+            <label htmlFor="rb-attachment-file">Unggah Bukti Kuitansi / Struk</label>
+            <input
+              id="rb-attachment-file"
+              type="file"
+              accept=".pdf,.png,.jpg,.jpeg"
+              onChange={handleFileChange}
+            />
+            {doc.attachments && doc.attachments.length > 0 && (
+              <div className="help" style={{ marginTop: '6px' }}>
+                Terlampir: {doc.attachments.map((a) => `${a.name} (${Math.ceil(a.size / 1024)} KB)`).join(', ')}
+              </div>
+            )}
           </div>
         </div>
       </div>

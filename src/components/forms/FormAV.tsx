@@ -1,18 +1,23 @@
 import React, { useState } from 'react';
-import type { AVDocument } from '../../types/document';
+import type { AVDocument, PODocument } from '../../types/document';
+import { calculatePoTotal } from '../../domain/calculations';
+import { TaxFields } from './TaxFields';
+import { readAttachment } from '../../lib/read-attachment';
 
 export interface FormAVProps {
   initialDoc: AVDocument;
+  availablePos: PODocument[];
   onSave: (doc: AVDocument) => void;
   onClose: () => void;
 }
 
-export const FormAV: React.FC<FormAVProps> = ({ initialDoc, onSave, onClose }) => {
+export const FormAV: React.FC<FormAVProps> = ({ initialDoc, availablePos, onSave, onClose }) => {
   const [doc, setDoc] = useState<AVDocument>(initialDoc);
-  const [amountStr, setAmountStr] = useState<string>(String(initialDoc.amount || ''));
+  const [amountStr, setAmountStr] = useState<string>(String(initialDoc.subtotal ?? (initialDoc.amount || '')));
   const [error, setError] = useState<string>('');
 
   const amount = Number(amountStr) || 0;
+  const calc = calculatePoTotal({ subtotal: amount, otherCosts: doc.otherCosts, discount: doc.discount, ppnRate: doc.ppnRate ?? 0, pphRate: doc.pphRate ?? 0 });
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -22,6 +27,10 @@ export const FormAV: React.FC<FormAVProps> = ({ initialDoc, onSave, onClose }) =
     }
     if (!doc.activityDate) {
       setError('Tanggal kegiatan operasional wajib diisi.');
+      return;
+    }
+    if (!doc.activityEndDate) {
+      setError('Tanggal selesai kegiatan wajib diisi.');
       return;
     }
     if (!doc.paymentDueDate) {
@@ -42,22 +51,24 @@ export const FormAV: React.FC<FormAVProps> = ({ initialDoc, onSave, onClose }) =
 
     onSave({
       ...doc,
-      amount,
+      budgetType: doc.budgetType ?? 'OPEX',
+      subtotal: calc.subtotal, amount: calc.totalAmount, ppnAmount: calc.ppnAmount, pphAmount: calc.pphAmount,
     });
   }
 
   return (
     <form onSubmit={handleSubmit} noValidate>
       <div className="form-body">
-        <div className="form-intro">
-          <span>AV</span>
-          <div>
-            <strong>Informasi Uang Muka (Cash Advance)</strong>
-            <p>Formulir permohonan uang muka kegiatan operasional atau perjalanan dinas.</p>
-          </div>
-        </div>
-
         {error && <div className="notice error-notice" role="alert">{error}</div>}
+
+        <label htmlFor="av-parent-po">PO terkait (jika ada)</label>
+        <select id="av-parent-po" value={doc.parentPoId ?? ''} onChange={(e) => {
+          const po = availablePos.find((item) => item.id === e.target.value);
+          setDoc({ ...doc, parentPoId: po?.id, branch: po?.branch ?? doc.branch, purpose: doc.purpose || po?.purpose || '', budgetType: doc.budgetType || po?.budgetType, vendorName: doc.vendorName || po?.vendorName });
+        }}>
+          <option value="">Tanpa PO</option>
+          {availablePos.map((po) => <option key={po.id} value={po.id}>{po.docNumber} — {po.title}</option>)}
+        </select>
 
         <label htmlFor="av-title">Judul Pengajuan Uang Muka <span>*</span></label>
         <input
@@ -72,6 +83,7 @@ export const FormAV: React.FC<FormAVProps> = ({ initialDoc, onSave, onClose }) =
             <label htmlFor="av-branch">Cabang <span>*</span></label>
             <input
               id="av-branch"
+              list="branch-options"
               value={doc.branch}
               onChange={(e) => setDoc({ ...doc, branch: e.target.value })}
               placeholder="Contoh: Semarang"
@@ -116,7 +128,10 @@ export const FormAV: React.FC<FormAVProps> = ({ initialDoc, onSave, onClose }) =
           </div>
         </div>
 
-        <label htmlFor="av-amount">Nominal Uang Muka Yang Diminta <span>*</span></label>
+        <label htmlFor="av-end-date">Tanggal Selesai Kegiatan <span>*</span></label>
+        <input id="av-end-date" type="date" value={doc.activityEndDate ?? ''} onChange={(e) => setDoc({ ...doc, activityEndDate: e.target.value })} />
+
+        <label htmlFor="av-amount">Subtotal Uang Muka Sebelum Pajak <span>*</span></label>
         <div className="money">
           <span>Rp</span>
           <input
@@ -128,6 +143,26 @@ export const FormAV: React.FC<FormAVProps> = ({ initialDoc, onSave, onClose }) =
           />
         </div>
 
+        <div className="form-grid-2">
+          <div><label htmlFor="av-other">Biaya lain</label><input id="av-other" type="number" min="0" value={doc.otherCosts ?? 0} onChange={(e) => setDoc({ ...doc, otherCosts: Number(e.target.value) })} /></div>
+          <div><label htmlFor="av-discount">Diskon</label><input id="av-discount" type="number" min="0" value={doc.discount ?? 0} onChange={(e) => setDoc({ ...doc, discount: Number(e.target.value) })} /></div>
+        </div>
+        <TaxFields prefix="av" values={doc} onChange={(values) => setDoc({ ...doc, ...values })} />
+        <p className="help">PPN Rp {calc.ppnAmount.toLocaleString('id-ID')} · PPh Rp {calc.pphAmount.toLocaleString('id-ID')} · Perkiraan total Rp {calc.totalAmount.toLocaleString('id-ID')}</p>
+        <div className="form-grid-2">
+          <div><label htmlFor="av-budget">Tipe anggaran</label><select id="av-budget" value={doc.budgetType ?? 'OPEX'} onChange={(e) => setDoc({ ...doc, budgetType: e.target.value })}><option value="OPEX">OPEX</option><option value="CAPEX">CAPEX</option><option value="PROJECT">Project</option></select></div>
+          <div><label htmlFor="av-vendor">Penerima / vendor</label><input id="av-vendor" value={doc.vendorName ?? ''} onChange={(e) => setDoc({ ...doc, vendorName: e.target.value })} /></div>
+        </div>
+
+        <label htmlFor="av-attachment">Lampiran pendukung</label>
+        <input id="av-attachment" type="file" accept=".pdf,.png,.jpg,.jpeg" onChange={async (event) => {
+          const file = event.target.files?.[0];
+          if (!file) return;
+          try { const attachment = await readAttachment(file, 'OTHER'); setDoc((previous) => ({ ...previous, attachments: [...(previous.attachments ?? []), attachment] })); }
+          catch { setError('Berkas tidak dapat dibaca.'); }
+        }} />
+        <label htmlFor="av-approver">Email Atasan Langsung <span>*</span></label>
+        <input id="av-approver" type="email" value={doc.stage1ApproverEmail ?? ''} onChange={(e) => setDoc({ ...doc, stage1ApproverEmail: e.target.value })} placeholder="atasan@blc.co.id" />
         <label htmlFor="av-purpose">Rincian Tujuan & Keperluan Penggunaan Dana</label>
         <textarea
           id="av-purpose"
