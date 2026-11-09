@@ -186,9 +186,9 @@
     "semantic_hash": "7237c336c4b6b95bd0be1ff96b09582d"
   },
   "src/components/ApprovalStepper.tsx": {
-    "mtime": 1794225987.7072315,
-    "seen": 1794231444.9927855,
-    "ast_hash": "5db392a3c0b56466d27b5341cb30df3e",
+    "mtime": 1794232889.7496912,
+    "seen": 1794234270.841496,
+    "ast_hash": "b38fc245c49abe6f58898c61d926f73f",
     "semantic_hash": ""
   },
   "src/components/DocumentDetailModal.tsx": {
@@ -468,9 +468,9 @@
     "semantic_hash": ""
   },
   "server/repository.ts": {
-    "mtime": 1794228306.7896383,
-    "seen": 1794231444.992773,
-    "ast_hash": "ff90f8b82e5ed9431e012772b1dbcd20",
+    "mtime": 1794232902.952769,
+    "seen": 1794234270.8408995,
+    "ast_hash": "86ac85271cb66a11b0723942c65b86a6",
     "semantic_hash": ""
   },
   "server/server.test.ts": {
@@ -540,15 +540,15 @@
     "semantic_hash": ""
   },
   "src/components/ApprovalProgress.test.tsx": {
-    "mtime": 1794227681.9454255,
-    "seen": 1794231444.9927816,
-    "ast_hash": "946b598ad5aa507ebb84e4b6d13ef0f6",
+    "mtime": 1794233580.6451175,
+    "seen": 1794234270.841491,
+    "ast_hash": "9f91d13f037cee391734cd92103d96d4",
     "semantic_hash": ""
   },
   "src/components/ApprovalProgress.tsx": {
-    "mtime": 1794227298.1961088,
-    "seen": 1794231444.992783,
-    "ast_hash": "0976790c88477b6e9dbae1ca9a24130d",
+    "mtime": 1794232885.0913174,
+    "seen": 1794234270.8414936,
+    "ast_hash": "711c13830b7cc3036f071654c174af5f",
     "semantic_hash": ""
   },
   "src/components/BentoMetrics.test.tsx": {
@@ -666,9 +666,9 @@
     "semantic_hash": ""
   },
   "src/style.test.ts": {
-    "mtime": 1794225987.7292633,
-    "seen": 1794231444.9928546,
-    "ast_hash": "40a90e47ce30ee4f7ed3c61092532722",
+    "mtime": 1794234021.4506059,
+    "seen": 1794234270.8471675,
+    "ast_hash": "002d3dca5e2b6c11066b4f979ebbabcd",
     "semantic_hash": ""
   },
   ".superpowers/sdd/elera-overhaul/progress.md": {
@@ -702,9 +702,9 @@
     "semantic_hash": ""
   },
   "src/components/DocumentDetailModal.test.tsx": {
-    "mtime": 1794225987.7092364,
-    "seen": 1794231444.9927905,
-    "ast_hash": "b4c51a94677a7bec061dadd6a301ea14",
+    "mtime": 1794234050.8546133,
+    "seen": 1794234270.8417962,
+    "ast_hash": "03454c4f8adf7245911baa7df07934c5",
     "semantic_hash": ""
   },
   "src/components/register-filter.test.ts": {
@@ -720,21 +720,21 @@
     "semantic_hash": ""
   },
   "src/components/ui/progress-indicator.tsx": {
-    "mtime": 1794227674.728418,
-    "seen": 1794231444.9928238,
-    "ast_hash": "2fd11b8c65112350ab458605ab90325f",
+    "mtime": 1794233447.2335122,
+    "seen": 1794234270.8446891,
+    "ast_hash": "ec2ef1998dbaf301e736f111f8d6f01c",
     "semantic_hash": ""
   },
   "src/domain/display-name.test.ts": {
-    "mtime": 1794228150.7387426,
-    "seen": 1794231444.9928331,
-    "ast_hash": "41c4bfa276ec43227c09e71de5d9025e",
+    "mtime": 1794232924.9035907,
+    "seen": 1794234270.8454263,
+    "ast_hash": "b1f975a677f921de1b50740e2fa16492",
     "semantic_hash": ""
   },
   "src/domain/display-name.ts": {
-    "mtime": 1794228189.610028,
-    "seen": 1794231444.9928346,
-    "ast_hash": "66067281d8fc6b6e66843da624852099",
+    "mtime": 1794232879.1335566,
+    "seen": 1794234270.8454287,
+    "ast_hash": "445195089caf324183448590a1f21a01",
     "semantic_hash": ""
   },
   "docs/superpowers/plans/2026-11-09-rencana-feedback-ui-dan-progress.md": {
@@ -867,6 +867,54 @@
     "mtime": 1794226872.611769,
     "seen": 1794231444.9929185,
     "ast_hash": "22b1be142480bfa6c7f0faf27e0c455f",
+    "semantic_hash": ""
+  },
+  ".superpowers/sdd/approval-stepper-and-document-list-remediation/progress.md": {
+    "mtime": 1794234143.9901412,
+    "seen": 1794234270.8479106,
+    "ast_hash": "639c57edc24b1ae631a7c3e3281154a5",
+    "semantic_hash": ""
+  },
+  ".superpowers/sdd/approval-stepper-and-document-list-remediation/task-1-brief.md": {
+    "mtime": 1794232477.02396,
+    "seen": 1794234270.8479133,
+    "ast_hash": "9362b7611e225340f8229ffd0092a559",
+    "semantic_hash": ""
+  },
+  ".superpowers/sdd/approval-stepper-and-document-list-remediation/task-1-report.md": {
+    "mtime": 1794233060.73971,
+    "seen": 1794234270.8479147,
+    "ast_hash": "6a6f1fd5ff37ddac04a6b01f93717d8b",
+    "semantic_hash": ""
+  },
+  ".superpowers/sdd/approval-stepper-and-document-list-remediation/task-2-brief.md": {
+    "mtime": 1794233095.4879475,
+    "seen": 1794234270.8479166,
+    "ast_hash": "1771bc02e50a6728e8a43e389e2ef210",
+    "semantic_hash": ""
+  },
+  ".superpowers/sdd/approval-stepper-and-document-list-remediation/task-2-report.md": {
+    "mtime": 1794233673.5458064,
+    "seen": 1794234270.8479183,
+    "ast_hash": "29c78c2889caab37d5d2c3ce037429da",
+    "semantic_hash": ""
+  },
+  ".superpowers/sdd/approval-stepper-and-document-list-remediation/task-3-brief.md": {
+    "mtime": 1794233711.1320128,
+    "seen": 1794234270.8479202,
+    "ast_hash": "925f9a7e73757afd931a2bef68657d90",
+    "semantic_hash": ""
+  },
+  ".superpowers/sdd/approval-stepper-and-document-list-remediation/task-3-report.md": {
+    "mtime": 1794234129.825662,
+    "seen": 1794234270.847922,
+    "ast_hash": "6ac2f0eb54e5b7dbad9f6427dcbb53ca",
+    "semantic_hash": ""
+  },
+  "docs/superpowers/plans/2026-11-09-approval-stepper-and-document-list-remediation.md": {
+    "mtime": 1794232455.0397203,
+    "seen": 1794234270.8530736,
+    "ast_hash": "997527d0e18514e9473ca27338607437",
     "semantic_hash": ""
   },
   "package-lock.json": {
