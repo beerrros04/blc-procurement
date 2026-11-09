@@ -1,5 +1,6 @@
 import { StrictMode, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
+import { AnimatePresence } from 'framer-motion';
 import {
   Banknote,
   BookOpen,
@@ -411,7 +412,12 @@ export function Sidebar({
   const initials = getUserInitials(displayName);
 
   return (
-    <aside className={`sidebar ${sidebarCollapsed ? 'is-collapsed' : ''}`}>
+    <aside
+      className={`sidebar ${sidebarCollapsed ? 'is-collapsed' : ''}`}
+      style={{
+        transition: 'width 0.25s cubic-bezier(0.2, 0, 0, 1)',
+      }}
+    >
       <div className="server-status">Mode uji · Data tersimpan di server lokal</div>
       <div className="brand">
         <div className="brand-main">
@@ -448,6 +454,23 @@ export function Sidebar({
         {mobileMenuOpen ? <X size={18} aria-hidden="true" /> : <Menu size={18} aria-hidden="true" />}
         <span>{mobileMenuOpen ? 'Tutup menu navigasi' : 'Buka menu navigasi'}</span>
       </button>
+
+      {mobileMenuOpen && (
+        <div
+          className="mobile-drawer-backdrop"
+          aria-hidden="true"
+          onClick={() => setMobileMenuOpen(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.4)',
+            backdropFilter: 'blur(2px)',
+            WebkitBackdropFilter: 'blur(2px)',
+            zIndex: 998,
+          }}
+        />
+      )}
+
       <div id="main-navigation" className={`sidebar-navigation ${mobileMenuOpen ? 'is-open' : ''}`}>
         {/* Section: OPERATIONS (Elera Architecture per User Specification) */}
         <div className="nav-label">OPERATIONS</div>
@@ -472,6 +495,12 @@ export function Sidebar({
                 className={isActive ? 'nav-active' : ''}
                 aria-current={isActive ? 'page' : undefined}
                 title={item.label}
+                style={{
+                  position: 'relative',
+                  borderLeft: isActive ? '3px solid #DC2626' : '3px solid transparent',
+                  background: isActive ? '#FEF2F2' : undefined,
+                  transition: 'background-color 0.15s ease, border-color 0.15s ease',
+                }}
                 onClick={(e) => {
                   e.preventDefault();
                   setActiveTab(item.tab);
@@ -506,6 +535,12 @@ export function Sidebar({
                 className={isActive ? 'nav-active' : ''}
                 aria-current={isActive ? 'page' : undefined}
                 title={item.label}
+                style={{
+                  position: 'relative',
+                  borderLeft: isActive ? '3px solid #DC2626' : '3px solid transparent',
+                  background: isActive ? '#FEF2F2' : undefined,
+                  transition: 'background-color 0.15s ease, border-color 0.15s ease',
+                }}
                 onClick={(e) => {
                   e.preventDefault();
                   setActiveTab(item.id);
@@ -1300,12 +1335,14 @@ export function App() {
         />
       )}
 
-      {isExportOpen && (
-        <ExportModal
-          documents={documents}
-          onClose={() => setIsExportOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {isExportOpen && (
+          <ExportModal
+            documents={documents}
+            onClose={() => setIsExportOpen(false)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
