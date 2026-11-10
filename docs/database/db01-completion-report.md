@@ -95,4 +95,4 @@ SHA256      570D12A1A797C19EF0E19AFDBD16B4617A85707C3A02FCE62920E36ECBD050FF    
 Sesuai instruksi otorisasi Product Owner:
 > **Persetujuan ini hanya mencakup pekerjaan DB-01. Production database dan DB-02 sampai DB-06 tetap LOCKED.**
 
-Implementasi DB-01 telah selesai seutuhnya dan diverifikasi secara independen. Sistem berhenti pada tahap ini dan menunggu instruksi serta otorisasi resmi dari Product Owner sebelum membuka fase berikutnya (**DB-02 — Centralized Vendor Master**).
+Implementasi DB-01 telah selesai seutuhnya dan diverifikasi secara independen. Sistem berhenti pada tahap ini dan menunggu instruksi serta otorisasi resmi dari Product Owner sebelum membuka fase berikutnya (**DB-02: Organizational Integrity**).

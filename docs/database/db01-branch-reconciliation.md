@@ -55,10 +55,31 @@ Sesuai aturan ketat ADR-DB-002 dan larangan menebak cabang:
 | `usr-hery-01` | Pak Hery | `BOD_HERY` | `hery@blc.co.id` | Bekasi | `brc-bks` | `UNVERIFIED` | Terpetakan pasti |
 | `usr-hashimoto-01` | Mr. Hashimoto | `BOD_HASHIMOTO` | `hashimoto@blc.co.id` | Bekasi | `brc-bks` | `UNVERIFIED` | Terpetakan pasti |
 
-### Rekonsiliasi Akun Tidak Terpetakan (Unmapped Accounts)
+### Rekonsiliasi Akun Tidak Terpetakan & Integritas Pemetaan (VERIFY-02)
 
-- **Jumlah akun tanpa pemetaan pasti:** 0 akun pada seed data operasional.
-- **Kebijakan Akun Baru/Lama:** Jika terdapat akun warisan tanpa cabang valid atau di luar daftar 7 cabang terkonfirmasi, kolom `primary_branch_id` tetap bernilai `NULL` sampai Admin menetapkan cabang resmi via endpoint `/api/v1/organization/users/:id`. Sistem menolak pengisian dummy atau tebakan otomatis.
+| Metrik Rekonsiliasi Akun | Jumlah Akun | Catatan Teknis |
+|---|---|---|
+| **Berhasil Dipetakan (Mapped)** | **7** | Seluruh akun operasional bawaan (`SEEDED_USERS`) terpetakan 100% ke cabang terverifikasi. |
+| **Pending Rekonsiliasi (`PENDING_RECONCILIATION`)** | **0** | Tidak ada akun yang tertunda pada baseline seed operasional. |
+| **Konflik Data (`CONFLICT`)** | **0** | Tidak ada ambiguitas atau multi-branch assignment. |
+
+### Kebijakan & Pembuktian Bebas Silent Default Assignment
+
+1. **Perlakuan Terhadap Akun Tanpa Cabang Valid:**
+   Jika ditemukan akun warisan tanpa cabang valid atau di luar daftar cabang terkonfirmasi:
+   - Kolom `primary_branch_id` tetap bernilai `NULL`.
+   - Sistem **TIDAK** mengisi nilai default (seperti otomatis menetapkan 'Bekasi' atau cabang pertama).
+   - Pengguna dengan `primary_branch_id = NULL` tetap berstatus `UNVERIFIED` sampai Admin secara eksplisit menetapkan cabang yang sah melalui endpoint `/api/v1/organization/users/:id`.
+
+2. **Bukti Kode Bebas Tebakan Otomatis:**
+   Pada [`server/organization.ts`](file:///C:/Users/Bernard/Documents/personal's%20project/BLC/server/organization.ts):
+   ```ts
+   const primaryBranchId = LEGACY_BRANCH_MAPPING[u.branch] ?? null;
+   ```
+   Nilai default yang digunakan jika nama cabang tidak cocok dengan kamus deterministik adalah strictly `null`. Tidak ada interpolasi string, tebakan email, atau fallback silent assignment.
+
+3. **Bukti Pengujian:**
+   Unit test `server/organization.test.ts` (T03) memvalidasi bahwa pembuatan atau pembaruan pengguna hanya dapat mengaitkan cabang yang benar-benar ada di master `branches` dan berstatus `ACTIVE`. Permintaan penugasan cabang `INACTIVE` atau cabang fiktif langsung digagalkan dengan HTTP 422 `BRANCH_INACTIVE` atau HTTP 404 `BRANCH_NOT_FOUND`.
 
 ---
 

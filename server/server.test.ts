@@ -1090,6 +1090,44 @@ describe('BLC Procurement Production Backend API & Domain Rules', () => {
       });
       expect(reactRes.status).toBe(200);
       expect((await reactRes.json()).branch.status).toBe('ACTIVE');
+
+      // VERIFY-01 Concurrency & Submission Guard:
+      // Create a draft document while branch is ACTIVE
+      const draftRes = await apiCall('/api/v1/documents', {
+        method: 'POST',
+        token: applicantToken,
+        body: { docType: 'PR', title: 'Draft Dokumen Jogja', branch: 'Yogyakarta' },
+      });
+      expect(draftRes.status).toBe(201);
+      const draftId = (await draftRes.json()).document.id;
+
+      // Deactivation is now blocked because draft exists
+      const deactDraftBlock = await apiCall(`/api/v1/branches/${jogja.id}/deactivate`, {
+        method: 'POST',
+        token: adminToken,
+      });
+      expect(deactDraftBlock.status).toBe(409);
+
+      // Force deactivate at repo level to test submit guard on inactive branch
+      app.branchRepo.deactivateBranch(jogja.id, 'usr-admin-01');
+
+      // Submitting draft on deactivated branch is rejected with 422 BRANCH_INACTIVE
+      const submitInactiveRes = await apiCall(`/api/v1/documents/${draftId}/submit`, {
+        method: 'POST',
+        token: applicantToken,
+        body: { supervisorUserId: 'usr-atasan-01' },
+      });
+      expect(submitInactiveRes.status).toBe(422);
+      expect((await submitInactiveRes.json()).code).toBe('BRANCH_INACTIVE');
+
+      // PUT branch by code works (Minor #4 fix)
+      const putByCode = await apiCall(`/api/v1/branches/JOG`, {
+        method: 'PUT',
+        token: adminToken,
+        body: { address: 'Jl. Malioboro No. 99, DIY' },
+      });
+      expect(putByCode.status).toBe(200);
+      expect((await putByCode.json()).branch.address).toBe('Jl. Malioboro No. 99, DIY');
     });
   });
 });

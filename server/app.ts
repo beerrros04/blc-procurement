@@ -441,37 +441,90 @@ export function createAppServer(options?: AppServerOptions): BLCAppServer {
         }>(req);
         const idempotencyKey = req.headers.get('idempotency-key') || undefined;
 
-        if (stageEngineEnabled && stageEngine) {
-          if (submission.docType === 'GR') {
-            const submitted = repo.submitDocument(docId, user.fullName, {
-              expectedVersion: body.expectedVersion,
-              idempotencyKey,
-            });
-            return jsonResponse({ document: visibleDocument(user, submitted) }, 200);
+        const targetBranch = submission.branch;
+        const resolvedBranch = targetBranch && targetBranch !== '*'
+          ? (branchRepo.getBranchByName(targetBranch) || branchRepo.getBranchByCode(targetBranch) || branchRepo.getBranchById(targetBranch))
+          : null;
+        const lockKey = resolvedBranch ? resolvedBranch.code : (targetBranch || 'default');
+
+        return await branchConcurrency.withBranchReadLock(lockKey, async () => {
+          if (resolvedBranch) {
+            const fresh = branchRepo.getBranchById(resolvedBranch.id);
+            if (fresh && fresh.status === 'INACTIVE') {
+              throw new DomainError('Cabang sedang tidak aktif dan tidak dapat memproses pengajuan dokumen.', 422, 'BRANCH_INACTIVE');
+            }
           }
 
-          if (submission.docType === 'PV') {
-            if (user.role !== 'KEUANGAN') {
-              throw new DomainError('Hanya peran KEUANGAN yang dapat mengajukan Payment Voucher.', 403, 'FORBIDDEN_ROLE');
+          if (stageEngineEnabled && stageEngine) {
+            if (submission.docType === 'GR') {
+              const submitted = repo.submitDocument(docId, user.fullName, {
+                expectedVersion: body.expectedVersion,
+                idempotencyKey,
+              });
+              return jsonResponse({ document: visibleDocument(user, submitted) }, 200);
             }
-            if (submission.sourceDocId) {
-              const parentDoc = repo.getDocumentById(submission.sourceDocId);
-              if (parentDoc.status !== 'APPROVED') {
-                throw new DomainError('Dokumen induk PO/AV/RB harus disetujui sebelum mengajukan PV.', 422, 'PARENT_DOCUMENT_NOT_APPROVED');
+
+            if (submission.docType === 'PV') {
+              if (user.role !== 'KEUANGAN') {
+                throw new DomainError('Hanya peran KEUANGAN yang dapat mengajukan Payment Voucher.', 403, 'FORBIDDEN_ROLE');
+              }
+              if (submission.sourceDocId) {
+                const parentDoc = repo.getDocumentById(submission.sourceDocId);
+                if (parentDoc.status !== 'APPROVED') {
+                  throw new DomainError('Dokumen induk PO/AV/RB harus disetujui sebelum mengajukan PV.', 422, 'PARENT_DOCUMENT_NOT_APPROVED');
+                }
+              }
+              if (!options?.organization) {
+                throw new DomainError('Penyimpanan organisasi belum dikonfigurasi.', 503, 'ORGANIZATION_UNAVAILABLE');
+              }
+              stageEngine.createSubmissionWorkflow(
+                {
+                  documentId: docId,
+                  docType: submission.docType,
+                  docNumber: submission.docNumber,
+                  applicantUserId: user.id,
+                },
+                options.organization
+              );
+              const submitted = repo.submitDocument(docId, user.fullName, {
+                expectedVersion: body.expectedVersion,
+                idempotencyKey,
+              });
+              return jsonResponse({ document: visibleDocument(user, submitted) }, 200);
+            }
+
+            // PR, PO, AV, RB
+            let supervisorUserId = body.supervisorUserId?.trim();
+            if (!supervisorUserId && submission.stage1ApproverEmail && options?.organization) {
+              const matched = options.organization.listUsers().find(
+                (u) => u.email.toLowerCase() === submission.stage1ApproverEmail?.toLowerCase()
+              );
+              if (matched) {
+                supervisorUserId = matched.id;
               }
             }
+
+            if (!supervisorUserId) {
+              throw new DomainError('Pilih atasan langsung yang memiliki penugasan sah.', 422, 'SUPERVISOR_REQUIRED');
+            }
+
             if (!options?.organization) {
               throw new DomainError('Penyimpanan organisasi belum dikonfigurasi.', 503, 'ORGANIZATION_UNAVAILABLE');
             }
+
+            // Create submission workflow in stageEngine - validates organizational assignment and identity
             stageEngine.createSubmissionWorkflow(
               {
                 documentId: docId,
                 docType: submission.docType,
                 docNumber: submission.docNumber,
+                unitId: body.unitId,
                 applicantUserId: user.id,
+                supervisorUserId,
               },
               options.organization
             );
+
             const submitted = repo.submitDocument(docId, user.fullName, {
               expectedVersion: body.expectedVersion,
               idempotencyKey,
@@ -479,57 +532,19 @@ export function createAppServer(options?: AppServerOptions): BLCAppServer {
             return jsonResponse({ document: visibleDocument(user, submitted) }, 200);
           }
 
-          // PR, PO, AV, RB
-          let supervisorUserId = body.supervisorUserId?.trim();
-          if (!supervisorUserId && submission.stage1ApproverEmail && options?.organization) {
-            const matched = options.organization.listUsers().find(
-              (u) => u.email.toLowerCase() === submission.stage1ApproverEmail?.toLowerCase()
-            );
-            if (matched) {
-              supervisorUserId = matched.id;
+          // Legacy submission logic
+          if (submission.docType !== 'GR' && submission.docType !== 'PV') {
+            const approverEmail = submission.stage1ApproverEmail?.trim().toLowerCase();
+            if (!approverEmail || approverEmail === user.email.toLowerCase() || SEEDED_USERS[approverEmail]?.role !== 'ATASAN') {
+              throw new DomainError('Pilih email atasan yang tersedia dan berbeda dari pengaju.', 422, 'INVALID_APPROVER');
             }
           }
-
-          if (!supervisorUserId) {
-            throw new DomainError('Pilih atasan langsung yang memiliki penugasan sah.', 422, 'SUPERVISOR_REQUIRED');
-          }
-
-          if (!options?.organization) {
-            throw new DomainError('Penyimpanan organisasi belum dikonfigurasi.', 503, 'ORGANIZATION_UNAVAILABLE');
-          }
-
-          // Create submission workflow in stageEngine - validates organizational assignment and identity
-          stageEngine.createSubmissionWorkflow(
-            {
-              documentId: docId,
-              docType: submission.docType,
-              docNumber: submission.docNumber,
-              unitId: body.unitId,
-              applicantUserId: user.id,
-              supervisorUserId,
-            },
-            options.organization
-          );
-
           const submitted = repo.submitDocument(docId, user.fullName, {
             expectedVersion: body.expectedVersion,
             idempotencyKey,
           });
           return jsonResponse({ document: visibleDocument(user, submitted) }, 200);
-        }
-
-        // Legacy submission logic
-        if (submission.docType !== 'GR' && submission.docType !== 'PV') {
-          const approverEmail = submission.stage1ApproverEmail?.trim().toLowerCase();
-          if (!approverEmail || approverEmail === user.email.toLowerCase() || SEEDED_USERS[approverEmail]?.role !== 'ATASAN') {
-            throw new DomainError('Pilih email atasan yang tersedia dan berbeda dari pengaju.', 422, 'INVALID_APPROVER');
-          }
-        }
-        const submitted = repo.submitDocument(docId, user.fullName, {
-          expectedVersion: body.expectedVersion,
-          idempotencyKey,
         });
-        return jsonResponse({ document: visibleDocument(user, submitted) }, 200);
       }
 
       // 7. POST /api/v1/documents/:id/decisions
@@ -764,8 +779,25 @@ export function createAppServer(options?: AppServerOptions): BLCAppServer {
           );
         }
         const sourceDocId = decodeURIComponent(genPvMatch[1]);
+        const sourceDoc = repo.getDocumentById(sourceDocId);
+        const targetBranch = sourceDoc.branch;
+        const resolvedBranch = targetBranch && targetBranch !== '*'
+          ? (branchRepo.getBranchByName(targetBranch) || branchRepo.getBranchByCode(targetBranch) || branchRepo.getBranchById(targetBranch))
+          : null;
+        const lockKey = resolvedBranch ? resolvedBranch.code : (targetBranch || 'default');
+
         const body = await parseJsonBody<PvGenerationOptions>(req);
-        const pv = repo.generatePvFromSource(sourceDocId, user.fullName, body);
+
+        const pv = await branchConcurrency.withBranchReadLock(lockKey, async () => {
+          if (resolvedBranch) {
+            const fresh = branchRepo.getBranchById(resolvedBranch.id);
+            if (fresh && fresh.status === 'INACTIVE') {
+              throw new DomainError('Cabang sedang tidak aktif dan tidak dapat menerbitkan Payment Voucher baru.', 422, 'BRANCH_INACTIVE');
+            }
+          }
+          return repo.generatePvFromSource(sourceDocId, user.fullName, body);
+        });
+
         if (stageEngineEnabled && stageEngine && options?.organization) {
           stageEngine.createSubmissionWorkflow(
             {
