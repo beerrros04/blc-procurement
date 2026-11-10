@@ -23,6 +23,8 @@ import { paymentLabel } from '../domain/payment-label';
 import { ApprovalProgress } from './ApprovalProgress';
 import { StatusBadge } from './ui/StatusBadge';
 import { FilterChip } from './ui/FilterChip';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
 import './document-lists.css';
 
 export interface DocumentListProps {
@@ -243,49 +245,30 @@ export const DocumentList: React.FC<DocumentListProps> = ({
                 top: '50%',
                 transform: 'translateY(-50%)',
                 color: '#7C8FAC',
+                zIndex: 1,
               }}
             />
-            <input
+            <Input
               type="search"
               aria-label="Cari nomor, judul, tujuan, atau cabang"
               placeholder="Cari nomor, judul, tujuan, cabang..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="control-height-md"
-              style={{
-                width: '100%',
-                height: '36px',
-                padding: '0 14px 0 38px',
-                fontSize: '13px',
-                borderRadius: '30px',
-                border: '1px solid var(--border-medium)',
-                background: '#F8FAFD',
-                color: '#111C2D',
-                boxSizing: 'border-box',
-              }}
+              className="control-height-md pl-10 h-9 rounded-full bg-[#F8FAFD] border-[#E4E2DD] text-xs focus-visible:ring-primary"
             />
           </div>
 
           {onOpenExport && (
-            <button
+            <Button
               type="button"
-              className="secondary control-height-md"
+              variant="outline"
+              size="sm"
+              className="secondary control-height-md gap-1.5 h-9 px-4 rounded-full border-[#E4E2DD] text-xs font-semibold hover:bg-[#F4F3EF] cursor-pointer"
               onClick={onOpenExport}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '6px',
-                height: '36px',
-                padding: '0 16px',
-                fontSize: '13px',
-                borderRadius: '30px',
-                boxSizing: 'border-box',
-              }}
             >
               <Download size={15} />
               Ekspor
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -578,159 +561,135 @@ export const DocumentList: React.FC<DocumentListProps> = ({
                       }}
                     >
                       <div style={{ display: 'inline-flex', gap: '6px', alignItems: 'center' }}>
-                        <button
+                        <Button
                           type="button"
-                          className="secondary"
-                          style={{
-                            padding: '6px 12px',
-                            fontSize: '12px',
-                            borderRadius: 'var(--btn-radius)',
-                          }}
+                          variant="outline"
+                          size="sm"
+                          className="secondary gap-1.5 h-7 px-2.5 text-xs rounded-md border-[#E4E2DD] hover:bg-[#F4F3EF] cursor-pointer"
                           onClick={() => handleDetail(doc)}
                           aria-label={`Lihat detail ${doc.docNumber}`}
                         >
                           <Eye size={13} />
                           Detail
-                        </button>
+                        </Button>
 
                         {activeRole === 'PEMOHON' && doc.docType === 'PR' && doc.status === 'APPROVED' && !documents.some((item) => item.docType === 'PO' && item.parentPrId === doc.id && item.status !== 'REJECTED') && (
-                          <button
+                          <Button
                             type="button"
-                            className="secondary"
-                            style={{ borderRadius: 'var(--btn-radius)', padding: '6px 12px', fontSize: '12px' }}
+                            variant="outline"
+                            size="sm"
+                            className="secondary h-7 px-2.5 text-xs rounded-md border-[#E4E2DD] hover:bg-[#F4F3EF] cursor-pointer"
                             onClick={() => onCreateRelated(doc)}
                             aria-label={`Buat PO dari ${doc.docNumber}`}
                           >
                             Buat PO
-                          </button>
+                          </Button>
                         )}
                         {activeRole === 'PEMOHON' && doc.docType === 'PO' && (doc.status === 'APPROVED' || doc.status === 'PAID') && (
-                          <button
+                          <Button
                             type="button"
-                            className="secondary"
-                            style={{ borderRadius: 'var(--btn-radius)', padding: '6px 12px', fontSize: '12px' }}
+                            variant="outline"
+                            size="sm"
+                            className="secondary h-7 px-2.5 text-xs rounded-md border-[#E4E2DD] hover:bg-[#F4F3EF] cursor-pointer"
                             onClick={() => onCreateRelated(doc)}
                             aria-label={`Buat GR dari ${doc.docNumber}`}
                           >
                             Catat GR
-                          </button>
+                          </Button>
                         )}
                         {activeRole === 'PEMOHON' && doc.docType === 'AV' && doc.status === 'PAID' && doc.ownerId === activeUserId && documents.some((item) => item.docType === 'PV' && item.sourceDocId === doc.id && item.paymentStatus === 'PAID') && !documents.some((item) => item.docType === 'RC' && item.parentAvId === doc.id) && (
-                          <button
+                          <Button
                             type="button"
-                            className="secondary"
-                            style={{ borderRadius: 'var(--btn-radius)', padding: '6px 12px', fontSize: '12px' }}
+                            variant="outline"
+                            size="sm"
+                            className="secondary h-7 px-2.5 text-xs rounded-md border-[#E4E2DD] hover:bg-[#F4F3EF] cursor-pointer"
                             onClick={() => onCreateRelated(doc)}
                             aria-label={`Buat RC dari ${doc.docNumber}`}
                           >
                             Buat RC
-                          </button>
+                          </Button>
                         )}
                         {activeRole === 'KEUANGAN' && doc.docType === 'RC' && doc.outcomeType !== 'DEFICIT' && (doc.status === 'APPROVED' || doc.status === 'PAID') && !doc.financeConfirmedAt && (
-                          <button
+                          <Button
                             type="button"
-                            className="secondary"
-                            style={{ borderRadius: 'var(--btn-radius)', padding: '6px 12px', fontSize: '12px' }}
+                            variant="outline"
+                            size="sm"
+                            className="secondary h-7 px-2.5 text-xs rounded-md border-[#E4E2DD] hover:bg-[#F4F3EF] cursor-pointer"
                             onClick={() => onConfirmRc(doc.id)}
                             aria-label={`Konfirmasi penyelesaian ${doc.docNumber}`}
                           >
                             Konfirmasi penyelesaian
-                          </button>
+                          </Button>
                         )}
 
                         {canEdit && (
-                          <button
+                          <Button
                             type="button"
-                            className="secondary"
-                            style={{
-                              padding: '6px 12px',
-                              fontSize: '12px',
-                              borderRadius: 'var(--btn-radius)',
-                            }}
+                            variant="outline"
+                            size="sm"
+                            className="secondary gap-1.5 h-7 px-2.5 text-xs rounded-md border-[#E4E2DD] hover:bg-[#F4F3EF] cursor-pointer"
                             onClick={() => onEditDoc(doc)}
                             aria-label={`Ubah draf ${doc.docNumber}`}
                           >
                             <Edit3 size={13} />
                             Ubah
-                          </button>
+                          </Button>
                         )}
 
                         {canSubmit && (
-                          <button
+                          <Button
                             type="button"
-                            className="primary"
-                            style={{
-                              padding: '6px 14px',
-                              fontSize: '12px',
-                              borderRadius: 'var(--btn-radius)',
-                            }}
+                            variant="default"
+                            size="sm"
+                            className="primary gap-1.5 h-7 px-3 text-xs rounded-md bg-primary hover:bg-[#B91C1C] text-white cursor-pointer shadow-xs"
                             onClick={() => onSubmitDoc(doc.id)}
                             aria-label={`Ajukan ${doc.docNumber}`}
                           >
                             <Send size={13} />
                             Ajukan
-                          </button>
+                          </Button>
                         )}
 
                         {isReviewable && (
-                          <button
+                          <Button
                             type="button"
-                            className="primary"
-                            style={{
-                              padding: '6px 14px',
-                              fontSize: '12px',
-                              background: '#F59E0B',
-                              borderColor: '#F59E0B',
-                              color: '#FFFFFF',
-                              borderRadius: 'var(--btn-radius)',
-                              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
-                            }}
+                            variant="default"
+                            size="sm"
+                            className="primary gap-1.5 h-7 px-3 text-xs rounded-md bg-[#D97706] hover:bg-[#B45309] text-white cursor-pointer shadow-xs"
                             onClick={() => handleDetail(doc)}
                             aria-label={`Tinjau pengajuan ${doc.docNumber}`}
                           >
                             <CheckCircle2 size={13} />
                             Tinjau
-                          </button>
+                          </Button>
                         )}
 
                         {canGeneratePv && (
-                          <button
+                          <Button
                             type="button"
-                            className="primary"
-                            style={{
-                              padding: '6px 14px',
-                              fontSize: '12px',
-                              background: '#2563EB',
-                              borderColor: '#2563EB',
-                              borderRadius: 'var(--btn-radius)',
-                              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
-                            }}
+                            variant="default"
+                            size="sm"
+                            className="primary gap-1.5 h-7 px-3 text-xs rounded-md bg-[#2563EB] hover:bg-[#1D4ED8] text-white cursor-pointer shadow-xs"
                             onClick={() => onGeneratePv(doc.id)}
                             aria-label={`Buat Payment Voucher dari ${doc.docNumber}`}
                           >
                             <PlusCircle size={13} />
                             Buat PV
-                          </button>
+                          </Button>
                         )}
 
                         {canPayPv && (
-                          <button
+                          <Button
                             type="button"
-                            className="primary"
-                            style={{
-                              padding: '6px 14px',
-                              fontSize: '12px',
-                              background: '#10B981',
-                              borderColor: '#10B981',
-                              borderRadius: 'var(--btn-radius)',
-                              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
-                            }}
+                            variant="default"
+                            size="sm"
+                            className="primary gap-1.5 h-7 px-3 text-xs rounded-md bg-[#059669] hover:bg-[#047857] text-white cursor-pointer shadow-xs"
                             onClick={() => onPayPv(doc as PVDocument)}
                             aria-label={`Catat pembayaran ${doc.docNumber}`}
                           >
                             <CreditCard size={13} />
                             Bayar
-                          </button>
+                          </Button>
                         )}
                       </div>
                     </td>

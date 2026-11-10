@@ -22,6 +22,7 @@ import { displayPersonName } from '../domain/display-name';
 import { ApprovalProgress } from './ApprovalProgress';
 import { StatusBadge } from './ui/StatusBadge';
 import { FilterChip } from './ui/FilterChip';
+import { Button } from './ui/button';
 import './document-lists.css';
 
 const rupiah = new Intl.NumberFormat('id-ID', {
@@ -301,7 +302,7 @@ export const ApprovalRegisterView: React.FC<ApprovalRegisterViewProps> = ({
             <option value="ALL">Semua tindak lanjut</option><option value="MENUNGGU">Menunggu</option><option value="MENUNGGU_PV">Menunggu PV</option><option value="JADWAL_PEMBAYARAN">Jadwal Pembayaran</option><option value="UNPAID">Belum Dibayar</option><option value="PAID">Lunas</option><option value="AV_TANPA_PO">AV Tanpa PO</option><option value="CA_BELUM_REALISASI">CA Belum Direalisasikan</option>
           </select>
         </label>
-        <button type="button" className="secondary control-height-md" onClick={() => { setSearch(''); setTypeFilter('ALL'); setBranchFilter('ALL'); setProgressFilter('ALL'); setPaymentFilter('ALL'); }}>Atur ulang</button>
+        <Button type="button" variant="outline" size="sm" className="secondary control-height-md border-[#E4E2DD] text-xs hover:bg-[#F4F3EF] cursor-pointer" onClick={() => { setSearch(''); setTypeFilter('ALL'); setBranchFilter('ALL'); setProgressFilter('ALL'); setPaymentFilter('ALL'); }}>Atur ulang</Button>
       </div>
       <p className="register-filter-summary" role="status">{filtered.length} dari {documents.length} dokumen ditampilkan</p>
 
@@ -453,15 +454,16 @@ export const ApprovalRegisterView: React.FC<ApprovalRegisterViewProps> = ({
                     {formatDateShort(doc.createdAt)}
                   </td>
                   <td data-label="Tindakan" style={{ textAlign: 'right' }}>
-                    <button
+                    <Button
                       type="button"
-                      className="secondary"
-                      style={{ padding: '6px 12px', fontSize: '12px', borderRadius: 'var(--btn-radius, 8px)' }}
+                      variant="outline"
+                      size="sm"
+                      className="secondary gap-1.5 h-7 px-2.5 text-xs rounded-md border-[#E4E2DD] hover:bg-[#F4F3EF] cursor-pointer"
                       onClick={() => onOpenDetail(doc)}
                       aria-label={`Buka detail ${doc.docNumber}`}
                     >
                       <Eye size={13} /> Detail
-                    </button>
+                    </Button>
                   </td>
                 </tr>
               );
@@ -716,15 +718,16 @@ export const ApprovalHistoryView: React.FC<ApprovalHistoryViewProps> = ({
                   <td data-label="Pejabat" style={{ fontWeight: 800, color: '#111C2D' }}>{displayPersonName(row.actor)}</td>
                   <td data-label="Catatan" style={{ color: 'var(--text-secondary, #374151)', maxWidth: '280px' }}>{row.comment}</td>
                   <td data-label="Tindakan" style={{ textAlign: 'right' }}>
-                    <button
+                    <Button
                       type="button"
-                      className="secondary"
-                      style={{ padding: '6px 12px', fontSize: '12px', borderRadius: 'var(--btn-radius, 8px)' }}
+                      variant="outline"
+                      size="sm"
+                      className="secondary gap-1.5 h-7 px-2.5 text-xs rounded-md border-[#E4E2DD] hover:bg-[#F4F3EF] cursor-pointer"
                       onClick={() => onOpenDetail(row.doc)}
                       aria-label={`Buka detail ${row.docNumber}`}
                     >
                       <Eye size={13} /> Detail
-                    </button>
+                    </Button>
                   </td>
                 </tr>
               );
@@ -982,29 +985,26 @@ export const ApprovalDocsView: React.FC<ApprovalDocsViewProps> = ({
                   </td>
                   <td data-label="Tindakan" style={{ textAlign: 'right' }}>
                     <div style={{ display: 'inline-flex', gap: '6px', alignItems: 'center' }}>
-                      <button
+                      <Button
                         type="button"
-                        className="secondary"
-                        style={{ padding: '6px 12px', fontSize: '12px', borderRadius: 'var(--btn-radius, 8px)' }}
+                        variant="outline"
+                        size="sm"
+                        className="secondary gap-1.5 h-7 px-2.5 text-xs rounded-md border-[#E4E2DD] hover:bg-[#F4F3EF] cursor-pointer"
                         onClick={() => onOpenDetail(doc)}
                         aria-label={`Buka detail ${doc.docNumber}`}
                       >
                         <Eye size={13} /> Lihat
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         type="button"
+                        variant="outline"
+                        size="sm"
                         onClick={() => void openAttachment(item.attachmentId).catch(() => setFileError('Lampiran tidak dapat dibuka.'))}
-                        className="secondary"
-                        style={{
-                          padding: '6px 12px',
-                          fontSize: '12px',
-                          borderRadius: 'var(--btn-radius, 8px)',
-                          textDecoration: 'none',
-                        }}
+                        className="secondary gap-1.5 h-7 px-2.5 text-xs rounded-md border-[#E4E2DD] hover:bg-[#F4F3EF] cursor-pointer"
                         aria-label={`Unduh ${item.fileName}`}
                       >
                         <ExternalLink size={13} /> Unduh
-                      </button>
+                      </Button>
                     </div>
                   </td>
                 </tr>

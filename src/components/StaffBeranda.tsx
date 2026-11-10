@@ -10,6 +10,8 @@ import {
 } from 'lucide-react';
 import type { AnyDocument, DocType, PVDocument, UserRole } from '../types/document';
 import { DocumentList } from './DocumentList';
+import { Card, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 export interface StaffBerandaProps {
   userName: string;
@@ -133,157 +135,100 @@ export const StaffBeranda: React.FC<StaffBerandaProps> = ({
         }}
       >
         {/* Welcome Card */}
-        <div
-          style={{
-            background: '#FFFFFF',
-            borderRadius: 'var(--card-radius)',
-            padding: '24px',
-            boxShadow: 'var(--shadow-card)',
-            border: '1px solid #E2E8F0',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            gap: '20px',
-            flexWrap: 'wrap',
-          }}
-        >
+        <Card className="bg-white rounded-xl border border-[#E4E2DD] shadow-xs p-6 flex justify-between items-center gap-5 flex-wrap">
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', minWidth: 0 }}>
             <img
               src="/logo.png"
               alt="Caready Logo"
-              style={{
-                width: '48px',
-                height: '48px',
-                borderRadius: '8px',
-                background: '#E51937',
-                padding: '6px',
-                objectFit: 'contain',
-              }}
+              className="w-12 h-12 rounded-xl bg-[#DC2626] p-1.5 object-contain shadow-xs"
             />
             <div>
               <div className="eyebrow" style={{ color: '#4B5563', fontSize: '11px', fontWeight: 700 }}>
                 BERANDA CAREADY · CABANG {userBranch.toUpperCase()}
               </div>
-              <h1 style={{ fontSize: '20px', fontWeight: 800, color: '#111827', margin: '4px 0 0 0' }}>
+              <h1 className="text-xl font-bold text-[#111827] mt-1 m-0">
                 Selamat Datang, {userName}
               </h1>
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <div className="flex items-center gap-5">
             <div>
-              <div style={{ fontSize: '20px', fontWeight: 800, color: '#991B1B' }}>
+              <div className="text-xl font-bold text-[#991B1B] tabular-nums">
                 {draftCount}
               </div>
-              <div style={{ fontSize: '11px', fontWeight: 600, color: '#4B5563' }}>Draf / Revisi</div>
+              <div className="text-xs font-semibold text-[#4B5563]">Draf / Revisi</div>
             </div>
-            <div style={{ width: '1px', height: '28px', background: '#E2E8F0' }} />
+            <div className="w-px h-7 bg-[#E4E2DD]" />
             <div>
-              <div style={{ fontSize: '20px', fontWeight: 800, color: '#92400E' }}>
+              <div className="text-xl font-bold text-[#92400E] tabular-nums">
                 {inReviewCount}
               </div>
-              <div style={{ fontSize: '11px', fontWeight: 600, color: '#4B5563' }}>Ditinjau</div>
+              <div className="text-xs font-semibold text-[#4B5563]">Ditinjau</div>
             </div>
-            <div style={{ width: '1px', height: '28px', background: '#E2E8F0' }} />
+            <div className="w-px h-7 bg-[#E4E2DD]" />
             <div>
-              <div style={{ fontSize: '20px', fontWeight: 800, color: '#065F46' }}>
+              <div className="text-xl font-bold text-[#065F46] tabular-nums">
                 {approvedCount}
               </div>
-              <div style={{ fontSize: '11px', fontWeight: 600, color: '#4B5563' }}>Disetujui / Lunas</div>
+              <div className="text-xs font-semibold text-[#4B5563]">Disetujui / Lunas</div>
             </div>
           </div>
-        </div>
+        </Card>
 
         {/* Quick Create Action Card */}
-        {activeRole === 'PEMOHON' && <div
-          style={{
-            background: '#FFFFFF',
-            borderRadius: 'var(--card-radius)',
-            padding: '24px',
-            boxShadow: 'var(--shadow-card)',
-            border: '1px solid #E2E8F0',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            gap: '14px',
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#111827', margin: 0 }}>
-              Ajukan Permohonan Baru
-            </h3>
-          </div>
+        {activeRole === 'PEMOHON' && (
+          <Card className="bg-white rounded-xl border border-[#E4E2DD] shadow-xs p-6 flex flex-col justify-between gap-3.5">
+            <div className="flex justify-between items-center">
+              <CardTitle className="text-sm sm:text-base font-bold text-[#111827] m-0">
+                Ajukan Permohonan Baru
+              </CardTitle>
+            </div>
 
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))',
-              gap: '10px',
-            }}
-          >
-            {quickActions.map((item) => {
-              const Icon = item.icon;
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() =>
-                    item.id === 'REGISTER' ? onNavigateTab('REGISTER') : onCreateDoc(item.id)
-                  }
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '10px',
-                    padding: '16px',
-                    borderRadius: 'var(--card-radius, 10px)',
-                    border: '1px solid var(--border-clean)',
-                    background: '#FFFFFF',
-                    textAlign: 'left',
-                    cursor: 'pointer',
-                  }}
-                  aria-label={item.id === 'REGISTER' ? 'Buka Approval Register' : `Buat dokumen baru ${item.title}`}
-                >
-                  <div
-                    style={{
-                      width: '34px',
-                      height: '34px',
-                      borderRadius: '10px',
-                      background: item.bg,
-                      color: item.accent,
-                      display: 'grid',
-                      placeItems: 'center',
-                      flexShrink: 0,
-                      border: '1px solid #E2E8F0',
-                    }}
+            <div
+              className="grid gap-2.5"
+              style={{
+                gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))',
+              }}
+            >
+              {quickActions.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() =>
+                      item.id === 'REGISTER' ? onNavigateTab('REGISTER') : onCreateDoc(item.id)
+                    }
+                    className="flex items-center gap-3 p-3.5 rounded-xl border border-[#E4E2DD] bg-white hover:border-[#DC2626] hover:shadow-xs transition-all text-left cursor-pointer group"
+                    aria-label={item.id === 'REGISTER' ? 'Buka Approval Register' : `Buat dokumen baru ${item.title}`}
                   >
-                    <Icon size={16} />
-                  </div>
-                  <div style={{ minWidth: 0 }}>
                     <div
+                      className="w-9 h-9 rounded-xl grid place-items-center shrink-0 border border-[#E4E2DD] transition-colors group-hover:border-[#DC2626]"
                       style={{
-                        fontSize: '11px',
-                        fontWeight: 800,
+                        background: item.bg,
                         color: item.accent,
                       }}
                     >
-                      {item.id === 'REGISTER' ? 'REGISTER' : `+ Buat ${item.code}`}
+                      <Icon size={16} />
                     </div>
-                    <div
-                      style={{
-                        fontSize: '12px',
-                        fontWeight: 700,
-                        color: '#111827',
-                        lineHeight: 1.3,
-                      }}
-                    >
-                      {item.title}
+                    <div className="min-w-0">
+                      <div
+                        className="text-[11px] font-bold"
+                        style={{ color: item.accent }}
+                      >
+                        {item.id === 'REGISTER' ? 'REGISTER' : `+ Buat ${item.code}`}
+                      </div>
+                      <div className="text-xs font-semibold text-[#111827] leading-snug">
+                        {item.title}
+                      </div>
                     </div>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>}
+                  </button>
+                );
+              })}
+            </div>
+          </Card>
+        )}
       </section>
 
       {/* =====================================================================

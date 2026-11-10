@@ -14,6 +14,8 @@ import type {
 import { ApprovalStepper } from './ApprovalStepper';
 import { openAttachment } from '../api';
 import { displayPersonName } from '../domain/display-name';
+import { Button } from './ui/button';
+import { Textarea } from './ui/textarea';
 import './document-detail.css';
 
 export interface DocumentDetailModalProps {
@@ -515,35 +517,36 @@ export const DocumentDetailModal: React.FC<DocumentDetailModalProps> = ({
               </div>
 
               <label htmlFor="decision-note">Catatan Peninjauan / Alasan</label>
-              <textarea
+              <Textarea
                 id="decision-note"
                 rows={2}
                 disabled={isSubmitting}
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="Tuliskan catatan persetujuan atau alasan revisi/penolakan..."
+                className="bg-white border-[#E4E2DD] focus-visible:ring-primary text-xs"
               />
 
               <div className="decision-actions">
-                <button
+                <Button
                   type="button"
-                  className="secondary"
-                  style={{ color: '#a13f34', borderColor: '#e8bcbc' }}
+                  variant="outline"
+                  className="secondary border-[#e8bcbc] text-[#a13f34] hover:bg-[#FFF1F2] cursor-pointer"
                   onClick={handleReject}
                   disabled={isSubmitting}
                 >
                   Tolak (Kembalikan ke Draf)
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
-                  className="primary"
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                  variant="default"
+                  className="primary gap-1.5 bg-primary text-white hover:bg-[#B91C1C] cursor-pointer shadow-xs"
                   onClick={handleApprove}
                   disabled={isSubmitting}
                 >
                   <Check size={16} />
                   Setujui Dokumen
-                </button>
+                </Button>
               </div>
             </div>
           )}
@@ -580,9 +583,15 @@ export const DocumentDetailModal: React.FC<DocumentDetailModalProps> = ({
         {error && <div className="notice error-notice" role="alert">{error}</div>}
         {isSubmitting && <div className="notice" role="status">Memproses keputusan…</div>}
         <div className="form-actions">
-          <button type="button" className="secondary" onClick={onClose} disabled={isSubmitting}>
+          <Button
+            type="button"
+            variant="outline"
+            className="secondary border-[#E4E2DD] text-[#111827] hover:bg-[#F4F3EF] cursor-pointer"
+            onClick={onClose}
+            disabled={isSubmitting}
+          >
             Tutup
-          </button>
+          </Button>
         </div>
       </section>
     </dialog>

@@ -38,6 +38,7 @@ import { FormRC } from './components/forms/FormRC';
 import { StaffBeranda } from './components/StaffBeranda';
 import { ModalDialog } from './components/ui/modal-dialog';
 import { SignInPage } from './components/ui/sign-in';
+import { Button } from './components/ui/button';
 import { branchOptions } from './domain/branches';
 import { displayPersonName } from './domain/display-name';
 import { api, clearApiToken, hasApiToken, setApiToken } from './api';
@@ -357,14 +358,16 @@ export function Topbar({
           </div>
         )}
 
-        <button
+        <Button
           type="button"
-          className="s-action"
+          variant="outline"
+          size="sm"
+          className="s-action border-[#E4E2DD] text-[#111827] hover:bg-[#F4F3EF] cursor-pointer"
           onClick={onOpenExport}
           title="Ekspor rekap 13 kolom untuk Finance"
         >
           Ekspor Laporan (13 Kolom)
-        </button>
+        </Button>
       </div>
     </header>
   );
@@ -1004,13 +1007,14 @@ export function App() {
                   </p>
                 </div>
                 <div style={{ display: 'flex', gap: '8px' }}>
-                  <button
+                  <Button
                     type="button"
-                    className="s-action s-action-caready"
+                    variant="default"
+                    className="s-action s-action-caready bg-primary text-primary-foreground hover:bg-[#B91C1C] cursor-pointer"
                     onClick={() => setActiveTab('ALL')}
                   >
                     Buka Register Dokumen
-                  </button>
+                  </Button>
                 </div>
               </div>
 

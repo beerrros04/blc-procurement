@@ -2,6 +2,8 @@ import { createServer, type IncomingMessage, type Server, type ServerResponse } 
 import type { AnyDocument, DocType, PVPaymentDetails, UserRole } from '../src/types/document';
 import { authenticateCredentials, verifyJwt, SEEDED_USERS, type AuthUser } from './auth';
 import { DomainError, ProcurementRepository, type PvGenerationOptions } from './repository';
+import type { OrganizationRepository, AppUserRecord } from './organization';
+import type { ApprovalStageEngine } from './stage-engine';
 import {
   LocalAttachmentStorage,
   type AttachmentCategory,
@@ -10,6 +12,9 @@ import {
 export interface AppServerOptions {
   repository?: ProcurementRepository;
   storage?: LocalAttachmentStorage;
+  organization?: OrganizationRepository;
+  stageEngine?: ApprovalStageEngine;
+  stageEngineEnabled?: boolean;
 }
 
 export interface BLCAppServer extends Server {
@@ -86,6 +91,8 @@ async function parseJsonBody<T = Record<string, unknown>>(req: Request): Promise
 export function createAppServer(options?: AppServerOptions): BLCAppServer {
   const repo = options?.repository ?? new ProcurementRepository();
   const storage = options?.storage ?? new LocalAttachmentStorage();
+  const stageEngine = options?.stageEngine;
+  const stageEngineEnabled = options?.stageEngineEnabled ?? (process.env.ENABLE_STAGE_ENGINE === 'true');
 
   async function handleFetch(req: Request): Promise<Response> {
     const url = new URL(req.url, 'http://localhost');
@@ -113,6 +120,99 @@ export function createAppServer(options?: AppServerOptions): BLCAppServer {
 
       // Semua endpoint /api/v1/* di bawah ini wajib terautentikasi JWT
       const user = extractAuthUser(req);
+
+      // Organizational assignments are deliberately separate from document approval.
+      if (path.startsWith('/api/v1/organization/')) {
+        if (user.role !== 'ADMIN') throw new DomainError('Akses organisasi hanya untuk Admin.', 403, 'FORBIDDEN_ROLE');
+        const org = options?.organization;
+        if (path === '/api/v1/organization/readiness' && method === 'GET') return jsonResponse(org ? org.readiness() : { configured: false, reachable: false, schema: 'UNAVAILABLE', identity: 'UNKNOWN', assignments: 'UNKNOWN' });
+        if (!org) throw new DomainError('Penyimpanan organisasi belum dikonfigurasi.', 503, 'ORGANIZATION_UNAVAILABLE');
+        if (path === '/api/v1/organization/units') {
+          if (method === 'GET') return jsonResponse({ units: org.listUnits() });
+          if (method === 'POST') { const body = await parseJsonBody(req); if (!body || typeof body !== 'object' || Array.isArray(body)) throw new DomainError('Payload harus objek.', 422, 'INVALID_INPUT'); return jsonResponse({ unit: org.createUnit(body.name, user.id) }, 201); }
+        }
+        if (path === '/api/v1/organization/assignments/review-needed' && method === 'GET') {
+          return jsonResponse({ reviewItems: org.listAssignmentsNeedingReview() });
+        }
+        if (path === '/api/v1/organization/assignments') {
+          if (method === 'GET') return jsonResponse({ assignments: org.listAssignments(url.searchParams.get('unitId') || undefined) });
+          if (method === 'POST') { const body = await parseJsonBody(req); if (!body || typeof body !== 'object' || Array.isArray(body)) throw new DomainError('Payload harus objek.', 422, 'INVALID_INPUT'); return jsonResponse({ assignment: org.createAssignment(body.unitId, body.supervisorUserId, user.id) }, 201); }
+        }
+        const byUnit = path.match(/^\/api\/v1\/organization\/units\/([^/]+)\/(assignments|eligible)$/);
+        if (byUnit && method === 'GET') { const id = decodeURIComponent(byUnit[1]); return jsonResponse(byUnit[2] === 'eligible' ? org.eligible(id) : { assignments: org.listAssignments(id) }); }
+        const assignment = path.match(/^\/api\/v1\/organization\/assignments\/([^/]+)(\/deactivate)?$/);
+        if (assignment && assignment[1] !== 'review-needed' && ((method === 'PATCH' && !assignment[2]) || (method === 'POST' && assignment[2]))) {
+          const body = assignment[2] ? { active: false } : await parseJsonBody(req);
+          if (!body || typeof body !== 'object' || Array.isArray(body)) throw new DomainError('Payload harus objek.', 422, 'INVALID_INPUT');
+          if (!assignment[2] && !['unitId','supervisorUserId','active'].some(k => Object.hasOwn(body,k))) throw new DomainError('Perubahan wajib diisi.', 422, 'INVALID_INPUT');
+          return jsonResponse({ assignment: org.updateAssignment(decodeURIComponent(assignment[1]), body, user.id) });
+        }
+
+        // Explicit Workflow Stage Assignment Management (HF02-B Final Revision 02)
+        if (path === '/api/v1/organization/stage-assignments') {
+          if (method === 'GET') {
+            return jsonResponse({ stageAssignments: org.listStageAssignments() });
+          }
+          if (method === 'POST') {
+            const body = await parseJsonBody<Record<string, unknown>>(req);
+            if (!body || typeof body !== 'object' || Array.isArray(body)) throw new DomainError('Payload harus objek.', 422, 'INVALID_INPUT');
+            return jsonResponse({ stageAssignment: org.setStageAssignment(body.stageKey, body.assignedUserId, user.id) }, 201);
+          }
+        }
+        const stageAssignmentDeact = path.match(/^\/api\/v1\/organization\/stage-assignments\/([^/]+)\/deactivate$/);
+        if (stageAssignmentDeact && method === 'POST') {
+          return jsonResponse({ stageAssignment: org.deactivateStageAssignment(decodeURIComponent(stageAssignmentDeact[1]), user.id) });
+        }
+
+        // Identity Management Endpoints (ADR-ID-001, ADR-ID-002, ADR-ID-003)
+        if (path === '/api/v1/organization/users') {
+          if (method === 'GET') {
+            const status = url.searchParams.get('status') as any;
+            const verificationStatus = url.searchParams.get('verificationStatus') as any;
+            return jsonResponse({ users: org.listUsers({ status, verificationStatus }) });
+          }
+          if (method === 'POST') {
+            const body = await parseJsonBody<Record<string, unknown>>(req);
+            if (!body || typeof body !== 'object' || Array.isArray(body)) throw new DomainError('Payload harus objek.', 422, 'INVALID_INPUT');
+            return jsonResponse({ user: org.createUser(body as any, user.id) }, 201);
+          }
+        }
+
+        const userAction = path.match(/^\/api\/v1\/organization\/users\/([^/]+)(\/(verify|lifecycle|deactivate|retire))?$/);
+        if (userAction) {
+          const targetUserId = decodeURIComponent(userAction[1]);
+          const action = userAction[3];
+
+          if (method === 'GET' && !action) {
+            return jsonResponse({ user: org.getUser(targetUserId) });
+          }
+          if (method === 'PATCH' && !action) {
+            const body = await parseJsonBody<Record<string, unknown>>(req);
+            if (!body || typeof body !== 'object' || Array.isArray(body)) throw new DomainError('Payload harus objek.', 422, 'INVALID_INPUT');
+            return jsonResponse({ user: org.updateUser(targetUserId, body as any, user.id) });
+          }
+          if (method === 'POST' && action === 'verify') {
+            const body = await parseJsonBody<{ proofReference?: unknown }>(req);
+            if (!body || typeof body !== 'object' || Array.isArray(body)) throw new DomainError('Payload harus objek.', 422, 'INVALID_INPUT');
+            return jsonResponse({ user: org.verifyUser(targetUserId, { proofReference: body.proofReference, verifiedBy: user.id }) });
+          }
+          if (method === 'POST' && action === 'lifecycle') {
+            const body = await parseJsonBody<{ status?: unknown; reason?: string }>(req);
+            if (!body || typeof body !== 'object' || Array.isArray(body)) throw new DomainError('Payload harus objek.', 422, 'INVALID_INPUT');
+            return jsonResponse({ user: org.setUserLifecycle(targetUserId, body.status, user.id, body.reason) });
+          }
+          if (method === 'POST' && action === 'deactivate') {
+            const body = await parseJsonBody<{ reason?: string }>(req);
+            return jsonResponse({ user: org.setUserLifecycle(targetUserId, 'INACTIVE', user.id, body?.reason) });
+          }
+          if (method === 'POST' && action === 'retire') {
+            const body = await parseJsonBody<{ reason?: unknown }>(req);
+            if (!body || typeof body !== 'object' || Array.isArray(body)) throw new DomainError('Payload harus objek.', 422, 'INVALID_INPUT');
+            org.retireUser(targetUserId, body.reason, user.id);
+            return jsonResponse({ success: true });
+          }
+        }
+      }
 
       // 2. GET /api/v1/me
       if (method === 'GET' && path === '/api/v1/me') {
@@ -190,15 +290,97 @@ export function createAppServer(options?: AppServerOptions): BLCAppServer {
         const docId = decodeURIComponent(submitMatch[1]);
         const submission = repo.getDocumentById(docId);
         requireOwner(user, submission);
+        const body = await parseJsonBody<{
+          expectedVersion?: number;
+          supervisorUserId?: string;
+          unitId?: string;
+        }>(req);
+        const idempotencyKey = req.headers.get('idempotency-key') || undefined;
+
+        if (stageEngineEnabled && stageEngine) {
+          if (submission.docType === 'GR') {
+            const submitted = repo.submitDocument(docId, user.fullName, {
+              expectedVersion: body.expectedVersion,
+              idempotencyKey,
+            });
+            return jsonResponse({ document: visibleDocument(user, submitted) }, 200);
+          }
+
+          if (submission.docType === 'PV') {
+            if (user.role !== 'KEUANGAN') {
+              throw new DomainError('Hanya peran KEUANGAN yang dapat mengajukan Payment Voucher.', 403, 'FORBIDDEN_ROLE');
+            }
+            if (submission.sourceDocId) {
+              const parentDoc = repo.getDocumentById(submission.sourceDocId);
+              if (parentDoc.status !== 'APPROVED') {
+                throw new DomainError('Dokumen induk PO/AV/RB harus disetujui sebelum mengajukan PV.', 422, 'PARENT_DOCUMENT_NOT_APPROVED');
+              }
+            }
+            if (!options?.organization) {
+              throw new DomainError('Penyimpanan organisasi belum dikonfigurasi.', 503, 'ORGANIZATION_UNAVAILABLE');
+            }
+            stageEngine.createSubmissionWorkflow(
+              {
+                documentId: docId,
+                docType: submission.docType,
+                docNumber: submission.docNumber,
+                applicantUserId: user.id,
+              },
+              options.organization
+            );
+            const submitted = repo.submitDocument(docId, user.fullName, {
+              expectedVersion: body.expectedVersion,
+              idempotencyKey,
+            });
+            return jsonResponse({ document: visibleDocument(user, submitted) }, 200);
+          }
+
+          // PR, PO, AV, RB
+          let supervisorUserId = body.supervisorUserId?.trim();
+          if (!supervisorUserId && submission.stage1ApproverEmail && options?.organization) {
+            const matched = options.organization.listUsers().find(
+              (u) => u.email.toLowerCase() === submission.stage1ApproverEmail?.toLowerCase()
+            );
+            if (matched) {
+              supervisorUserId = matched.id;
+            }
+          }
+
+          if (!supervisorUserId) {
+            throw new DomainError('Pilih atasan langsung yang memiliki penugasan sah.', 422, 'SUPERVISOR_REQUIRED');
+          }
+
+          if (!options?.organization) {
+            throw new DomainError('Penyimpanan organisasi belum dikonfigurasi.', 503, 'ORGANIZATION_UNAVAILABLE');
+          }
+
+          // Create submission workflow in stageEngine - validates organizational assignment and identity
+          stageEngine.createSubmissionWorkflow(
+            {
+              documentId: docId,
+              docType: submission.docType,
+              docNumber: submission.docNumber,
+              unitId: body.unitId,
+              applicantUserId: user.id,
+              supervisorUserId,
+            },
+            options.organization
+          );
+
+          const submitted = repo.submitDocument(docId, user.fullName, {
+            expectedVersion: body.expectedVersion,
+            idempotencyKey,
+          });
+          return jsonResponse({ document: visibleDocument(user, submitted) }, 200);
+        }
+
+        // Legacy submission logic
         if (submission.docType !== 'GR' && submission.docType !== 'PV') {
           const approverEmail = submission.stage1ApproverEmail?.trim().toLowerCase();
           if (!approverEmail || approverEmail === user.email.toLowerCase() || SEEDED_USERS[approverEmail]?.role !== 'ATASAN') {
             throw new DomainError('Pilih email atasan yang tersedia dan berbeda dari pengaju.', 422, 'INVALID_APPROVER');
           }
         }
-        const body = await parseJsonBody<{ expectedVersion?: number }>(req);
-        const idempotencyKey = req.headers.get('idempotency-key') || undefined;
-
         const submitted = repo.submitDocument(docId, user.fullName, {
           expectedVersion: body.expectedVersion,
           idempotencyKey,
@@ -241,6 +423,192 @@ export function createAppServer(options?: AppServerOptions): BLCAppServer {
         return jsonResponse({ document: visibleDocument(user, decided) }, 200);
       }
 
+      // HF02-C: Isolated Approval Stage Engine Endpoints (REV-C02)
+      if (path.startsWith('/api/v1/stages/') || path.match(/^\/api\/v1\/documents\/[^/]+\/workflow$/)) {
+        if (!stageEngineEnabled || !stageEngine) {
+          throw new DomainError(
+            'Integrasi approval stage engine belum diaktifkan (feature disabled).',
+            404,
+            'STAGE_ENGINE_DISABLED'
+          );
+        }
+      }
+
+      // POST /api/v1/stages/:stageId/decisions
+      const stageDecisionMatch = path.match(/^\/api\/v1\/stages\/([^/]+)\/decisions$/);
+      if (method === 'POST' && stageDecisionMatch) {
+        if (!stageEngine) {
+          throw new DomainError('Engine persetujuan tahap belum dikonfigurasi.', 503, 'STAGE_ENGINE_UNAVAILABLE');
+        }
+        const stageId = decodeURIComponent(stageDecisionMatch[1]);
+        const body = await parseJsonBody<{
+          decision: 'APPROVE' | 'REJECT';
+          comment?: string;
+        }>(req);
+
+        if (body.decision !== 'APPROVE' && body.decision !== 'REJECT') {
+          throw new DomainError('Keputusan (decision) harus bernilai APPROVE atau REJECT.', 400, 'INVALID_DECISION');
+        }
+
+        const idempotencyKey =
+          req.headers.get('x-idempotency-key') || req.headers.get('idempotency-key') || undefined;
+
+        // Fetch stage & workflow to coordinate sync
+        const targetStage = stageEngine.getStage(stageId);
+        const wf = stageEngine.getWorkflow(targetStage.workflowId);
+
+        let orgUser: AppUserRecord | undefined;
+        if (options?.organization) {
+          try {
+            orgUser = options.organization.getUser(user.id);
+          } catch {
+            // fallback
+          }
+        }
+
+        const syncId = stageEngine.prepareCrossStorageSync({
+          documentId: wf.documentId,
+          workflowId: wf.id,
+          stageId: targetStage.id,
+          operationType: body.decision,
+          stageState: { decision: body.decision, approverUserId: user.id },
+        });
+
+        try {
+          const result = stageEngine.recordStageDecision(
+            {
+              workflowId: targetStage.workflowId,
+              stageId,
+              approverUserId: user.id,
+              decision: body.decision,
+              comment: body.comment,
+              idempotencyKey,
+              authenticatedUser: orgUser,
+            },
+            options?.organization
+          );
+
+          // Synchronize document lifecycle to repository if document exists
+          if (repo) {
+            try {
+              const doc = (repo as any).state?.documents?.find((d: any) => d.id === wf.documentId);
+              if (doc) {
+                const now = new Date().toISOString();
+                if (result.workflow.status === 'COMPLETED') {
+                  doc.status = 'APPROVED';
+                } else if (result.workflow.status === 'REJECTED') {
+                  doc.status = 'REJECTED';
+                } else {
+                  doc.status = 'IN_REVIEW';
+                }
+
+                if (targetStage.stageKey === 'STAGE_1_SUPERVISOR' && doc.approvalSteps?.atasan) {
+                  doc.approvalSteps.atasan.status = body.decision === 'APPROVE' ? 'APPROVED' : 'REJECTED';
+                  doc.approvalSteps.atasan.decisionAt = now;
+                  doc.approvalSteps.atasan.comment = body.comment;
+                } else if (targetStage.stageKey === 'STAGE_2_FINANCE' && doc.approvalSteps?.ayu) {
+                  doc.approvalSteps.ayu.status = body.decision === 'APPROVE' ? 'APPROVED' : 'REJECTED';
+                  doc.approvalSteps.ayu.decisionAt = now;
+                  doc.approvalSteps.ayu.comment = body.comment;
+                } else if (targetStage.stageKey === 'STAGE_3_BOD_HERY' && doc.approvalSteps?.bod) {
+                  doc.approvalSteps.bod.heryStatus = body.decision === 'APPROVE' ? 'APPROVED' : 'REJECTED';
+                  doc.approvalSteps.bod.heryDecisionAt = now;
+                  doc.approvalSteps.bod.heryComment = body.comment;
+                } else if (targetStage.stageKey === 'STAGE_3_BOD_HASHIMOTO' && doc.approvalSteps?.bod) {
+                  doc.approvalSteps.bod.hashimotoStatus = body.decision === 'APPROVE' ? 'APPROVED' : 'REJECTED';
+                  doc.approvalSteps.bod.hashimotoDecisionAt = now;
+                  doc.approvalSteps.bod.hashimotoComment = body.comment;
+                }
+
+                doc.updatedAt = now;
+                doc.auditLog.push({
+                  id: (globalThis.crypto?.randomUUID?.() ?? Math.random().toString(36).substring(2)),
+                  timestamp: now,
+                  actor: user.fullName,
+                  action: body.decision,
+                  comment: body.comment || `Keputusan tahap ${targetStage.stageKey}`,
+                });
+
+                (repo as any).flush?.();
+              }
+            } catch (repoErr: any) {
+              if (repoErr?.code === 'NOT_FOUND') {
+                // Standalone stage engine document in isolated unit test
+              } else {
+                throw repoErr;
+              }
+            }
+          }
+
+          stageEngine.commitCrossStorageSync(syncId);
+          return jsonResponse(result, 200);
+        } catch (err: any) {
+          stageEngine.compensateCrossStorageSync(syncId, err.message || 'Stage decision error');
+          throw err;
+        }
+      }
+
+      // POST /api/v1/stages/:stageId/reassign
+      const stageReassignMatch = path.match(/^\/api\/v1\/stages\/([^/]+)\/reassign$/);
+      if (method === 'POST' && stageReassignMatch) {
+        if (!stageEngine) {
+          throw new DomainError('Engine persetujuan tahap belum dikonfigurasi.', 503, 'STAGE_ENGINE_UNAVAILABLE');
+        }
+        if (user.role !== 'ADMIN') {
+          throw new DomainError('Reassignment hanya dapat dikelola oleh Administrator.', 403, 'FORBIDDEN_ROLE');
+        }
+        if (!options?.organization) {
+          throw new DomainError('Penyimpanan organisasi belum dikonfigurasi.', 503, 'ORGANIZATION_UNAVAILABLE');
+        }
+
+        const stageId = decodeURIComponent(stageReassignMatch[1]);
+        const body = await parseJsonBody<{
+          newApproverUserId: string;
+          reason: string;
+        }>(req);
+
+        const result = stageEngine.reassignStage(
+          {
+            stageId,
+            newApproverUserId: body.newApproverUserId,
+            reason: body.reason,
+            actorUserId: user.id,
+          },
+          options.organization
+        );
+
+        return jsonResponse(result, 200);
+      }
+
+      // GET /api/v1/documents/:documentId/workflow
+      const docWfMatch = path.match(/^\/api\/v1\/documents\/([^/]+)\/workflow$/);
+      if (method === 'GET' && docWfMatch) {
+        if (!stageEngine) {
+          throw new DomainError('Engine persetujuan tahap belum dikonfigurasi.', 503, 'STAGE_ENGINE_UNAVAILABLE');
+        }
+        const docId = decodeURIComponent(docWfMatch[1]);
+        const workflow = stageEngine.getWorkflowByDocumentId(docId);
+        if (!workflow) {
+          throw new DomainError(`Workflow untuk dokumen ${docId} tidak ditemukan.`, 404, 'WORKFLOW_NOT_FOUND');
+        }
+
+        const stages = stageEngine.getStages(workflow.id);
+        const snapshots = stageEngine.getSnapshots(workflow.id);
+        const reassignments = stageEngine.getReassignments(workflow.id);
+        const decisions = stageEngine.getDecisions(workflow.id);
+
+        return jsonResponse(
+          {
+            workflow,
+            stages,
+            snapshots,
+            reassignments,
+            decisions,
+          },
+          200
+        );
+      }
+
       // 8. POST /api/v1/documents/:id/generate-pv
       const genPvMatch = path.match(/^\/api\/v1\/documents\/([^/]+)\/generate-pv$/);
       if (method === 'POST' && genPvMatch) {
@@ -254,6 +622,17 @@ export function createAppServer(options?: AppServerOptions): BLCAppServer {
         const sourceDocId = decodeURIComponent(genPvMatch[1]);
         const body = await parseJsonBody<PvGenerationOptions>(req);
         const pv = repo.generatePvFromSource(sourceDocId, user.fullName, body);
+        if (stageEngineEnabled && stageEngine && options?.organization) {
+          stageEngine.createSubmissionWorkflow(
+            {
+              documentId: pv.id,
+              docType: 'PV',
+              docNumber: pv.docNumber,
+              applicantUserId: user.id,
+            },
+            options.organization
+          );
+        }
         return jsonResponse({ document: visibleDocument(user, pv) }, 201);
       }
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { ShieldCheck } from 'lucide-react';
 import type { UserRole } from '../types/document';
+import { Badge } from '@/components/ui/badge';
 
 export interface RoleSwitcherProps {
   activeRole: UserRole;
@@ -42,7 +43,7 @@ export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ activeRole, onRoleCh
               onClick={() => onRoleChange(def.role)}
             >
               <strong>{def.title}</strong>
-              <span className="role-chip-badge">{def.badge}</span>
+              <Badge variant="secondary" className="role-chip-badge">{def.badge}</Badge>
             </button>
           );
         })}

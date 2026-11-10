@@ -3,6 +3,7 @@ import { Download, FileSpreadsheet, FileText, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { modalMotionVariants } from '../lib/motion';
 import type { AnyDocument } from '../types/document';
+import { Button } from '@/components/ui/button';
 
 export interface ExportModalProps {
   documents: AnyDocument[];
@@ -356,35 +357,22 @@ export const ExportModal: React.FC<ExportModalProps> = ({ documents, onClose }) 
 
         {/* Actions Footer */}
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
-          <button
+          <Button
             type="button"
-            className="btn-ghost secondary"
+            variant="ghost"
             onClick={onClose}
-            style={{ padding: '8px 16px', fontSize: '13px', borderRadius: '6px', cursor: 'pointer' }}
           >
             Batal
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
-            className="btn-primary primary"
+            variant="default"
             onClick={handleDownload}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '8px 18px',
-              fontSize: '13px',
-              borderRadius: '6px',
-              background: 'var(--color-primary, #DC2626)',
-              border: 'none',
-              color: '#FFFFFF',
-              fontWeight: 600,
-              cursor: 'pointer',
-            }}
+            className="gap-2"
           >
             <Download size={15} />
             Export File
-          </button>
+          </Button>
         </div>
       </motion.div>
     </dialog>
