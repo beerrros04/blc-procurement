@@ -1612,5 +1612,47 @@
     "seen": 1794307369.5998747,
     "ast_hash": "0a8e245044d1c472af8f41ed6a48c3e2",
     "semantic_hash": ""
+  },
+  "docs/database/database-architecture-v1.md": {
+    "mtime": 1794309202.3944142,
+    "seen": 1794309462.9044325,
+    "ast_hash": "33dff2a4bb1bebf2741372570c34fd02",
+    "semantic_hash": ""
+  },
+  "docs/database/database-hardening-plan.md": {
+    "mtime": 1794309292.3327723,
+    "seen": 1794309462.9046607,
+    "ast_hash": "4a4305133961a87248a2674d8b65bf22",
+    "semantic_hash": ""
+  },
+  "docs/database/database-test-plan.md": {
+    "mtime": 1794309342.3595407,
+    "seen": 1794309462.9053752,
+    "ast_hash": "e5e734ceb2f7028f2494f20076ffca1b",
+    "semantic_hash": ""
+  },
+  "docs/database/master-data-schema-proposal.md": {
+    "mtime": 1794309235.1469917,
+    "seen": 1794309462.9056032,
+    "ast_hash": "7c781f0862dd4d09e7b253e8c767e43d",
+    "semantic_hash": ""
+  },
+  "docs/database/migration-and-reconciliation-plan.md": {
+    "mtime": 1794309317.862403,
+    "seen": 1794309462.9056067,
+    "ast_hash": "96d0c6125817c978b92ca0d924d1dfb0",
+    "semantic_hash": ""
+  },
+  "docs/database/product-owner-decision-register.md": {
+    "mtime": 1794309373.7382886,
+    "seen": 1794309462.9056094,
+    "ast_hash": "44a1a7abc241781d785d07c54c951a96",
+    "semantic_hash": ""
+  },
+  "docs/database/relational-integrity-review.md": {
+    "mtime": 1794309263.4343488,
+    "seen": 1794309462.905789,
+    "ast_hash": "7b11d3de10e4d64340e02d4ea4d6bad5",
+    "semantic_hash": ""
   }
 }
