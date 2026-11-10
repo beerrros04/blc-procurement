@@ -1,11 +1,12 @@
 # PRODUCT OWNER DECISION REGISTER — PHASE 00
-## Final Design Addendum & Decisions Sign-Off
+## Final Design Addendum, Reconciliation & Decisions Sign-Off
 
 **Project:** BLC Caready Procurement Pro  
-**Document:** Product Owner Decisions Register & Review Addendum  
-**Status:** DESIGN FINALIZED — AWAITING IMPLEMENTATION APPROVAL  
-**Scope:** Finalisasi REG-01–REG-06 dan DB-REVIEW-01–03  
-**Implementation:** NOT AUTHORIZED  
+**Document:** Product Owner Decisions Register, Technical Reconciliation & Review Addendum  
+**Status:** AUTHORIZED — DOCUMENTATION REVISION ONLY  
+**Reference:** BLC Procurement Guide v3, November 2026  
+**Scope:** Finalisasi REG-01–REG-06, DB-REVIEW-01–03, dan Rekonsiliasi REC-01–REC-04  
+**Implementation:** LOCKED  
 **Production Migration:** LOCKED  
 **Review Authority:** Project Manager & Product Owner  
 **Date:** 10 November 2026  
@@ -14,12 +15,11 @@
 
 ## 1. Executive Summary
 
-Dokumen ini merupakan catatan resmi keputusan arsitektur dan bisnis yang telah **ditetapkan secara final oleh Product Owner** (**ADR-DB-001 s/d ADR-DB-007**, **REG-01 s/d REG-06**, serta resolusi desain **DB-REVIEW-01 s/d DB-REVIEW-03**).
+Dokumen ini mencatat seluruh keputusan arsitektur dan bisnis yang telah **ditetapkan secara final oleh Product Owner** (**ADR-DB-001 s/d ADR-DB-007**, **REG-01 s/d REG-06**, **DB-REVIEW-01 s/d DB-REVIEW-03**), serta hasil audit rekonsiliasi teknis terhadap empat temuan akhir Project Manager (**REC-01 s/d REC-04**).
 
 > [!IMPORTANT]
-> Seluruh keputusan di bawah ini mengikat (*binding*). Rekomendasi awal tim teknis mengenai *strict branch isolation*, *hierarchical organization*, dan *branch-scoped bank accounts* telah secara resmi **DIGANTIKAN (SUPERSEDED)** oleh keputusan final Product Owner.
-> 
-> Status dokumen: **DESIGN FINALIZED**. Tidak ada skema baru yang boleh dibuat atau dimigrasikan ke database operasional sebelum adanya otorisasi implementasi resmi dari Product Owner.
+> **Status: AUTHORIZED — DOCUMENTATION REVISION ONLY.**  
+> Seluruh rekomendasi teknis awal mengenai *strict branch isolation*, *hierarchical organization*, dan *branch-scoped bank accounts* telah **SECARA RESMI DIGANTIKAN (SUPERSEDED)** oleh keputusan Product Owner. Seluruh fase implementasi fisik (**DB-01 s/d DB-06**) dan migrasi database operasional berstatus **LOCKED** hingga persetujuan implementasi resmi diberikan.
 
 ---
 
@@ -28,164 +28,104 @@ Dokumen ini merupakan catatan resmi keputusan arsitektur dan bisnis yang telah *
 | ID | Status | Keputusan Final Product Owner | Catatan Integrasi Teknis |
 |---|:---:|---|---|
 | **ADR-DB-001** | **DECIDED** | Dynamic Branch Master, Admin-only | Tabel `branches` dikelola eksklusif oleh Administrator. |
-| **ADR-DB-002** | **DECIDED** | One primary branch per user | Setiap pengguna memiliki satu `primary_branch_id`. Transaksi historis tetap menyimpan snapshot nama cabang. |
+| **ADR-DB-002** | **DECIDED** | One primary branch per user | Setiap pengguna memiliki satu `primary_branch_id`. Transaksi historis menyimpan snapshot nama cabang. |
 | **ADR-DB-003** | **DECIDED** | One primary application role, approval assignment terpisah | Satu role utama aplikasi (`role`), kewenangan approval dipisahkan ke stage engine sesuai BR-APP-001. |
 | **ADR-DB-004** | **DECIDED** | Organization managed by Admin | Struktur unit dan penugasan supervisor dikelola oleh Admin. |
-| **ADR-DB-005** | **DECIDED** | Fixed document types | 7 tipe dokumen (`PR`, `PO`, `AV`, `RB`, `RC`, `GR`, `PV`) dipertahankan sebagai static enum; tidak dibuatkan tabel dinamis. |
+| **ADR-DB-005** | **DECIDED** | Fixed document types | 7 tipe dokumen transaksi (`PR`, `PO`, `AV`, `RB`, `RC`, `GR`, `PV`) dipertahankan sebagai static enum; tidak dibuatkan tabel dinamis. |
 | **ADR-DB-006** | **DECIDED** | Centralized vendors and vendor bank accounts | Master vendor dan rekening terpusat. Transaksi historis membekukan data rekening saat submission. |
 | **ADR-DB-007** | **DECIDED** | BLC source bank accounts managed by Finance/Admin | Master rekening kas BLC dikelola Admin & Keuangan, berstatus aktif/nonaktif. |
 | **REG-01** | **DECIDED** | Vendor master managed by Admin only | Hanya Admin yang berwenang membuat atau mengubah master rekanan. |
-| **REG-02** | **DECIDED** | Vendor bank account changes require Maker–Checker | Perubahan nomor rekening vendor wajib melalui pengajuan Maker dan persetujuan Checker berbeda (`maker_user_id !== checker_user_id`). |
+| **REG-02** | **DECIDED** | Vendor bank account changes require Maker–Checker | Perubahan nomor rekening vendor wajib melalui Maker dan Checker berbeda (`maker_user_id !== checker_user_id`). |
 | **REG-03** | **DECIDED** | Global document read access | Seluruh pengguna sah dapat melihat dokumen lintas cabang. *Read access ≠ Mutation authority*. |
 | **REG-04** | **DECIDED** | Flat organizational units with branch and position attributes | Unit organisasi datar tanpa parent-child hierarchy. Atribut jabatan adalah informasi organisasi, bukan bukti kewenangan approval. |
 | **REG-05** | **DECIDED** | Branch deactivation rejected while active transactions exist | Penonaktifan cabang ditolak keras jika masih memiliki transaksi aktif atau kewajiban terbuka. |
 | **REG-06** | **DECIDED** | BLC bank accounts available to all branches | Semua rekening aktif PT BLC Caready tersedia untuk seluruh cabang tanpa mandatory `branch_scope`. |
+| **DB-REVIEW-01**| **DESIGN RESOLVED** | Resolusi Struktur Organisasi Datar | Model unit datar; rekonsiliasi berbasis worksheet resmi `Organization_BLC` menggunakan identifier pengguna terverifikasi. |
+| **DB-REVIEW-02**| **DESIGN RESOLVED** | Freeze Transaction Banking Data at Submission | Pembekuan snapshot rekening rekanan saat submission PO/PV; PV mengunci rekening dari snapshot PO, bukan master vendor. |
+| **DB-REVIEW-03**| **DESIGN RESOLVED** | Consistent SQLite WAL Backup & Verified Restore | Standar pencadangan konsisten WAL-aware (SQLite + workspace JSON + attachments) dan pengujian restore rehearsal. |
 
 ---
 
-## 3. Rincian Keputusan Bisnis REG-01 s/d REG-06
+## 3. Hasil Rekonsiliasi Teknis Akhir (REC-01 s/d REC-04)
 
-### REG-01: Kewenangan Pengelolaan Master Vendor
-- **Status:** **`DECIDED`**
-- **Keputusan PO:** **Centralized Vendor Master (Admin-Only)**.
-- **Aturan:**
-  1. Hanya pengguna dengan peran `ADMIN` yang memiliki hak akses Create dan Update pada tabel `vendors`.
-  2. Staf Pemohon di cabang tidak dapat mengetik nama vendor bebas; pemohon memilih dari vendor yang berstatus `ACTIVE`.
-  3. Menggantikan usulan draf lokal dari cabang.
-
----
-
-### REG-02: Kebijakan Persetujuan Perubahan Rekening Vendor (Maker–Checker)
-- **Status:** **`DECIDED`**
-- **Keputusan PO:** **Wajib Alur Maker–Checker Dua Admin Berbeda**.
-- **Aturan:**
-  1. Pengajuan perubahan atau penambahan rekening rekanan diajukan oleh Admin sebagai **Maker**.
-  2. Pemeriksaan dan persetujuan dilakukan oleh Admin lain sebagai **Checker**.
-  3. Validasi ketat: `maker_user_id !== checker_user_id` (larangan *self-approval*).
-  4. Entitas baru diusulkan: `vendor_bank_account_change_requests`.
-  5. Rekening baru/rekening yang diubah **tidak boleh digunakan** dalam transaksi sebelum disetujui Checker.
-  6. Jika hanya ada 1 Admin aktif, perubahan rekening tetap tertahan menunggu Checker sah berikutnya (tidak ada auto-approval fallback).
+### REC-01: Rekonsiliasi Jenis Dokumen (Document Type Reconciliation)
+- **Status:** **`RECONCILED & DOCUMENTED`**
+- **Temuan & Bukti:**
+  - Panduan BLC v3 mencatat alur transaksi: PR, PO, AV, RB, PV, GR, dan Payment Record.
+  - Kode aplikasi secara aktif mengimplementasikan `RC` (*Realisasi Kasbon / Pertanggungjawaban Uang Muka*) pada [`src/types/document.ts#L1`](file:///C:/Users/Bernard/Documents/personal's%20project/BLC/src/types/document.ts#L1), [`server/repository.ts#L424-L445`](file:///C:/Users/Bernard/Documents/personal's%20project/BLC/server/repository.ts#L424-L445), formulir frontend [`src/components/forms/FormRC.tsx`](file:///C:/Users/Bernard/Documents/personal's%20project/BLC/src/components/forms/FormRC.tsx), dan integrasi tes [`server/server.test.ts#L119-L134`](file:///C:/Users/Bernard/Documents/personal's%20project/BLC/server/server.test.ts#L119-L134).
+  - Dalam logika akuntansi BLC, setiap Advance Payment (`AV`) yang telah dicairkan **wajib dipertanggungjawabkan**. Dokumen `RC` menangani 3 kemungkinan hasil penyelesaian (*settlement outcome*): `SURPLUS` (kembalian kas ke perusahaan), `DEFICIT` (biaya melebihi kasbon, memicu penerbitan PV selisih `RC_DEFICIT`), dan `EXACT` (pas/nihil).
+- **Pemisahan Konseptual:**
+  1. **Transactional Document (`DocType`):** `PR`, `PO`, `AV`, `RB`, `RC`, `GR`, `PV`. Memiliki nomor dokumen resmi, lifecycle status, approval workflow, dan audit trail.
+  2. **Supporting Attachments (`AttachmentCategoryType`):** Berkas bukti pendukung transaksi (`IAM_MEMO`, `QUOTATION`, `INVOICE`, `RECEIPT`, `PHOTO`, `BAST`, `REFUND_PROOF`, `PAYMENT_PROOF`, `SUPPORTING`, `OTHER`).
+  3. **Payment Transaction Record (`PaymentRecord`):** Rekaman eksekusi pencairan kas untuk PV yang telah disetujui, **bukan** jenis dokumen `DocType` tersendiri dan **bukan** tahapan approval baru.
+- **Keputusan:** Dokumen `RC` **tetap dipertahankan 100%** di dalam sistem sebagai jenis dokumen resmi pendamping `AV`.
 
 ---
 
-### REG-03: Batasan Visibilitas Transaksi Antar-Cabang (Cross-Branch Visibility)
-- **Status:** **`DECIDED`**
-- **Keputusan PO:** **Global Document Read Access**.
-- **Klarifikasi Penting (Superseded Recommendation):**
-  - Rekomendasi teknis awal mengenai *Strict Branch Isolation* (isolasi pembacaan berdasarkan cabang) **RESMI DIGANTIKAN**.
-  - Seluruh pengguna terautentikasi dan sah berhak membaca daftar serta detail dokumen di seluruh cabang (*open operational transparency*).
-  - **Prinsip Utama: Read Access $\neq$ Mutation Authority.**
-    - Read: Seluruh pengguna terautentikasi lintas cabang.
-    - Create/Edit: Staf Pemohon sesuai kepemilikan dokumen.
-    - Approval: Approver hanya dapat menyetujui stage yang ditugaskan eksplisit kepadanya. Hak membaca dokumen cabang lain tidak memberikan hak menyetujui dokumen tersebut.
-    - Finance: Keuangan memproses pencairan dan pencatatan kas sesuai wewenang.
-    - Masking finansial tetap ditegakkan: Nomor rekening bank lengkap tetap disamarkan dari pengguna non-finansial.
+### REC-02: Integritas Pembayaran Sebagian & Multi-PV (Partial Payment & Multiple PV)
+- **Status:** **`RECONCILED & INVARIANTS DESIGNED`**
+- **Temuan & Bukti:**
+  - Panduan BLC v3 mengizinkan pembayaran bertahap (termin/sebagian dan pelunasan sisa) pada PO.
+  - Kode aplikasi pada [`server/repository.ts#L1085-L1096`](file:///C:/Users/Bernard/Documents/personal's%20project/BLC/server/repository.ts#L1085-L1096) (`getCommittedAmountOnPo`) telah menghitung komitmen dana PV dan AV sebelumnya. Namun, dokumen rancangan sebelumnya sempat mencantumkan batasan penyederhanaan "Satu dokumen sumber hanya boleh memiliki tepat satu PV aktif" yang bertentangan dengan kebutuhan pembayaran bertahap.
+  - Untuk AV dan RB, batasannya tetap 1 PV karena nilai kasbon/reimbursement bersifat tunggal.
+- **Invarian Pembayaran Sebagian yang Dirancang:**
+  1. **Outstanding Balance Limit:**
+     $$\text{Outstanding Balance} = \text{Source PO Total Net} - \sum \text{PV.netAmountToPay (status } \neq \text{REJECTED, } \neq \text{DRAFT)} - \sum \text{AV.amount (status } \neq \text{REJECTED)}$$
+  2. **Pencegahan Overpayment & Double Payment:** Nilai neto PV baru tidak boleh melebihi `Outstanding Balance`.
+  3. **Concurrency Protection:** Transaksi penerbitan PV mengunci dokumen PO sumber di database untuk mencegah dua staf keuangan membuat PV parsial secara bersamaan yang bila digabung melebihi sisa kewajiban.
+  4. **Pelepasan Komitmen Ditolak:** Jika suatu PV berstatus `REJECTED`, nilai komitmennya dilepaskan kembali secara otomatis ke `Outstanding Balance`.
+  5. **Status Pembayaran Bertingkat:** PO berstatus pembayaran `PARTIALLY_PAID` saat minimal 1 PV lunas namun saldo sisa $> 0$, dan berstatus `PAID` saat seluruh kewajiban telah lunas dicairkan.
 
 ---
 
-### REG-04: Hubungan Antara Cabang, Divisi, dan Jabatan
-- **Status:** **`DECIDED`**
-- **Keputusan PO:** **Flat Organizational Units with Branch and Position Attributes**.
-- **Klarifikasi Penting (Superseded Recommendation):**
-  - Rekomendasi awal mengenai *Hierarchical Parent-Child Units* (`parent_unit_id`) **RESMI DIGANTIKAN**. Sistem menggunakan struktur datar (*flat*).
-  - Entitas `org_units` menyimpan unit organisasi datar dengan atribut `branch_id` dan `status`.
-  - Atribut jabatan (*job_title* / *position_label*) pada profil pengguna adalah data deskriptif organisasi, **bukan bukti kewenangan approval**.
-  - Kantor Pusat atau unit yang melayani multi-cabang direpresentasikan secara eksplisit, bukan diasumsikan dari penamaan.
-  - Kewenangan persetujuan atasan tetap menggunakan penugasan organisasi (`org_assignments`) dan snapshot submission.
-  - Referensi resmi: Worksheet `Organization_BLC` pada workbook operasional resmi; rekonsiliasi wajib berbasis identifier pengguna yang terverifikasi, bukan pencocokan nama otomatis.
+### REC-03: Prosedur Migrasi Aman Tabel Eksisting `org_units` (Existing Table Migration)
+- **Status:** **`RECONCILED & RUNBOOK DESIGNED`**
+- **Temuan & Bukti:**
+  - Tabel `org_units` saat ini telah terpasang fisik di database dengan skema v1: `(id TEXT PRIMARY KEY, name TEXT NOT NULL UNIQUE, created_at TEXT NOT NULL, created_by TEXT NOT NULL)` ([`server/organization.ts#L49`](file:///C:/Users/Bernard/Documents/personal's%20project/BLC/server/organization.ts#L49)).
+  - Modul [`server/organization.ts#L64-L105`](file:///C:/Users/Bernard/Documents/personal's%20project/BLC/server/organization.ts#L64-L105) menerapkan fungsi penegak `schemaState(db)` yang sangat ketat: jika definisi tabel berbeda tanpa migrasi versi yang sah pada `org_schema_version`, sistem menyatakan database `INCOMPATIBLE` (HTTP 503).
+  - Perintah `CREATE TABLE IF NOT EXISTS org_units` tidak dapat menambahkan kolom baru (`code`, `branch_id`, `status`, `updated_at`, `updated_by`).
+- **Prosedur Migrasi Aditif Aman (Phase DB-02):**
+  1. Periksa `PRAGMA table_info(org_units)`.
+  2. Tambahkan kolom yang belum ada menggunakan `ALTER TABLE org_units ADD COLUMN ...`.
+  3. Buat indeks parsial/unik baru secara terpisah: `CREATE UNIQUE INDEX IF NOT EXISTS idx_org_units_code ON org_units(code) WHERE code IS NOT NULL;`.
+  4. Perbarui `org_schema_version` dari `2` menjadi `3`.
+  5. Seluruh proses dibungkus dalam transaksi `BEGIN IMMEDIATE ... COMMIT` dengan rollback otomatis jika terjadi kegagalan.
 
 ---
 
-### REG-05: Prosedur Penonaktifan Cabang (Controlled Branch Deactivation)
-- **Status:** **`DECIDED`**
-- **Keputusan PO:** **Tolak Penonaktifan Jika Masih Terdapat Transaksi Aktif (Reject While Active Transactions Exist)**.
-- **Klarifikasi Penting (Superseded Recommendation):**
-  - Usulan awal mengenai *Graceful Inactive with In-Flight Drain* **RESMI DIGANTIKAN**.
-  - Backend wajib memeriksa transaksi aktif dan kewajiban terbuka sebelum penonaktifan cabang disahkan.
-  - Transaksi penghambat mencakup:
-    - Dokumen berstatus `SUBMITTED` atau `IN_REVIEW`.
-    - Dokumen yang membutuhkan tindakan lanjutan.
-    - PO, AV, atau RB yang masih membutuhkan PV.
-    - PV yang belum lunas (`UNPAID`).
-    - Payment workflow yang belum selesai.
-    - Draf yang belum dibatalkan/ditutup.
-  - Jika ditemukan transaksi aktif, permintaan penonaktifan **DITOLAK KERAS** dengan kode error eksplisit serta rincian jenis dan jumlah transaksi penghambat.
-  - Pengguna aktif yang terdaftar pada cabang tersebut wajib direkonsiliasi terlebih dahulu sebelum cabang diizinkan nonaktif.
-  - Tidak ada penghapusan fisik (*no hard delete*).
+### REC-04: Penguatan Integritas Maker–Checker (Maker–Checker Hardening)
+- **Status:** **`RECONCILED & CONSTRAINTS DESIGNED`**
+- **Temuan & Bukti:**
+  - Entitas `vendor_bank_account_change_requests` diusulkan untuk memenuhi **REG-02**.
+  - Diperlukan proteksi ganda: level database (SQL CHECK constraint) dan level backend application logic.
+- **Spesifikasi Integritas:**
+  1. **Database Check Constraint:**
+     ```sql
+     CHECK (checker_user_id IS NULL OR maker_user_id <> checker_user_id)
+     CHECK ((status = 'PENDING' AND checker_user_id IS NULL AND reviewed_at IS NULL) OR 
+            (status IN ('APPROVED', 'REJECTED') AND checker_user_id IS NOT NULL AND reviewed_at IS NOT NULL))
+     ```
+  2. **Backend Dual-Control Gate:** Endpoint review memverifikasi token Checker berstatus `ADMIN` aktif dan menolak jika `checkerUserId === request.makerUserId` (HTTP 422).
+  3. **Concurrency Protection:** Keputusan review dieksekusi dengan kueri atomik `WHERE id = ? AND status = 'PENDING'`. Jika baris yang terpengaruh bernilai 0, permintaan ditolak dengan HTTP 409 `CHANGE_REQUEST_ALREADY_REVIEWED`.
 
 ---
 
-### REG-06: Cakupan Master Rekening Kas Perusahaan (Company Bank Account Scope)
-- **Status:** **`DECIDED`**
-- **Keputusan PO:** **All Active BLC Bank Accounts Available to All Branches**.
-- **Klarifikasi Penting (Superseded Recommendation):**
-  - Usulan awal mengenai kolom wajib `branch_scope` **RESMI DIGANTIKAN**.
-  - Seluruh rekening kas/bank aktif PT BLC Caready bersifat global dan dapat digunakan untuk pelunasan transaksi dari seluruh cabang.
-  - Tidak diperlukan pembatasan relasi tabel cabang-rekening.
-  - Pengelolaan dilakukan oleh Tim Keuangan dan Admin. Rekening `INACTIVE` tidak boleh dipilih untuk transaksi baru.
+## 4. Item Keputusan Bisnis yang Masih Terbuka (Remaining Business Decisions)
+
+Seluruh isu arsitektural telah terselesaikan pada level perancangan. Berikut adalah dua (2) detail kebijakan operasional yang ditandai untuk difinalisasi sebelum fase DB-04 dan DB-05:
+
+| ID Keputusan | Topik Kebijakan | Pertanyaan Spesifik untuk Product Owner | Rekomendasi Solusi Teknis |
+|:---:|---|---|---|
+| **BD-REC-01** | *Masa Berlaku Perubahan Rekening Vendor (Change Request Expiry)* | Apakah pengajuan perubahan rekening vendor yang berstatus `PENDING` memiliki batas waktu kedaluwarsa (misal: otomatis batal setelah 14 hari kerja jika belum disetujui Checker)? | Diberikan batas waktu 14 hari kalender; setelah itu status berubah menjadi `EXPIRED` untuk mencegah penumpukan antrean usang. |
+| **BD-REC-02** | *Toleransi Pembulatan Pajak PV Termin (Rounding Tolerance)* | Pada pembayaran bertahap (termin PO), apakah potongan PPh dipotong proporsional di setiap termin atau seluruhnya diselesaikan pada termin pelunasan terakhir? | Dipotong proporsional per termin sesuai nilai tagihan masing-masing termin, dengan rekonsiliasi selisih pembulatan rupiah di termin terakhir. |
 
 ---
 
-## 4. Resolusi Masalah Desain Teknis (DB-REVIEW-01 s/d DB-REVIEW-03)
+## 5. Ringkasan Status Dokumen & Pengesahan
 
-### DB-REVIEW-01: Resolusi Struktur Organisasi
-- **Status:** **`DESIGN RESOLVED`**
-- **Hasil:**
-  - Mengadopsi model unit organisasi datar (*Flat Units*).
-  - Skema proposal `org_units` menghapus kolom `parent_unit_id`.
-  - Penugasan supervisor menggunakan `org_assignments` yang mengaitkan unit dan supervisor terverifikasi.
-  - Pengguna dapat menjadi supervisor untuk beberapa unit jika terdapat penugasan sah.
-  - Mutasi cabang atau unit tidak mempengaruhi approval snapshot historis.
-
----
-
-### DB-REVIEW-02: Snapshot Data Perbankan Transaksi Finansial
-- **Status:** **`DESIGN RESOLVED`**
-- **Hasil:** **Freeze Transaction Banking Data at Submission**.
-  - **PO Lifecycle:**
-    - Draft: Pemohon memilih vendor aktif dan rekening vendor aktif yang telah disetujui Maker-Checker.
-    - Submission: Menyalin dan membekukan snapshot perbankan secara permanen (`vendor_id`, `legal_name`, `vendor_bank_account_id`, `bank_name`, `account_number`, `account_holder_name`, `snapshot_timestamp`). Perubahan master vendor pasca-submission tidak mengubah data PO. Koreksi wajib melalui alur revisi sah, bukan *silent overwrite*.
-  - **PV Lifecycle:**
-    - Diterbitkan melalui tindakan eksplisit Tim Keuangan.
-    - Untuk PV dari PO: Mengunci rekening tujuan persis dari snapshot PO yang disetujui, bukan mengambil nomor rekening terkini dari master vendor.
-    - Pada submission PV: Data rekening dikunci kembali dalam konteks transaksi PV.
-  - **Payment Record:**
-    - Terhubung ke Approved PV, rekening sumber BLC yang valid, nominal persis, tanggal, dan informasi rekening tujuan dari transaksi PV.
-    - Perubahan master rekening perusahaan setelah pembayaran tidak mengubah data historis.
-  - **Keamanan:** Penyamaran (*masking*) nomor rekening tetap aktif pada antarmuka umum; data sensitif hanya dapat diakses dengan permission keuangan/admin.
-
----
-
-### DB-REVIEW-03: Pencadangan & Pemulihan SQLite WAL
-- **Status:** **`DESIGN RESOLVED`**
-- **Hasil:** **Consistent Backup and Verified Restore Protocol**.
-  - Menghindari penyalinan file `.sqlite` aktif secara sembarangan saat WAL aktif.
-  - Menggunakan SQLite Online Backup API atau snapshot point-in-time yang konsisten.
-  - Menyertakan metadata versi skema, manifest backup, dan checksum SHA-256.
-  - Mengoordinasikan pencadangan antara database SQLite dengan penyimpanan dokumen transaksi (`workspace`) dan berkas unggahan (`attachments`).
-  - Prosedur pengujian pemulihan wajib: `PRAGMA integrity_check;`, `PRAGMA foreign_key_check;`, validasi integritas transaksi & approval, serta *restore rehearsal* di lingkungan terisolasi.
-
----
-
-## 5. Ringkasan Status Akhir & Lembar Pengesahan
-
-| Register / Review ID | Status Akhir | Keputusan Binding Product Owner |
-|:---:|:---:|---|
-| **REG-01** | **DECIDED** | Centralized Vendor Master (Admin-Only). |
-| **REG-02** | **DECIDED** | Maker–Checker untuk Penambahan/Perubahan Rekening Vendor (`maker_user_id !== checker_user_id`). |
-| **REG-03** | **DECIDED** | Global Document Read Access (Read $\neq$ Mutation Authority; Sensitive Data Masked). |
-| **REG-04** | **DECIDED** | Flat Organizational Units with Branch & Position Attributes (No Hierarchy). |
-| **REG-05** | **DECIDED** | Controlled Branch Deactivation: Ditolak Keras Jika Transaksi Aktif / Kewajiban Terbuka Ada. |
-| **REG-06** | **DECIDED** | Seluruh Rekening Kas BLC Aktif Tersedia untuk Semua Cabang (Tanpa Branch Scope). |
-| **DB-REVIEW-01** | **DESIGN RESOLVED** | Resolusi Struktur Organisasi Datar & Penugasan Eksplisit. |
-| **DB-REVIEW-02** | **DESIGN RESOLVED** | Pembekuan Snapshot Data Rekening Transaksi Finansial Saat Submission (PO, PV, Payment). |
-| **DB-REVIEW-03** | **DESIGN RESOLVED** | Standar Backup Konsisten SQLite WAL & Rehearsal Verifikasi Restore Lintas Storage. |
-
-> [!NOTE]
-> Seluruh keputusan telah disinkronkan ke dalam dokumen arsitektur v1:
-> - [`docs/database/database-architecture-v1.md`](file:///C:/Users/Bernard/Documents/personal's%20project/BLC/docs/database/database-architecture-v1.md)
-> - [`docs/database/master-data-schema-proposal.md`](file:///C:/Users/Bernard/Documents/personal's%20project/BLC/docs/database/master-data-schema-proposal.md)
-> - [`docs/database/relational-integrity-review.md`](file:///C:/Users/Bernard/Documents/personal's%20project/BLC/docs/database/relational-integrity-review.md)
-> - [`docs/database/database-hardening-plan.md`](file:///C:/Users/Bernard/Documents/personal's%20project/BLC/docs/database/database-hardening-plan.md)
-> - [`docs/database/migration-and-reconciliation-plan.md`](file:///C:/Users/Bernard/Documents/personal's%20project/BLC/docs/database/migration-and-reconciliation-plan.md)
-> - [`docs/database/database-test-plan.md`](file:///C:/Users/Bernard/Documents/personal's%20project/BLC/docs/database/database-test-plan.md)
+| Komponen | Status Dokumen | Otorisasi Operasional |
+|---|:---:|:---:|
+| **Dokumentasi Arsitektur Database v1** | `DESIGN FINALIZED` | **AUTHORIZED (Documentation Revision Only)** |
+| **Fase Implementasi DB-01 s/d DB-06** | `SPECIFIED & GATED` | **LOCKED (Awaiting PO Authorization)** |
+| **Migrasi Database Fisik Produksi** | `NOT STARTED` | **LOCKED (Strict Freeze)** |
+| **Baseline 315 Automated Tests** | `VERIFIED 100% PASS` | **PRESERVED** |

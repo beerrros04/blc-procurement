@@ -1,11 +1,12 @@
 # MIGRATION & DATA RECONCILIATION PLAN — PHASE 00
-## Database Migration, Reconciliation & Rollback Specification (Task DBH-006)
+## Database Migration, Reconciliation & Rollback Specification (Task DBH-006 & REC-01 s/d REC-04)
 
 **Project:** BLC Caready Procurement Pro  
 **Document:** Database Migration, Reconciliation & Rollback Specification (Task DBH-006)  
-**Status:** DESIGN FINALIZED — AWAITING IMPLEMENTATION APPROVAL  
-**Scope:** Finalisasi REG-01–REG-06 dan DB-REVIEW-01–03  
-**Implementation:** NOT AUTHORIZED  
+**Status:** AUTHORIZED — DOCUMENTATION REVISION ONLY  
+**Reference:** BLC Procurement Guide v3, November 2026  
+**Scope:** Finalisasi REG-01–REG-06, DB-REVIEW-01–03, dan Rekonsiliasi REC-01–REC-04  
+**Implementation:** LOCKED  
 **Production Migration:** LOCKED  
 **Review Authority:** Project Manager & Product Owner  
 **Date:** 10 November 2026  
@@ -14,18 +15,19 @@
 
 ## 1. Executive Summary
 
-Dokumen ini merinci strategi migrasi data, rekonsiliasi bertahap, serta protokol pencadangan dan pemulihan (*backup and restore protocol*) menuju rancangan basis data v1 yang telah diperkuat. Seluruh rancangan mematuhi keputusan final Product Owner (**ADR-DB-001 s/d ADR-DB-007**, **REG-01 s/d REG-06**, dan **DB-REVIEW-01 s/d DB-REVIEW-03**).
+Dokumen ini merinci strategi migrasi data, rekonsiliasi bertahap, serta protokol pencadangan dan pemulihan (*backup and restore protocol*) menuju rancangan basis data v1 yang telah diperkuat. Seluruh rancangan mematuhi keputusan final Product Owner (**ADR-DB-001 s/d ADR-DB-007**, **REG-01 s/d REG-06**, **DB-REVIEW-01 s/d DB-REVIEW-03**, dan **REC-01 s/d REC-04**).
 
 > [!IMPORTANT]
-> **Status: DESIGN FINALIZED — IMPLEMENTATION NOT AUTHORIZED.**  
+> **Status: AUTHORIZED — DOCUMENTATION REVISION ONLY.**  
 > Dokumen ini berstatus spesifikasi rancangan migrasi. Seluruh eksekusi migrasi ke database operasional dihentikan (*locked*) hingga izin implementasi resmi diterbitkan oleh Product Owner.
 
 ### Prinsip Utama Migrasi:
 1. **Additive & Non-Destructive:** Seluruh perubahan skema bersifat aditif (*additive*). Kolom atau tabel baru ditambahkan tanpa menghapus atau mengubah kolom eksisting.
 2. **Idempotent Execution:** Skrip migrasi dirancang idempoten dan aman dijalankan berulang kali tanpa menghasilkan error atau duplikasi data.
-3. **Zero Automated Name Guessing:** Pencocokan identitas atau relasi organisasi wajib menggunakan identifier kanonikal pengguna yang terverifikasi, bukan menebak berdasarkan kesamaan nama atau jabatan (DB-REVIEW-01).
-4. **Transactional Rollback:** Setiap langkah migrasi dibungkus dalam transaksi `BEGIN IMMEDIATE ... COMMIT`.
-5. **Cross-Storage Coordinated Backup:** Pencadangan point-in-time konsisten mencakup database SQLite WAL, repositori dokumen transaksi, dan berkas lampiran (DB-REVIEW-03).
+3. **Safe Existing Table Alteration (REC-03):** Migrasi terhadap tabel yang sudah ada (`org_units`) mendeteksi skema melalui `PRAGMA table_info` dan menaikkan versi skema secara aman.
+4. **Zero Automated Name Guessing:** Pencocokan identitas atau relasi organisasi wajib menggunakan identifier kanonikal pengguna yang terverifikasi (`usr-*`), bukan menebak berdasarkan nama atau jabatan (DB-REVIEW-01).
+5. **Transactional Rollback:** Setiap langkah migrasi dibungkus dalam transaksi `BEGIN IMMEDIATE ... COMMIT`.
+6. **Cross-Storage Coordinated Backup:** Pencadangan point-in-time konsisten mencakup database SQLite WAL, repositori dokumen transaksi, dan berkas lampiran (DB-REVIEW-03).
 
 ---
 
@@ -45,7 +47,6 @@ Sebanyak 7 nama cabang yang saat ini tercatat pada file statis [`src/domain/bran
 | **Samarinda** | `brc-smd` | `SMD` | Kantor Cabang Samarinda | `ACTIVE` |
 
 ### 2.2. Rekonsiliasi Pengguna ke `primary_branch_id`:
-Skrip migrasi akan mengeksekusi pembaruan relasional:
 ```sql
 UPDATE app_users SET primary_branch_id = 'brc-bks' WHERE branch = 'Bekasi';
 UPDATE app_users SET primary_branch_id = 'brc-cbn' WHERE branch = 'Cibinong';
@@ -55,26 +56,119 @@ UPDATE app_users SET primary_branch_id = 'brc-pku' WHERE branch = 'Pekanbaru';
 UPDATE app_users SET primary_branch_id = 'brc-mks' WHERE branch = 'Makassar';
 UPDATE app_users SET primary_branch_id = 'brc-smd' WHERE branch = 'Samarinda';
 ```
-> [!IMPORTANT]
-> Jika ditemukan pengguna dengan nama cabang di luar 7 cabang resmi, skrip migrasi **TIDAK AKAN** menebak cabang pengguna tersebut, melainkan memasukkannya ke dalam tabel *Reconciliation Exception Log* untuk ditinjau secara manual oleh Administrator.
-
-### 2.3. Rekonsiliasi Struktur Organisasi Resmi (Official Organization Reference — DB-REVIEW-01):
-- **Referensi Resmi:** Menggunakan worksheet `Organization_BLC` pada workbook operasional resmi sebagai sumber kebenaran (*single source of truth*) data divisi dan posisi.
-- **Unit Datar (Flat Units):** Unit organisasi dipetakan sebagai flat units dengan penanda cabang (`branch_id`) dan status aktif (REG-04).
-- **Identifier Verifikasi:** Pencocokan pengguna dengan jabatan dan unit organisasi dilakukan berdasarkan identifier kanonikal pengguna (`usr-*`) yang telah diverifikasi (`verification_status = 'VERIFIED'`). Tidak diperkenankan melakukan pencocokan atau penugasan otomatis hanya berdasarkan string nama dan jabatan.
-- **Kekebalan Approval Historis:** Rekonsiliasi unit dan cabang baru tidak mengubah data snapshot approval yang telah terkunci pada dokumen historis.
-
-### 2.4. Rekonsiliasi Rekanan Eksisting (Vendor Extraction & Deduplication):
-1. Membaca seluruh `po.vendorName`, `po.vendorCode`, dan `po.bankDetails` dari dokumen PO berstatus `APPROVED`.
-2. Mengekstrak daftar nama unik dan menormalisasi penamaan.
-3. Mendaftarkan draf data awal untuk tabel `vendors` dengan status `'ACTIVE'` atau `'DRAFT'`.
-4. Mendaftarkan rekening bank terkait ke tabel `vendor_bank_accounts`.
-5. Perubahan rekening di masa mendatang dialihkan ke alur Maker–Checker (`vendor_bank_account_change_requests`) sesuai REG-02.
 
 ---
 
-## 3. Langkah-Langkah Eksekusi Migrasi (Migration Execution Steps)
+## 3. Runbook Migrasi Aman Tabel Eksisting `org_units` (TASK REC-03)
 
+### 3.1. Analisis Skema Eksisting:
+Berdasarkan inspeksi langsung pada [`server/organization.ts#L49`](file:///C:/Users/Bernard/Documents/personal's%20project/BLC/server/organization.ts#L49), tabel `org_units` saat ini didefinisikan sebagai:
+```sql
+CREATE TABLE IF NOT EXISTS org_units (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL UNIQUE,
+  created_at TEXT NOT NULL,
+  created_by TEXT NOT NULL
+);
+```
+Tabel versi saat ini dipantau oleh fungsi `schemaState()` yang membaca tabel `org_schema_version` (versi 2). Perintah `CREATE TABLE IF NOT EXISTS` tidak berpengaruh terhadap tabel yang sudah ada, sehingga penambahan kolom `code`, `branch_id`, `status`, `updated_at`, dan `updated_by` wajib melalui prosedur migrasi aditif terstruktur.
+
+### 3.2. Prosedur Migrasi Aditif Berkelanjutan (Phase DB-02):
+Skrip migrasi dijalankan melalui TypeScript migration runner yang mematuhi 9 tahapan integritas:
+
+```typescript
+// Proposed Migration Step: DB-02 Safe org_units Alteration
+export function migrateOrgUnitsToV3(db: DatabaseSync): void {
+  // 1. Periksa versi skema saat ini
+  const versionRow = db.prepare('SELECT version FROM org_schema_version LIMIT 1').get() as { version: number } | undefined;
+  if (!versionRow || versionRow.version < 2) {
+    throw new Error('Database harus berada pada skema organisasi minimal versi 2 sebelum migrasi ke versi 3.');
+  }
+  if (versionRow.version >= 3) {
+    return; // Idempotent: sudah termigrasi
+  }
+
+  // 2. Bungkus dalam transaksi IMMEDIATE
+  db.exec('PRAGMA foreign_keys=OFF; BEGIN IMMEDIATE;');
+  try {
+    // 3. Inspeksi kolom eksisting pada org_units
+    const columns = db.prepare("PRAGMA table_info('org_units')").all() as { name: string }[];
+    const colNames = new Set(columns.map(c => c.name));
+
+    // 4. Tambahkan kolom aditif yang belum ada
+    if (!colNames.has('code')) {
+      db.exec('ALTER TABLE org_units ADD COLUMN code TEXT;');
+    }
+    if (!colNames.has('branch_id')) {
+      db.exec('ALTER TABLE org_units ADD COLUMN branch_id TEXT REFERENCES branches(id);');
+    }
+    if (!colNames.has('status')) {
+      db.exec("ALTER TABLE org_units ADD COLUMN status TEXT NOT NULL DEFAULT 'ACTIVE' CHECK(status IN ('ACTIVE','INACTIVE'));");
+    }
+    if (!colNames.has('updated_at')) {
+      db.exec('ALTER TABLE org_units ADD COLUMN updated_at TEXT;');
+    }
+    if (!colNames.has('updated_by')) {
+      db.exec('ALTER TABLE org_units ADD COLUMN updated_by TEXT;');
+    }
+
+    // 5. Buat partial unique index untuk kode unit
+    db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_org_units_code ON org_units(code) WHERE code IS NOT NULL;');
+    db.exec('CREATE INDEX IF NOT EXISTS idx_org_units_branch ON org_units(branch_id);');
+    db.exec('CREATE INDEX IF NOT EXISTS idx_org_units_status ON org_units(status);');
+
+    // 6. Rekonsiliasi data unit datar eksisting dengan cabang default
+    const now = new Date().toISOString();
+    db.prepare(`
+      UPDATE org_units 
+      SET status = 'ACTIVE', updated_at = ?, updated_by = 'MIGRATION_V3' 
+      WHERE status IS NULL OR updated_at IS NULL
+    `).run(now);
+
+    // 7. Naikkan versi skema ke versi 3
+    db.exec('DROP TABLE IF EXISTS org_schema_version;');
+    db.exec('CREATE TABLE org_schema_version (version INTEGER NOT NULL CHECK(version=3));');
+    db.prepare('INSERT INTO org_schema_version(version) VALUES(3);').run();
+
+    // 8. Commit transaksi
+    db.exec('COMMIT;');
+  } catch (err) {
+    db.exec('ROLLBACK;');
+    throw err;
+  } finally {
+    db.exec('PRAGMA foreign_keys=ON;');
+    // 9. Verifikasi integritas pasca migrasi
+    const fkCheck = db.prepare('PRAGMA foreign_key_check;').all();
+    if (fkCheck.length > 0) {
+      throw new Error(`Integritas Foreign Key terlanggar pasca migrasi org_units: ${JSON.stringify(fkCheck)}`);
+    }
+  }
+}
+```
+
+---
+
+## 4. Rekonsiliasi Dokumen & Pembayaran Bertahap (REC-01 & REC-02)
+
+### 4.1. Rekonsiliasi Dokumen RC (Realisasi Kasbon REC-01):
+- Dokumen `RC` yang telah tercatat pada dokumen historis dipertahankan secara utuh.
+- Validasi kardinalitas 1 AV : 1 RC tetap ditegakkan pada submission ([`server/repository.ts#L424-L445`](file:///C:/Users/Bernard/Documents/personal's%20project/BLC/server/repository.ts#L424-L445)).
+- Dokumen `RC` dengan status `DEFICIT` tetap menjadi sumber sah bagi penerbitan satu PV selisih (`sourceDocType = 'RC_DEFICIT'`).
+
+### 4.2. Rekonsiliasi Pembayaran Bertahap PO (REC-02):
+- Untuk PO historis yang memiliki lebih dari satu PV atau pembayaran uang muka (`AV` bertaut `parentPoId`), skrip audit menghitung akumulasi komitmen:
+  ```typescript
+  const committed = getCommittedAmountOnPo(po.id);
+  const remaining = po.totalAmount - committed;
+  ```
+- Dokumen PO dengan `remaining === 0` dipastikan berstatus pembayaran `PAID`.
+- Dokumen PO dengan `committed > 0` dan `remaining > 0` dipastikan berstatus pembayaran `PARTIALLY_PAID`.
+
+---
+
+## 5. Strategi Cadangan & Pemulihan (Backup & Recovery Protocol — DB-REVIEW-03)
+
+### 5.1. Alur Koordinasi Cadangan Point-in-Time:
 ```mermaid
 sequenceDiagram
     participant Admin as Administrator / CI
@@ -84,47 +178,18 @@ sequenceDiagram
     participant Validator as Post-Migration Verifier
 
     Admin->>Backup: 1. Trigger Pre-Migration Coordinated Backup
-    Backup->>SQLite: Lock Write & Execute sqlite3_backup
+    Backup->>SQLite: Lock Write-Quiesce & Execute sqlite3_backup
     Backup->>Files: Snapshot workspace JSON & uploads/
-    Backup-->>Admin: Backup Manifest & Checksums Ready
-    Admin->>SQLite: 2. BEGIN IMMEDIATE Transaction
-    SQLite->>SQLite: 3. Create New Master Tables (branches, vendors, change_requests, etc.)
-    SQLite->>SQLite: 4. Add Columns (ALTER TABLE app_users ADD primary_branch_id, etc.)
-    SQLite->>SQLite: 5. Seed 7 Official Branches & Initial Company Accounts
-    SQLite->>SQLite: 6. Reconcile Existing References (branch, users, flat units)
-    SQLite-->>Admin: Transaction Ready
-    Admin->>SQLite: 7. COMMIT Transaction
-    Admin->>Validator: 8. Run PRAGMA integrity_check & foreign_key_check
+    Backup-->>Admin: Backup Manifest & SHA-256 Ready
+    Admin->>SQLite: 2. Execute Migration Transaction (BEGIN IMMEDIATE)
+    SQLite->>SQLite: 3. Alter org_units & Create Master Tables
+    SQLite->>SQLite: 4. Bump org_schema_version = 3
+    SQLite-->>Admin: DDL Success
+    Admin->>SQLite: 5. COMMIT Transaction
+    Admin->>Validator: 6. Run PRAGMA integrity_check & foreign_key_check
     Validator-->>Admin: Integrity PASS (0 Errors)
 ```
 
----
-
-## 4. Strategi Cadangan & Pemulihan (Backup & Recovery Protocol — DB-REVIEW-03)
-
-### 4.1. Tantangan Arsitektur SQLite WAL & Multi-Storage:
-Karena sistem menggunakan SQLite dalam mode Write-Ahead Logging (WAL) dan dokumen transaksi disimpan secara hibrida pada JSON `workspace` serta lampiran fisik di `.data/uploads/`:
-- **Menyalin file `.sqlite` secara langsung saat server aktif dilarang keras** karena dapat menghasilkan berkas yang korup atau terfragmentasi.
-- **Backup SQLite saja tidak cukup** untuk memulihkan seluruh sistem jika data transaksi JSON atau berkas lampiran tidak dicadangkan pada titik waktu (*point-in-time*) yang persis sama.
-- Sistem **tidak mengklaim pencadangan atomik lintas storage tanpa koordinasi yang teruji**.
-
-### 4.2. Spesifikasi Pencadangan Konsisten (Consistent Backup Requirements):
-1. **SQLite Online Backup API:** Menggunakan utility `.backup` SQLite atau binding `sqlite3_backup_*` yang menjamin snapshot konsisten tanpa menghentikan pembacaan.
-2. **Metadata Versi Skema:** Menyertakan informasi nomor commit git, versi migrasi, dan waktu pembuatan.
-3. **Manifest & Checksum:** Setiap arsip cadangan menghasilkan file manifest yang memuat hash SHA-256 berkas database, berkas workspace dokumen, dan daftar attachment.
-4. **Koordinasi Multi-Storage:**
-   - Langkah 1: Kunci sementara transaksi penulisan baru (*write-quiesce*).
-   - Langkah 2: Jalankan backup database SQLite ke folder cadangan:
-     ```bash
-     sqlite3 .data/blc-local.sqlite ".backup '.data/backups/blc-db-$(date +%Y%m%d%H%M%S).sqlite'"
-     ```
-   - Langkah 3: Salin snapshot `workspace` dan direktori `.data/uploads/`.
-   - Langkah 4: Buka kembali kunci penulisan.
-   - Langkah 5: Hitung dan catat checksum SHA-256 ke dalam manifest.
-
-### 4.3. Prosedur Verifikasi Pemulihan (Verified Restore Protocol):
-Sebelum hasil cadangan dinyatakan layak (*recovery readiness*), protokol pengujian berikut wajib dijalankan pada lingkungan terisolasi (*restore rehearsal*):
-1. **Struktur B-Tree:** Menjalankan `PRAGMA integrity_check;` pada database hasil pemulihan (wajib mengembalikan `ok`).
-2. **Integritas Relasional:** Menjalankan `PRAGMA foreign_key_check;` (wajib 0 baris pelanggaran).
-3. **Validasi Transaksi & Approval:** Memverifikasi dokumen historis dan stage approval dapat dibaca secara utuh tanpa referensi yatim (*orphans*).
-4. **Dokumentasi RTO/RPO:** Menetapkan batas waktu pemulihan (*Recovery Time Objective*) dan potensi kehilangan data (*Recovery Point Objective*) berdasarkan mekanisme yang benar-benar tersedia dan teruji di server lokal.
+### 5.2. Verifikasi Pemulihan (Verified Restore Protocol):
+- Berkas cadangan SQLite hasil pemulihan wajib lolos uji `PRAGMA integrity_check;` (`ok`) dan `PRAGMA foreign_key_check;` (0 baris).
+- Simulasi pemulihan (*restore rehearsal*) dijalankan secara berkala pada direktori pengujian terisolasi untuk membuktikan dokumen dan state alur approval dapat dibaca 100% tanpa inkonsistensi data.

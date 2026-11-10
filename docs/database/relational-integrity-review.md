@@ -1,11 +1,12 @@
 # RELATIONAL INTEGRITY & DATABASE CONSTRAINTS REVIEW — PHASE 00
-## Relational Integrity, Database Constraints & Invariants Specification (Task DBH-003)
+## Relational Integrity, Database Constraints & Invariants Specification (Task DBH-003 & REC-01 s/d REC-04)
 
 **Project:** BLC Caready Procurement Pro  
 **Document:** Relational Integrity & Invariant Specification (Task DBH-003)  
-**Status:** DESIGN FINALIZED — AWAITING IMPLEMENTATION APPROVAL  
-**Scope:** Finalisasi REG-01–REG-06 dan DB-REVIEW-01–03  
-**Implementation:** NOT AUTHORIZED  
+**Status:** AUTHORIZED — DOCUMENTATION REVISION ONLY  
+**Reference:** BLC Procurement Guide v3, November 2026  
+**Scope:** Finalisasi REG-01–REG-06, DB-REVIEW-01–03, dan Rekonsiliasi REC-01–REC-04  
+**Implementation:** LOCKED  
 **Production Migration:** LOCKED  
 **Review Authority:** Project Manager & Product Owner  
 **Date:** 10 November 2026  
@@ -19,13 +20,13 @@ Dokumen ini merumuskan penegakan integritas relasional (*relational integrity*) 
 2. **Application Domain Layer (Domain Invariants):** Ditegakkan secara transaksional di dalam kode backend ([`server/repository.ts`](file:///C:/Users/Bernard/Documents/personal's%20project/BLC/server/repository.ts), [`server/stage-engine.ts`](file:///C:/Users/Bernard/Documents/personal's%20project/BLC/server/stage-engine.ts), [`server/organization.ts`](file:///C:/Users/Bernard/Documents/personal's%20project/BLC/server/organization.ts)) untuk memvalidasi aturan bisnis kompleks sebelum data ditulis ke disk.
 
 > [!IMPORTANT]
-> Seluruh rekomendasi teknis awal mengenai *strict branch isolation*, *hierarchical organization*, dan *branch-scoped bank accounts* telah **SECARA RESMI DIGANTIKAN** oleh keputusan Product Owner (REG-01 s/d REG-06 dan DB-REVIEW-01 s/d DB-REVIEW-03). Dokumen ini berstatus desain final dan terkunci hingga persetujuan implementasi diberikan.
+> Seluruh rekomendasi teknis awal mengenai *strict branch isolation*, *hierarchical organization*, dan *branch-scoped bank accounts* telah **SECARA RESMI DIGANTIKAN** oleh keputusan Product Owner (REG-01 s/d REG-06, DB-REVIEW-01 s/d DB-REVIEW-03, dan rekonsiliasi REC-01 s/d REC-04). Dokumen ini berstatus desain final dan terkunci hingga persetujuan implementasi diberikan.
 
 ---
 
 ## 2. Invarian Wajib Sistem (Mandatory System Invariants)
 
-Berikut adalah empat belas (14) invarian wajib yang tidak boleh dilanggar dalam kondisi operasional apapun:
+Berikut adalah tujuh belas (17) invarian wajib yang tidak boleh dilanggar dalam kondisi operasional apapun:
 
 | No | Nama Invarian | Deskripsi Aturan Bisnis | Mekanisme Penegakan | Status |
 |:---:|---|---|---|:---:|
@@ -39,10 +40,13 @@ Berikut adalah empat belas (14) invarian wajib yang tidak boleh dilanggar dalam 
 | 8 | **Approval Snapshot Immutability Invariant**| Data approver yang dikunci saat draf disubmit (`approval_assignment_snapshots`) tidak boleh berubah akibat mutasi master data. | Tabel snapshot terpisah yang diisi sekali saat submission; tidak ada trigger update retrospektif. | **Terpenuhi** |
 | 9 | **Zero Orphan Reference Invariant** | Penonaktifan master data (cabang, vendor, rekening) tidak boleh menghapus baris data secara fisik jika sudah pernah dirujuk. | Kebijakan *Soft Deactivation* (`status = 'INACTIVE'`) dan larangan hard `DELETE`. | **Dirancang** |
 | 10 | **Controlled Branch Deactivation (REG-05)** | Cabang dilarang dinonaktifkan jika masih memiliki dokumen aktif (`SUBMITTED`/`IN_REVIEW`), PV belum dibayar, atau draf terbuka. | Evaluasi transaksi terbuka di backend; penolakan keras dengan HTTP 409/422 dan daftar transaksi penghambat. | **Dirancang** |
-| 11 | **Maker–Checker Dual Control (REG-02)** | Perubahan nomor rekening vendor wajib diajukan dan disetujui oleh dua Admin berbeda (`maker_user_id !== checker_user_id`). | Validasi `vendor_bank_account_change_requests` dengan penolakan *self-approval*. | **Dirancang** |
+| 11 | **Maker–Checker Physical Integrity (REC-04)** | Pengajuan perubahan rekening vendor wajib memenuhi `maker_user_id <> checker_user_id` pada level database; status review konsisten. | Database `CHECK (checker_user_id IS NULL OR maker_user_id <> checker_user_id)` dan validasi atomic UPDATE. | **Dirancang** |
 | 12 | **Banking Data Freeze Invariant (DB-REVIEW-02)** | Data rekening vendor pada PO dibekukan saat submission. Dokumen PV dari PO wajib mengunci rekening dari snapshot PO, bukan master vendor. | Snapshot permanen dalam transaksi dokumen; pelarangan *silent overwrite*. | **Dirancang** |
 | 13 | **Global Read / Decoupled Mutation (REG-03)** | Seluruh pengguna sah dapat membaca dokumen lintas cabang, namun otorisasi persetujuan strictly terkunci pada assigned approver. | Query unisolated untuk pembacaan; verifikasi `assigned_approver_id` ketat untuk mutasi; masking nomor rekening lengkap. | **Dirancang** |
 | 14 | **Flat Organizational Units Invariant (REG-04)** | Unit organisasi bersifat datar tanpa parent-child hierarchy; jabatan adalah deskriptif profil, bukan dasar kewenangan approval. | Skema `org_units` tanpa `parent_unit_id`; kewenangan atasan wajib berbasis `org_assignments` dan snapshot. | **Dirancang** |
+| 15 | **Document Classification Separation (REC-01)** | Sistem membedakan secara tegas 7 `DocType` (`PR`, `PO`, `AV`, `RB`, `RC`, `GR`, `PV`), berkas lampiran, dan `PaymentRecord`. | Static enum pada types dan database constraints; `PaymentRecord` bukan `DocType` dan bukan tahap approval. | **Dirancang** |
+| 16 | **Outstanding Balance Integrity (REC-02)** | Total komitmen PV bertahap pada PO tidak boleh melampaui total nilai neto PO; pembatalan/penolakan PV memulihkan saldo. | Rumus saldo terutang pada `getCommittedAmountOnPo` + locking transaksi untuk mencegah concurrent overpayment. | **Dirancang** |
+| 17 | **Safe Additive Migration Invariant (REC-03)** | Migrasi tabel eksisting `org_units` wajib memeriksa skema via `PRAGMA table_info` dan menaikkan versi skema ke v3 dalam transaksi tertutup. | Pengecekan kolom dinamis + transaksi rollback otomatis jika terdeteksi skema incompatible. | **Dirancang** |
 
 ---
 
@@ -54,13 +58,13 @@ graph TD
         B[branches]
         BA[branch_audit]
         U[app_users]
-        OU[org_units - Flat]
+        OU[org_units - Flat (REC-03)]
         OA[org_assignments]
         V[vendors]
         VBA[vendor_bank_accounts]
-        VBACR[vendor_bank_account_change_requests - REG-02]
+        VBACR[vendor_bank_account_change_requests (REC-04)]
         VA[vendor_audit]
-        CBA[company_bank_accounts - Global REG-06]
+        CBA[company_bank_accounts - Global (REG-06)]
         CBAA[company_bank_account_audit]
     end
 
@@ -74,8 +78,8 @@ graph TD
     end
 
     subgraph Document_Repo["Dokumen Transaksi (JSON di workspace)"]
-        DOCS[PR / PO / AV / RB / RC / GR / PV]
-        PAYREC[Payment Record]
+        DOCS[PR / PO / AV / RB / RC / GR / PV (REC-01)]
+        PAYREC[Payment Record (Execution Artifact)]
     end
 
     %% Relasi FK Fisik Master
@@ -87,8 +91,8 @@ graph TD
     V -->|FK ON DELETE RESTRICT: vendor_id| VBA
     V -->|FK: vendor_id| VBACR
     VBA -->|FK: target_account_id| VBACR
-    U -->|FK: maker_user_id| VBACR
-    U -->|FK: checker_user_id| VBACR
+    U -->|FK: maker_user_id (REC-04)| VBACR
+    U -->|FK: checker_user_id (REC-04)| VBACR
     V -->|FK: vendor_id| VA
     CBA -->|FK: account_id| CBAA
     
@@ -111,7 +115,7 @@ graph TD
 ```
 
 ### Aksi Referensial (Referential Actions):
-- **Semua Relasi Master Data:** Diterapkan `ON DELETE RESTRICT` (atau default SQLite `RESTRICT`). Tidak diperbolehkan menggunakan `ON DELETE CASCADE` pada entitas master maupun transaksi, guna mencegah penghapusan data berantai yang tidak disengaja.
+- **Semua Relasi Master Data:** Diterapkan `ON DELETE RESTRICT` (atau default SQLite `RESTRICT`). Tidak diperbolehkan menggunakan `ON DELETE CASCADE` pada entitas master maupun transaksi.
 
 ---
 
@@ -121,6 +125,7 @@ graph TD
 |---|---|---|:---:|
 | `idx_branches_code_unique` | `branches(code)` | Pencarian cepat dan validasi keunikan kode cabang saat registrasi/update. | UNIQUE |
 | `idx_branches_status` | `branches(status)` | Filtering dropdown cabang aktif pada antarmuka pengguna (`WHERE status='ACTIVE'`). | Regular |
+| `idx_org_units_code` | `org_units(code)` | Validasi keunikan kode unit organisasi datar (REC-03). | Partial UNIQUE |
 | `idx_org_units_branch` | `org_units(branch_id)` | Lookup unit organisasi berdasarkan cabang. | Regular |
 | `idx_vendors_code` | `vendors(vendor_code)` | Pencarian vendor berdasarkan kode pada formulir pengadaan. | UNIQUE |
 | `idx_vendors_legal_name` | `vendors(legal_name)` | Autocomplete pencarian nama rekanan pada form procurement. | Regular |
@@ -134,8 +139,6 @@ graph TD
 ---
 
 ## 5. Konfigurasi Mesin SQLite Enterprise & Prosedur Pemeriksaan Integritas
-
-Untuk menjamin keandalan data setara database enterprise, file koneksi SQLite wajib mengaktifkan pragma konfigurasi berikut pada setiap inisialisasi:
 
 ```typescript
 // Konfigurasi Standar Engine SQLite BLC Procurement Pro
