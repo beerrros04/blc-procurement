@@ -406,4 +406,48 @@ describe('HF02-A Revision 01 Persistent Identity Foundation', () => {
     }
     expect(org.readiness().schema).toBe('COMPATIBLE');
   });
+
+  it('T03: validates user primary_branch_id and rejects inactive branch on create/update', async () => {
+    const { file, org } = setup();
+    const db = new DatabaseSync(file);
+    const { BranchRepository } = await import('./branch-engine');
+    const branchRepo = new BranchRepository(db);
+
+    // Verify seeded users have primaryBranchId reconciled
+    const adminUser = org.getUser('usr-admin-01');
+    expect(adminUser.primaryBranchId).toBe('brc-bks');
+    expect(adminUser.branch).toBe('Bekasi');
+
+    const surabayaUser = org.getUser('usr-atasan-01');
+    expect(surabayaUser.primaryBranchId).toBe('brc-sby');
+    expect(surabayaUser.branch).toBe('Surabaya');
+
+    // Deactivate Cibinong
+    branchRepo.deactivateBranch('brc-cbn', 'usr-admin-01');
+
+    // Creating user with inactive branch must throw 422 BRANCH_INACTIVE
+    expect(() => {
+      org.createUser({
+        email: 'staff.cibinong@blc.co.id',
+        fullName: 'Staff Cibinong',
+        branch: 'Cibinong',
+      }, 'usr-admin-01');
+    }).toThrowError(/BRANCH_INACTIVE/);
+
+    // Creating user with active branch works and sets primaryBranchId
+    const created = org.createUser({
+      email: 'staff.medan@blc.co.id',
+      fullName: 'Staff Medan',
+      branch: 'Medan',
+    }, 'usr-admin-01');
+    expect(created.branch).toBe('Medan');
+    expect(created.primaryBranchId).toBe('brc-mdn');
+
+    // Updating user to inactive branch must throw 422 BRANCH_INACTIVE
+    expect(() => {
+      org.updateUser(created.id, { branch: 'Cibinong' }, 'usr-admin-01');
+    }).toThrowError(/BRANCH_INACTIVE/);
+
+    db.close();
+  });
 });

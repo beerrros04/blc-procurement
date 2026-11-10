@@ -3,9 +3,20 @@ import { randomUUID } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import { SEEDED_USERS } from './auth';
 import { DomainError } from './repository';
+import { migrateBranchMaster } from './branch-engine';
 
 export type AccountLifecycleStatus = 'UNVERIFIED' | 'ACTIVE' | 'INACTIVE';
 export type IdentityVerificationStatus = 'UNVERIFIED' | 'VERIFIED' | 'REJECTED';
+
+export const LEGACY_BRANCH_MAPPING: Record<string, string> = {
+  'Bekasi': 'brc-bks',
+  'Cibinong': 'brc-cbn',
+  'Medan': 'brc-mdn',
+  'Surabaya': 'brc-sby',
+  'Pekanbaru': 'brc-pku',
+  'Makassar': 'brc-mks',
+  'Samarinda': 'brc-smd',
+};
 
 export interface AppUserRecord {
   id: string;
@@ -14,6 +25,7 @@ export interface AppUserRecord {
   fullName: string;
   role: string;
   branch: string;
+  primaryBranchId?: string | null;
   branchScope: string;
   status: AccountLifecycleStatus;
   verificationStatus: IdentityVerificationStatus;
@@ -53,6 +65,12 @@ const orgSchemaV1 = `
 `;
 
 const identitySchemaV2 = `
+ CREATE TABLE IF NOT EXISTS app_users (id TEXT PRIMARY KEY, legacy_id TEXT UNIQUE, email TEXT NOT NULL UNIQUE, full_name TEXT NOT NULL, role TEXT NOT NULL, branch TEXT NOT NULL, branch_scope TEXT NOT NULL, status TEXT NOT NULL CHECK(status IN ('UNVERIFIED','ACTIVE','INACTIVE')), verification_status TEXT NOT NULL CHECK(verification_status IN ('UNVERIFIED','VERIFIED','REJECTED')), verified_at TEXT, verified_by TEXT, verification_proof TEXT, created_at TEXT NOT NULL, created_by TEXT NOT NULL, updated_at TEXT NOT NULL, updated_by TEXT NOT NULL, primary_branch_id TEXT);
+ CREATE TABLE IF NOT EXISTS app_user_audit (id TEXT PRIMARY KEY, user_id TEXT NOT NULL REFERENCES app_users(id), actor_user_id TEXT NOT NULL, action TEXT NOT NULL, at TEXT NOT NULL, before_json TEXT, after_json TEXT NOT NULL);
+ CREATE TABLE IF NOT EXISTS app_retired_user_ids (id TEXT PRIMARY KEY, retired_at TEXT NOT NULL, reason TEXT NOT NULL);
+`;
+
+const identitySchemaV2Legacy = `
  CREATE TABLE IF NOT EXISTS app_users (id TEXT PRIMARY KEY, legacy_id TEXT UNIQUE, email TEXT NOT NULL UNIQUE, full_name TEXT NOT NULL, role TEXT NOT NULL, branch TEXT NOT NULL, branch_scope TEXT NOT NULL, status TEXT NOT NULL CHECK(status IN ('UNVERIFIED','ACTIVE','INACTIVE')), verification_status TEXT NOT NULL CHECK(verification_status IN ('UNVERIFIED','VERIFIED','REJECTED')), verified_at TEXT, verified_by TEXT, verification_proof TEXT, created_at TEXT NOT NULL, created_by TEXT NOT NULL, updated_at TEXT NOT NULL, updated_by TEXT NOT NULL);
  CREATE TABLE IF NOT EXISTS app_user_audit (id TEXT PRIMARY KEY, user_id TEXT NOT NULL REFERENCES app_users(id), actor_user_id TEXT NOT NULL, action TEXT NOT NULL, at TEXT NOT NULL, before_json TEXT, after_json TEXT NOT NULL);
  CREATE TABLE IF NOT EXISTS app_retired_user_ids (id TEXT PRIMARY KEY, retired_at TEXT NOT NULL, reason TEXT NOT NULL);
@@ -66,10 +84,16 @@ function schemaState(db: DatabaseSync): 'ABSENT' | 'LEGACY' | 'COMPATIBLE' | 'IN
   if (!rows.length) return 'ABSENT';
 
   const ref = new DatabaseSync(':memory:');
+  const refLegacy = new DatabaseSync(':memory:');
   try {
     ref.exec(orgSchemaV1);
     ref.exec(identitySchemaV2);
     const expected = ref.prepare("SELECT name, sql FROM sqlite_master WHERE name IN ('org_units','org_assignments','org_assignment_audit','org_assignment_active_unique','app_users','app_user_audit','app_retired_user_ids')").all() as { name: string; sql: string }[];
+
+    refLegacy.exec(orgSchemaV1);
+    refLegacy.exec(identitySchemaV2Legacy);
+    const expectedLegacy = refLegacy.prepare("SELECT name, sql FROM sqlite_master WHERE name IN ('org_units','org_assignments','org_assignment_audit','org_assignment_active_unique','app_users','app_user_audit','app_retired_user_ids')").all() as { name: string; sql: string }[];
+
     const normalize = (v: string) => (v || '').toLowerCase().replace(/\s+/g, '').replace(/ifnotexists/g, '');
 
     const v1Match = namesV1.every(n => {
@@ -84,9 +108,15 @@ function schemaState(db: DatabaseSync): 'ABSENT' | 'LEGACY' | 'COMPATIBLE' | 'IN
       return a && b && normalize(a.sql) === normalize(b.sql);
     });
 
+    const v2LegacyMatch = namesV2.every(n => {
+      const a = rows.find(x => x.name === n);
+      const b = expectedLegacy.find(x => x.name === n);
+      return a && b && normalize(a.sql) === normalize(b.sql);
+    });
+
     const versionTable = rows.find(r => r.name === 'org_schema_version');
     if (!versionTable) {
-      return v1Match ? 'LEGACY' : 'INCOMPATIBLE';
+      return (v1Match || v2LegacyMatch) ? 'LEGACY' : 'INCOMPATIBLE';
     }
 
     try {
@@ -94,6 +124,7 @@ function schemaState(db: DatabaseSync): 'ABSENT' | 'LEGACY' | 'COMPATIBLE' | 'IN
       if (versions.length !== 1) return 'INCOMPATIBLE';
       const v = versions[0].version;
       if (v === 1 && v1Match) return 'LEGACY';
+      if (v === 2 && v2LegacyMatch) return 'LEGACY';
       if (v === 2 && v2Match) return 'COMPATIBLE';
       return 'INCOMPATIBLE';
     } catch {
@@ -101,6 +132,7 @@ function schemaState(db: DatabaseSync): 'ABSENT' | 'LEGACY' | 'COMPATIBLE' | 'IN
     }
   } finally {
     ref.close();
+    refLegacy.close();
   }
 }
 
@@ -113,8 +145,15 @@ export function migrateOrganization(path: string): void {
     }
     db.exec('PRAGMA foreign_keys=ON; BEGIN IMMEDIATE');
     try {
+      migrateBranchMaster(db);
       db.exec(orgSchemaV1);
       db.exec(identitySchemaV2);
+      const userColumns = db.prepare("PRAGMA table_info('app_users')").all() as { name: string }[];
+      if (userColumns.length > 0 && !userColumns.some(c => c.name === 'primary_branch_id')) {
+        db.exec('ALTER TABLE app_users ADD COLUMN primary_branch_id TEXT;');
+      }
+      db.exec('CREATE INDEX IF NOT EXISTS idx_app_users_primary_branch ON app_users(primary_branch_id);');
+
       db.exec('DROP TABLE IF EXISTS org_schema_version');
       db.exec('CREATE TABLE org_schema_version (version INTEGER NOT NULL CHECK(version=2))');
       db.prepare('INSERT INTO org_schema_version(version) VALUES(2)').run();
@@ -126,8 +165,8 @@ export function migrateOrganization(path: string): void {
           INSERT INTO app_users (
             id, legacy_id, email, full_name, role, branch, branch_scope,
             status, verification_status, verified_at, verified_by, verification_proof,
-            created_at, created_by, updated_at, updated_by
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            created_at, created_by, updated_at, updated_by, primary_branch_id
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `);
         const insertAudit = db.prepare(`
           INSERT INTO app_user_audit (id, user_id, actor_user_id, action, at, before_json, after_json)
@@ -141,17 +180,25 @@ export function migrateOrganization(path: string): void {
           const verifiedAt = isAdmin ? now : null;
           const verifiedBy = isAdmin ? 'SYSTEM_BOOTSTRAP' : null;
           const verificationProof = isAdmin ? 'Bootstrap administrative identity' : null;
+          const primaryBranchId = LEGACY_BRANCH_MAPPING[u.branch] ?? null;
 
           insertUser.run(
             u.id, u.id, u.email, u.fullName, u.role, u.branch, u.branchScope,
             status, verificationStatus, verifiedAt, verifiedBy, verificationProof,
-            now, 'SYSTEM_BOOTSTRAP', now, 'SYSTEM_BOOTSTRAP'
+            now, 'SYSTEM_BOOTSTRAP', now, 'SYSTEM_BOOTSTRAP', primaryBranchId
           );
 
           insertAudit.run(
             randomUUID(), u.id, 'SYSTEM_BOOTSTRAP', 'BOOTSTRAP_SEED', now, null,
-            JSON.stringify({ id: u.id, email: u.email, status, verificationStatus })
+            JSON.stringify({ id: u.id, email: u.email, status, verificationStatus, primaryBranchId })
           );
+        }
+      } else {
+        const updatePrimaryBranch = db.prepare(`
+          UPDATE app_users SET primary_branch_id = ? WHERE (primary_branch_id IS NULL OR primary_branch_id = '') AND branch = ?
+        `);
+        for (const [branchName, branchId] of Object.entries(LEGACY_BRANCH_MAPPING)) {
+          updatePrimaryBranch.run(branchId, branchName);
         }
       }
 
@@ -252,6 +299,7 @@ export class OrganizationRepository {
       fullName: row.full_name,
       role: row.role,
       branch: row.branch,
+      primaryBranchId: row.primary_branch_id ?? null,
       branchScope: row.branch_scope,
       status: row.status as AccountLifecycleStatus,
       verificationStatus: row.verification_status as IdentityVerificationStatus,
@@ -570,11 +618,11 @@ export class OrganizationRepository {
     }
   }
 
-  createUser(input: { id?: string; legacyId?: string; email: unknown; fullName: unknown; role?: unknown; branch?: unknown; branchScope?: unknown }, actor: string): AppUserRecord {
+  createUser(input: { id?: string; legacyId?: string; email: unknown; fullName: unknown; role?: unknown; branch?: unknown; primaryBranchId?: unknown; branchScope?: unknown }, actor: string): AppUserRecord {
     const email = required(input.email, 'email').toLowerCase();
     const fullName = required(input.fullName, 'fullName');
     const role = typeof input.role === 'string' && input.role.trim() ? input.role.trim() : 'PEMOHON';
-    const branch = typeof input.branch === 'string' && input.branch.trim() ? input.branch.trim() : 'Bekasi';
+    let branch = typeof input.branch === 'string' && input.branch.trim() ? input.branch.trim() : 'Bekasi';
     const branchScope = typeof input.branchScope === 'string' && input.branchScope.trim() ? input.branchScope.trim() : branch;
     const id = input.id ? required(input.id, 'id') : randomUUID();
     const legacyId = input.legacyId ? required(input.legacyId, 'legacyId') : null;
@@ -601,13 +649,31 @@ export class OrganizationRepository {
         throw new DomainError('Email pengguna sudah terdaftar.', 409, 'DUPLICATE_EMAIL');
       }
 
+      let primaryBranchId: string | null = null;
+      const hasBranches = !!db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='branches'").get();
+      if (hasBranches) {
+        const branchKey = (typeof input.primaryBranchId === 'string' && input.primaryBranchId.trim())
+          ? input.primaryBranchId.trim()
+          : branch;
+        const bRow = db.prepare("SELECT id, name, status FROM branches WHERE id = ? OR code = ? COLLATE NOCASE OR name = ? COLLATE NOCASE").get(branchKey, branchKey, branchKey) as { id: string; name: string; status: string } | undefined;
+        if (bRow) {
+          if (bRow.status === 'INACTIVE') {
+            throw new DomainError('[BRANCH_INACTIVE] Cabang yang dipilih sedang tidak aktif.', 422, 'BRANCH_INACTIVE');
+          }
+          primaryBranchId = bRow.id;
+          branch = bRow.name;
+        } else if (input.primaryBranchId) {
+          throw new DomainError('[BRANCH_NOT_FOUND] Cabang tidak ditemukan.', 404, 'BRANCH_NOT_FOUND');
+        }
+      }
+
       db.prepare(`
         INSERT INTO app_users (
           id, legacy_id, email, full_name, role, branch, branch_scope,
           status, verification_status, verified_at, verified_by, verification_proof,
-          created_at, created_by, updated_at, updated_by
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, 'UNVERIFIED', 'UNVERIFIED', null, null, null, ?, ?, ?, ?)
-      `).run(id, legacyId, email, fullName, role, branch, branchScope, now, actor, now, actor);
+          created_at, created_by, updated_at, updated_by, primary_branch_id
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, 'UNVERIFIED', 'UNVERIFIED', null, null, null, ?, ?, ?, ?, ?)
+      `).run(id, legacyId, email, fullName, role, branch, branchScope, now, actor, now, actor, primaryBranchId);
 
       const created = this.userRow(db.prepare('SELECT * FROM app_users WHERE id = ?').get(id));
       db.prepare('INSERT INTO app_user_audit VALUES (?, ?, ?, ?, ?, null, ?)').run(
@@ -624,7 +690,7 @@ export class OrganizationRepository {
     }
   }
 
-  updateUser(idOrLegacyId: string, patch: { id?: unknown; legacyId?: unknown; fullName?: unknown; email?: unknown; branch?: unknown; branchScope?: unknown; role?: unknown }, actor: string): AppUserRecord {
+  updateUser(idOrLegacyId: string, patch: { id?: unknown; legacyId?: unknown; fullName?: unknown; email?: unknown; branch?: unknown; primaryBranchId?: unknown; branchScope?: unknown; role?: unknown }, actor: string): AppUserRecord {
     if (patch.id !== undefined || patch.legacyId !== undefined) {
       throw new DomainError('Identifier canonical dan legacy tidak dapat diubah.', 422, 'IMMUTABLE_IDENTIFIER');
     }
@@ -638,7 +704,31 @@ export class OrganizationRepository {
 
       const fullName = patch.fullName !== undefined ? required(patch.fullName, 'fullName') : existing.fullName;
       const email = patch.email !== undefined ? required(patch.email, 'email').toLowerCase() : existing.email;
-      const branch = patch.branch !== undefined ? required(patch.branch, 'branch') : existing.branch;
+      let branch = existing.branch;
+      let primaryBranchId = existing.primaryBranchId ?? null;
+
+      const hasBranches = !!db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='branches'").get();
+      if (hasBranches && (patch.primaryBranchId !== undefined || patch.branch !== undefined)) {
+        const branchKey = (typeof patch.primaryBranchId === 'string' && patch.primaryBranchId.trim())
+          ? patch.primaryBranchId.trim()
+          : (typeof patch.branch === 'string' && patch.branch.trim() ? patch.branch.trim() : existing.branch);
+
+        const bRow = db.prepare("SELECT id, name, status FROM branches WHERE id = ? OR code = ? COLLATE NOCASE OR name = ? COLLATE NOCASE").get(branchKey, branchKey, branchKey) as { id: string; name: string; status: string } | undefined;
+        if (bRow) {
+          if (bRow.status === 'INACTIVE') {
+            throw new DomainError('[BRANCH_INACTIVE] Cabang yang dipilih sedang tidak aktif.', 422, 'BRANCH_INACTIVE');
+          }
+          primaryBranchId = bRow.id;
+          branch = bRow.name;
+        } else if (patch.primaryBranchId) {
+          throw new DomainError('[BRANCH_NOT_FOUND] Cabang tidak ditemukan.', 404, 'BRANCH_NOT_FOUND');
+        } else if (patch.branch !== undefined) {
+          branch = required(patch.branch, 'branch');
+        }
+      } else if (patch.branch !== undefined) {
+        branch = required(patch.branch, 'branch');
+      }
+
       const branchScope = patch.branchScope !== undefined ? required(patch.branchScope, 'branchScope') : existing.branchScope;
       const role = patch.role !== undefined ? required(patch.role, 'role') : existing.role;
 
@@ -649,9 +739,9 @@ export class OrganizationRepository {
 
       db.prepare(`
         UPDATE app_users
-        SET full_name = ?, email = ?, branch = ?, branch_scope = ?, role = ?, updated_at = ?, updated_by = ?
+        SET full_name = ?, email = ?, branch = ?, branch_scope = ?, role = ?, primary_branch_id = ?, updated_at = ?, updated_by = ?
         WHERE id = ?
-      `).run(fullName, email, branch, branchScope, role, now, actor, existing.id);
+      `).run(fullName, email, branch, branchScope, role, primaryBranchId, now, actor, existing.id);
 
       const updated = this.userRow(db.prepare('SELECT * FROM app_users WHERE id = ?').get(existing.id));
       db.prepare('INSERT INTO app_user_audit VALUES (?, ?, ?, ?, ?, ?, ?)').run(

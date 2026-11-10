@@ -967,4 +967,129 @@ describe('BLC Procurement Production Backend API & Domain Rules', () => {
     expect(rejectedDoc.approvalSteps.bod.heryStatus).toBe('REJECTED');
     expect(rejectedDoc.approvalSteps.bod.hashimotoStatus).toBe('WAITING');
   });
+
+  describe('DB-01: Branch Master REST API & Controlled Deactivation (REG-05)', () => {
+    it('T01 & T02: Admin manages branches via REST API with audit logging and uniqueness enforcement', async () => {
+      const adminToken = await loginAs('ADMIN');
+      const applicantToken = await loginAs('PEMOHON');
+
+      // Global read access (REG-03)
+      const listRes = await apiCall('/api/v1/branches', { token: applicantToken });
+      expect(listRes.status).toBe(200);
+      const listData = await listRes.json();
+      expect(listData.branches.length).toBeGreaterThanOrEqual(7);
+
+      // Non-Admin mutation is rejected with 403
+      const nonAdminCreate = await apiCall('/api/v1/branches', {
+        method: 'POST',
+        token: applicantToken,
+        body: { code: 'DPS', name: 'Denpasar' },
+      });
+      expect(nonAdminCreate.status).toBe(403);
+
+      // Admin creates new branch
+      const createRes = await apiCall('/api/v1/branches', {
+        method: 'POST',
+        token: adminToken,
+        body: { code: 'DPS', name: 'Denpasar', address: 'Jl. Sunset Road No. 88, Kuta' },
+      });
+      expect(createRes.status).toBe(201);
+      const createdBranch = (await createRes.json()).branch;
+      expect(createdBranch.code).toBe('DPS');
+      expect(createdBranch.name).toBe('Denpasar');
+      expect(createdBranch.status).toBe('ACTIVE');
+
+      // Duplicate code is rejected with 409
+      const dupRes = await apiCall('/api/v1/branches', {
+        method: 'POST',
+        token: adminToken,
+        body: { code: 'DPS', name: 'Denpasar Selatan' },
+      });
+      expect(dupRes.status).toBe(409);
+
+      // Admin updates branch
+      const updateRes = await apiCall(`/api/v1/branches/${createdBranch.id}`, {
+        method: 'PUT',
+        token: adminToken,
+        body: { name: 'Denpasar Raya' },
+      });
+      expect(updateRes.status).toBe(200);
+      const updatedBranch = (await updateRes.json()).branch;
+      expect(updatedBranch.name).toBe('Denpasar Raya');
+
+      // Admin views audit trail
+      const auditRes = await apiCall(`/api/v1/branches/${createdBranch.id}/audits`, { token: adminToken });
+      expect(auditRes.status).toBe(200);
+      const audits = (await auditRes.json()).audits;
+      expect(audits).toHaveLength(2);
+      expect(audits[0].action).toBe('CREATE');
+      expect(audits[1].action).toBe('UPDATE');
+    });
+
+    it('T09 & T10: enforces REG-05 rejecting branch deactivation when active transactions exist, allows when clean', async () => {
+      const adminToken = await loginAs('ADMIN');
+      const applicantToken = await loginAs('PEMOHON');
+
+      // Create branch Solo (SLO) and branch Yogyakarta (JOG)
+      const soloCreate = await apiCall('/api/v1/branches', {
+        method: 'POST',
+        token: adminToken,
+        body: { code: 'SLO', name: 'Solo', address: 'Jl. Slamet Riyadi No. 1' },
+      });
+      const solo = (await soloCreate.json()).branch;
+
+      const jogjaCreate = await apiCall('/api/v1/branches', {
+        method: 'POST',
+        token: adminToken,
+        body: { code: 'JOG', name: 'Yogyakarta', address: 'Jl. Malioboro No. 10' },
+      });
+      const jogja = (await jogjaCreate.json()).branch;
+
+      // Submit an active PR for Solo
+      const prRes = await apiCall('/api/v1/documents', {
+        method: 'POST',
+        token: applicantToken,
+        body: { docType: 'PR', title: 'Pengadaan Laptop Solo', branch: 'Solo' },
+      });
+      expect(prRes.status).toBe(201);
+      const prId = (await prRes.json()).document.id;
+
+      // Submit the document to make it SUBMITTED/active
+      await apiCall(`/api/v1/documents/${prId}/submit`, { method: 'POST', token: applicantToken });
+
+      // Admin tries to deactivate Solo while PR is SUBMITTED -> Rejected 409
+      const deactBlockRes = await apiCall(`/api/v1/branches/${solo.id}/deactivate`, {
+        method: 'POST',
+        token: adminToken,
+      });
+      expect(deactBlockRes.status).toBe(409);
+      const blockBody = await deactBlockRes.json();
+      expect(blockBody.code).toBe('BRANCH_HAS_ACTIVE_TRANSACTIONS');
+
+      // Deactivation of clean branch Yogyakarta succeeds with 200
+      const deactSuccessRes = await apiCall(`/api/v1/branches/${jogja.id}/deactivate`, {
+        method: 'POST',
+        token: adminToken,
+      });
+      expect(deactSuccessRes.status).toBe(200);
+      const deactivatedBranch = (await deactSuccessRes.json()).branch;
+      expect(deactivatedBranch.status).toBe('INACTIVE');
+
+      // Attempting to create a document for deactivated branch fails with 422
+      const postDeactDoc = await apiCall('/api/v1/documents', {
+        method: 'POST',
+        token: applicantToken,
+        body: { docType: 'PR', title: 'Pengadaan Gagal', branch: 'Yogyakarta' },
+      });
+      expect(postDeactDoc.status).toBe(422);
+
+      // Reactivating branch succeeds
+      const reactRes = await apiCall(`/api/v1/branches/${jogja.id}/activate`, {
+        method: 'POST',
+        token: adminToken,
+      });
+      expect(reactRes.status).toBe(200);
+      expect((await reactRes.json()).branch.status).toBe('ACTIVE');
+    });
+  });
 });

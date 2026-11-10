@@ -1,9 +1,19 @@
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
+import { DatabaseSync } from 'node:sqlite';
+import { existsSync } from 'node:fs';
 import type { AnyDocument, DocType, PVPaymentDetails, UserRole } from '../src/types/document';
 import { authenticateCredentials, verifyJwt, SEEDED_USERS, type AuthUser } from './auth';
 import { DomainError, ProcurementRepository, type PvGenerationOptions } from './repository';
 import type { OrganizationRepository, AppUserRecord } from './organization';
 import type { ApprovalStageEngine } from './stage-engine';
+import {
+  BranchRepository,
+  BranchConcurrencyCoordinator,
+  migrateBranchMaster,
+  type BranchStatus,
+  type CreateBranchInput,
+  type UpdateBranchPatch,
+} from './branch-engine';
 import {
   LocalAttachmentStorage,
   type AttachmentCategory,
@@ -15,11 +25,14 @@ export interface AppServerOptions {
   organization?: OrganizationRepository;
   stageEngine?: ApprovalStageEngine;
   stageEngineEnabled?: boolean;
+  branchRepo?: BranchRepository;
+  branchConcurrency?: BranchConcurrencyCoordinator;
 }
 
 export interface BLCAppServer extends Server {
   readonly repo: ProcurementRepository;
   readonly storage: LocalAttachmentStorage;
+  readonly branchRepo: BranchRepository;
   fetch: (req: Request) => Promise<Response>;
 }
 
@@ -94,6 +107,23 @@ export function createAppServer(options?: AppServerOptions): BLCAppServer {
   const stageEngine = options?.stageEngine;
   const stageEngineEnabled = options?.stageEngineEnabled ?? (process.env.ENABLE_STAGE_ENGINE === 'true');
 
+  const resolveBranchRepo = (): BranchRepository => {
+    if (options?.branchRepo) return options.branchRepo;
+    const orgPath = (options?.organization as any)?.path;
+    const repoSqlitePath = (repo as any)?.sqlitePath;
+    const dbPath = (orgPath && existsSync(orgPath)) ? orgPath : (repoSqlitePath && existsSync(repoSqlitePath) ? repoSqlitePath : undefined);
+    if (dbPath && (process.env.RUN_DB_MIGRATIONS === 'true' || !dbPath.toLowerCase().includes('blc-local.sqlite'))) {
+      const db = new DatabaseSync(dbPath);
+      migrateBranchMaster(db);
+      return new BranchRepository(db);
+    }
+    const memDb = new DatabaseSync(':memory:');
+    migrateBranchMaster(memDb);
+    return new BranchRepository(memDb);
+  };
+  const branchRepo = resolveBranchRepo();
+  const branchConcurrency = options?.branchConcurrency ?? new BranchConcurrencyCoordinator();
+
   async function handleFetch(req: Request): Promise<Response> {
     const url = new URL(req.url, 'http://localhost');
     const method = req.method.toUpperCase();
@@ -120,6 +150,105 @@ export function createAppServer(options?: AppServerOptions): BLCAppServer {
 
       // Semua endpoint /api/v1/* di bawah ini wajib terautentikasi JWT
       const user = extractAuthUser(req);
+
+      // Branch Master endpoints (/api/v1/branches*)
+      if (path === '/api/v1/branches' || path.startsWith('/api/v1/branches/')) {
+        // GET /api/v1/branches
+        if (path === '/api/v1/branches' && method === 'GET') {
+          const statusParam = url.searchParams.get('status') as BranchStatus | null;
+          const statusFilter = (statusParam === 'ACTIVE' || statusParam === 'INACTIVE') ? statusParam : undefined;
+          return jsonResponse({ branches: branchRepo.listBranches(statusFilter) }, 200);
+        }
+
+        // POST /api/v1/branches (Admin-only)
+        if (path === '/api/v1/branches' && method === 'POST') {
+          if (user.role !== 'ADMIN') throw new DomainError('Akses manajemen cabang hanya untuk Admin.', 403, 'FORBIDDEN_ROLE');
+          const body = await parseJsonBody<CreateBranchInput>(req);
+          const created = branchRepo.createBranch(body, user.id);
+          return jsonResponse({ branch: created }, 201);
+        }
+
+        // Match /api/v1/branches/:id
+        const branchMatch = path.match(/^\/api\/v1\/branches\/([^/]+)(\/(deactivate|activate|audits))?$/);
+        if (branchMatch) {
+          const branchId = decodeURIComponent(branchMatch[1]);
+          const subAction = branchMatch[3]; // 'deactivate' | 'activate' | 'audits' | undefined
+
+          if (!subAction && method === 'GET') {
+            const branch = branchRepo.getBranchById(branchId) || branchRepo.getBranchByCode(branchId);
+            if (!branch) throw new DomainError('Cabang tidak ditemukan.', 404, 'BRANCH_NOT_FOUND');
+            return jsonResponse({ branch }, 200);
+          }
+
+          if (!subAction && (method === 'PUT' || method === 'PATCH')) {
+            if (user.role !== 'ADMIN') throw new DomainError('Akses manajemen cabang hanya untuk Admin.', 403, 'FORBIDDEN_ROLE');
+            const target = branchRepo.getBranchById(branchId) || branchRepo.getBranchByCode(branchId);
+            if (!target) throw new DomainError('Cabang tidak ditemukan.', 404, 'BRANCH_NOT_FOUND');
+            const body = await parseJsonBody<UpdateBranchPatch>(req);
+            const updated = branchRepo.updateBranch(target.id, body, user.id);
+            return jsonResponse({ branch: updated }, 200);
+          }
+
+          if (subAction === 'audits' && method === 'GET') {
+            if (user.role !== 'ADMIN') throw new DomainError('Akses audit cabang hanya untuk Admin.', 403, 'FORBIDDEN_ROLE');
+            const target = branchRepo.getBranchById(branchId) || branchRepo.getBranchByCode(branchId);
+            if (!target) throw new DomainError('Cabang tidak ditemukan.', 404, 'BRANCH_NOT_FOUND');
+            return jsonResponse({ audits: branchRepo.listAuditsForBranch(target.id) }, 200);
+          }
+
+          if (subAction === 'deactivate' && method === 'POST') {
+            if (user.role !== 'ADMIN') throw new DomainError('Akses manajemen cabang hanya untuk Admin.', 403, 'FORBIDDEN_ROLE');
+            const target = branchRepo.getBranchById(branchId) || branchRepo.getBranchByCode(branchId);
+            if (!target) throw new DomainError('Cabang tidak ditemukan.', 404, 'BRANCH_NOT_FOUND');
+
+            const deactivated = await branchConcurrency.withBranchWriteLock(target.code, async () => {
+              return branchRepo.deactivateBranch(target.id, user.id, (targetBranch) => {
+                const keys = typeof targetBranch === 'string'
+                  ? [targetBranch.trim().toLowerCase()]
+                  : [targetBranch.id.toLowerCase(), targetBranch.code.toLowerCase(), targetBranch.name.toLowerCase()];
+                const docs = repo.listDocuments({ branch: '*' });
+                const matched = docs.filter(
+                  (d) => keys.includes(d.branch.trim().toLowerCase())
+                );
+                const reasons: string[] = [];
+                let activeCount = 0;
+
+                for (const d of matched) {
+                  if (d.status === 'SUBMITTED' || d.status === 'IN_REVIEW') {
+                    activeCount++;
+                    reasons.push(`Dokumen ${d.id} (${d.docType}) sedang dalam proses persetujuan.`);
+                  } else if (d.status === 'DRAFT') {
+                    activeCount++;
+                    reasons.push(`Dokumen ${d.id} (${d.docType}) masih berstatus DRAFT terbuka.`);
+                  } else if (d.docType === 'PV' && (d as any).paymentStatus !== 'PAID') {
+                    activeCount++;
+                    reasons.push(`Payment Voucher ${d.id} belum lunas.`);
+                  } else if (['PO', 'AV', 'RB'].includes(d.docType) && d.status === 'APPROVED') {
+                    const relatedPvs = docs.filter((x) => x.docType === 'PV' && (x as any).sourceDocId === d.id);
+                    const hasPaidPv = relatedPvs.some((pv) => (pv as any).paymentStatus === 'PAID');
+                    if (!hasPaidPv) {
+                      activeCount++;
+                      reasons.push(`Dokumen ${d.id} (${d.docType}) telah disetujui tetapi belum memiliki pembayaran lunas.`);
+                    }
+                  }
+                }
+
+                return { activeCount, reasons };
+              });
+            });
+
+            return jsonResponse({ branch: deactivated }, 200);
+          }
+
+          if (subAction === 'activate' && method === 'POST') {
+            if (user.role !== 'ADMIN') throw new DomainError('Akses manajemen cabang hanya untuk Admin.', 403, 'FORBIDDEN_ROLE');
+            const target = branchRepo.getBranchById(branchId) || branchRepo.getBranchByCode(branchId);
+            if (!target) throw new DomainError('Cabang tidak ditemukan.', 404, 'BRANCH_NOT_FOUND');
+            const activated = branchRepo.activateBranch(target.id, user.id);
+            return jsonResponse({ branch: activated }, 200);
+          }
+        }
+      }
 
       // Organizational assignments are deliberately separate from document approval.
       if (path.startsWith('/api/v1/organization/')) {
@@ -244,12 +373,27 @@ export function createAppServer(options?: AppServerOptions): BLCAppServer {
         }
 
         if (method === 'POST') {
-          const body = await parseJsonBody<{ docType: DocType } & Record<string, unknown>>(req);
+          const body = await parseJsonBody<{ docType: DocType; branch?: string } & Record<string, unknown>>(req);
           if (!body.docType) {
             throw new DomainError('Parameter docType wajib diisi.', 400, 'MISSING_DOC_TYPE');
           }
           if (user.role !== 'PEMOHON') throw new DomainError('Hanya pengaju yang dapat membuat pengajuan.', 403, 'FORBIDDEN_ROLE');
-          const created = repo.createDocument({ ...body, ownerId: user.id }, user.fullName);
+
+          const targetBranch = (typeof body.branch === 'string' && body.branch.trim()) ? body.branch.trim() : user.branch;
+          const resolvedBranch = targetBranch && targetBranch !== '*'
+            ? (branchRepo.getBranchByName(targetBranch) || branchRepo.getBranchByCode(targetBranch) || branchRepo.getBranchById(targetBranch))
+            : null;
+          const lockKey = resolvedBranch ? resolvedBranch.code : (targetBranch || 'default');
+
+          const created = await branchConcurrency.withBranchReadLock(lockKey, async () => {
+            if (resolvedBranch) {
+              const fresh = branchRepo.getBranchById(resolvedBranch.id);
+              if (fresh && fresh.status === 'INACTIVE') {
+                throw new DomainError('Cabang sedang tidak aktif dan tidak dapat menerima pengajuan baru.', 422, 'BRANCH_INACTIVE');
+              }
+            }
+            return repo.createDocument({ ...body, ownerId: user.id }, user.fullName);
+          });
           return jsonResponse({ document: visibleDocument(user, created) }, 201);
         }
       }
@@ -731,7 +875,7 @@ export function createAppServer(options?: AppServerOptions): BLCAppServer {
     } catch (err) {
       if (err instanceof DomainError) {
         return jsonResponse(
-          { error: err.message, code: err.code },
+          { error: err.message, code: err.code, details: (err as any).details },
           err.statusCode
         );
       }
@@ -774,6 +918,7 @@ export function createAppServer(options?: AppServerOptions): BLCAppServer {
 
   Object.defineProperty(server, 'repo', { value: repo, enumerable: true });
   Object.defineProperty(server, 'storage', { value: storage, enumerable: true });
+  Object.defineProperty(server, 'branchRepo', { value: branchRepo, enumerable: true });
   Object.defineProperty(server, 'fetch', { value: handleFetch, enumerable: true });
 
   return server;
