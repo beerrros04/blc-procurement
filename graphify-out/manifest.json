@@ -450,15 +450,15 @@
     "semantic_hash": ""
   },
   "vite.config.ts": {
-    "mtime": 1794076269.9361632,
-    "seen": 1794327505.8627284,
-    "ast_hash": "b57a504a0af5e3444156416d9583461e",
+    "mtime": 1794354160.76524,
+    "seen": 1794358795.1975472,
+    "ast_hash": "35a093023d01751d2bc0109d7e8d97bc",
     "semantic_hash": ""
   },
   "server/app.ts": {
-    "mtime": 1794330305.7045405,
-    "seen": 1794330462.2271066,
-    "ast_hash": "3ab2f0090e0404b08c18d5ac18104ca1",
+    "mtime": 1794331244.6627142,
+    "seen": 1794358795.1816764,
+    "ast_hash": "f507347cb000da71dab8359982ed621c",
     "semantic_hash": ""
   },
   "server/auth.ts": {
@@ -474,9 +474,9 @@
     "semantic_hash": ""
   },
   "server/server.test.ts": {
-    "mtime": 1794330230.886769,
-    "seen": 1794330462.22773,
-    "ast_hash": "742592b87875008fddcec33c4db9db6b",
+    "mtime": 1794331258.42831,
+    "seen": 1794358795.1828058,
+    "ast_hash": "d8184530cf49737a4e3f121d0f4672be",
     "semantic_hash": ""
   },
   "server/storage.ts": {
@@ -1662,27 +1662,27 @@
     "semantic_hash": ""
   },
   "server/branch-engine.ts": {
-    "mtime": 1794330349.5664682,
-    "seen": 1794330462.2273881,
-    "ast_hash": "cc18a37fefc2d06dd3f8d614b42a69f4",
+    "mtime": 1794330906.2898114,
+    "seen": 1794358795.1819618,
+    "ast_hash": "b5274e14424f81ad95899dfda7088939",
     "semantic_hash": ""
   },
   "docs/database/db01-branch-reconciliation.md": {
-    "mtime": 1794330400.1364253,
-    "seen": 1794330462.2524357,
-    "ast_hash": "60eab81b1dc3efa4b6d59aae652fef64",
+    "mtime": 1794331309.355505,
+    "seen": 1794358795.2084014,
+    "ast_hash": "245309d614ce0dd6db480be7f0f05651",
     "semantic_hash": ""
   },
   "docs/database/db01-completion-report.md": {
-    "mtime": 1794330439.3400824,
-    "seen": 1794330462.25244,
-    "ast_hash": "d1642a510e6d155af4c94f6ab26fbafe",
+    "mtime": 1794331289.9519322,
+    "seen": 1794358795.208404,
+    "ast_hash": "133c5a3d07160f7970aab5bf91914aa2",
     "semantic_hash": ""
   },
   "docs/database/db01-concurrency-test-report.md": {
-    "mtime": 1794330410.2796676,
-    "seen": 1794330462.2524421,
-    "ast_hash": "d80567c6b096078ffb0c0c30a17890e8",
+    "mtime": 1794331331.4563677,
+    "seen": 1794358795.2084062,
+    "ast_hash": "fc6bea1c4b0da8ca0b03fbc04cd1ec3c",
     "semantic_hash": ""
   },
   "docs/database/db01-migration-verification.md": {
@@ -1695,6 +1695,450 @@
     "mtime": 1794328955.0635507,
     "seen": 1794330462.2586312,
     "ast_hash": "e15f66a1e6714103e926e68b64d612d5",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/dashboard-approved.js": {
+    "mtime": 1794354346.8686368,
+    "seen": 1794358795.1808474,
+    "ast_hash": "e5cdbd41c18a551633bdd71bff077ffb",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/preview.js": {
+    "mtime": 1794352287.1653872,
+    "seen": 1794358795.1808515,
+    "ast_hash": "475ce77ff97b12709f1fe7c5996aad42",
+    "semantic_hash": ""
+  },
+  "docs/uiux/dashboard-reference-study/comparison.html": {
+    "mtime": 1794353216.08782,
+    "seen": 1794358795.219722,
+    "ast_hash": "0777997a2537d35587b5bd6ad2d63096",
+    "semantic_hash": ""
+  },
+  "docs/uiux/dashboard-reference-study/index.html": {
+    "mtime": 1794353188.6958845,
+    "seen": 1794358795.2197251,
+    "ast_hash": "5d1ff3757ef01b19c879134e1dcc1f2f",
+    "semantic_hash": ""
+  },
+  "docs/uiux/phase01-design-direction.md": {
+    "mtime": 1794350008.1012886,
+    "seen": 1794358795.2197268,
+    "ast_hash": "90752c20a46c337ef87f693bd8529237",
+    "semantic_hash": ""
+  },
+  "docs/uiux/phase01-final-critique-report.md": {
+    "mtime": 1794350008.1012886,
+    "seen": 1794358795.2197287,
+    "ast_hash": "29c66237740ee03bb5a4eff383ff3f30",
+    "semantic_hash": ""
+  },
+  "docs/uiux/phase01-final-validation-closure.md": {
+    "mtime": 1794350611.7747324,
+    "seen": 1794358795.2197304,
+    "ast_hash": "980165781180719562d56312f28cc0ed",
+    "semantic_hash": ""
+  },
+  "docs/uiux/phase01-information-architecture.md": {
+    "mtime": 1794332776.2031362,
+    "seen": 1794358795.2197325,
+    "ast_hash": "f5744c9edabf4946bf1db9f0cc03e3b6",
+    "semantic_hash": ""
+  },
+  "docs/uiux/phase01-responsive-strategy.md": {
+    "mtime": 1794349949.6606717,
+    "seen": 1794358795.219734,
+    "ast_hash": "c4d833f1ab2ca4b604d85dc73c4fb425",
+    "semantic_hash": ""
+  },
+  "docs/uiux/phase01-user-flows.md": {
+    "mtime": 1794350008.1002953,
+    "seen": 1794358795.2197359,
+    "ast_hash": "90310471b640e186df1049b35a43317d",
+    "semantic_hash": ""
+  },
+  "docs/uiux/phase01-ux-audit.md": {
+    "mtime": 1794350008.1012886,
+    "seen": 1794358795.2197373,
+    "ast_hash": "bb6ffc28db9358a0d468a5991bbe23b5",
+    "semantic_hash": ""
+  },
+  "docs/uiux/phase01-wireframes.md": {
+    "mtime": 1794349949.6616685,
+    "seen": 1794358795.2197387,
+    "ast_hash": "87424c27157c052cce53dd9f7c57b308",
+    "semantic_hash": ""
+  },
+  "docs/uiux/phase02-component-specifications.md": {
+    "mtime": 1794351533.3324778,
+    "seen": 1794358795.2197406,
+    "ast_hash": "88f66d57ccf0f370060a5015f5dab641",
+    "semantic_hash": ""
+  },
+  "docs/uiux/phase02-dashboard-analytics-contract.md": {
+    "mtime": 1794354325.3363907,
+    "seen": 1794358795.2197425,
+    "ast_hash": "1fda971d427c7afaeb23415207c067c3",
+    "semantic_hash": ""
+  },
+  "docs/uiux/phase02-dashboard-visual-review.md": {
+    "mtime": 1794354501.5023124,
+    "seen": 1794358795.219744,
+    "ast_hash": "18753ad9c5b7befd82a9819bb379aea4",
+    "semantic_hash": ""
+  },
+  "docs/uiux/phase02-design-handoff.md": {
+    "mtime": 1794352207.681397,
+    "seen": 1794358795.2197454,
+    "ast_hash": "028b5bee6b21884efbb8c4017e88f91f",
+    "semantic_hash": ""
+  },
+  "docs/uiux/phase02-design-tokens.md": {
+    "mtime": 1794351657.0209255,
+    "seen": 1794358795.2197468,
+    "ast_hash": "d6e04e637aa7b38d6c2a5a2a68466814",
+    "semantic_hash": ""
+  },
+  "docs/uiux/phase02-frozen-design-foundation.md": {
+    "mtime": 1794355208.6052487,
+    "seen": 1794358795.2197483,
+    "ast_hash": "27225e78f2c108e98b39efd8d92d865e",
+    "semantic_hash": ""
+  },
+  "docs/uiux/phase02-impeccable-critique.md": {
+    "mtime": 1794352338.879538,
+    "seen": 1794358795.21975,
+    "ast_hash": "93047d98a2b34dbfd54edc44807d9555",
+    "semantic_hash": ""
+  },
+  "docs/uiux/phase02-next-screens-mapping.md": {
+    "mtime": 1794355229.471158,
+    "seen": 1794358795.2197516,
+    "ast_hash": "8ab9cfe81eed29b036de8bb629984e13",
+    "semantic_hash": ""
+  },
+  "docs/uiux/phase02-responsive-specifications.md": {
+    "mtime": 1794352338.880534,
+    "seen": 1794358795.2197533,
+    "ast_hash": "63f547bf0825c16486f7ee2ac07b80e9",
+    "semantic_hash": ""
+  },
+  "docs/uiux/phase02-taste-design-review.md": {
+    "mtime": 1794352338.881038,
+    "seen": 1794358795.2197547,
+    "ast_hash": "0a50d18eac958c3e687fad496a01f476",
+    "semantic_hash": ""
+  },
+  "docs/uiux/phase02-typography-and-layout.md": {
+    "mtime": 1794351533.3324778,
+    "seen": 1794358795.2197564,
+    "ast_hash": "72daea94d0b8e1a235df4d1481ca2c82",
+    "semantic_hash": ""
+  },
+  "docs/uiux/phase02-visual-foundations.md": {
+    "mtime": 1794351533.3304062,
+    "seen": 1794358795.2197578,
+    "ast_hash": "1acb195b560d0d178fcd4c2bfba8fda2",
+    "semantic_hash": ""
+  },
+  "docs/uiux/phase02-workspaces-specifications.md": {
+    "mtime": 1794356854.7614353,
+    "seen": 1794358795.2197597,
+    "ast_hash": "9f35e0fbcda680721714a1e487a9c2dd",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/approval-approved.html": {
+    "mtime": 1794357506.6380844,
+    "seen": 1794358795.219761,
+    "ast_hash": "5f4793eca8c8f90eed1ac9d7eef6e369",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/contact-sheet-desktop.html": {
+    "mtime": 1794357030.051744,
+    "seen": 1794358795.2197623,
+    "ast_hash": "b1bf8f11807f6183e9ced1f7d6a512ed",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/contact-sheet-mobile.html": {
+    "mtime": 1794357040.83155,
+    "seen": 1794358795.2197645,
+    "ast_hash": "11b8c28269d99f2464ac740423215d80",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/dashboard-approved-comparison.html": {
+    "mtime": 1794354325.3353794,
+    "seen": 1794358795.219766,
+    "ast_hash": "f81a94ddfb9752593fc167fb4a57250d",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/dashboard-approved.html": {
+    "mtime": 1794354346.8655758,
+    "seen": 1794358795.2197673,
+    "ast_hash": "54deb158877fef0027d94bf0867f4899",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/finance-approved.html": {
+    "mtime": 1794356360.0029297,
+    "seen": 1794358795.2197688,
+    "ast_hash": "7151780cce2b60cda00b1f504b5f87b7",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/form-approved.html": {
+    "mtime": 1794357510.3247273,
+    "seen": 1794358795.2197704,
+    "ast_hash": "de11c40a5d06a0d86bf894d072dc0108",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/index.html": {
+    "mtime": 1794355988.7244833,
+    "seen": 1794358795.2197719,
+    "ast_hash": "8a1b45b4d36d2fe82da0244b15e3c608",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/register-approved.html": {
+    "mtime": 1794356356.3124812,
+    "seen": 1794358795.2197733,
+    "ast_hash": "e4b1fe5d99b4dda03246135b44c98495",
+    "semantic_hash": ""
+  },
+  "docs/uiux/dashboard-reference-study/comparison.png": {
+    "mtime": 1794353261.3591275,
+    "seen": 1794358795.2316842,
+    "ast_hash": "7dcf13d962682bdabf9ec36e8833af3c",
+    "semantic_hash": ""
+  },
+  "docs/uiux/dashboard-reference-study/dashboard-1440.png": {
+    "mtime": 1794353204.7685015,
+    "seen": 1794358795.2316873,
+    "ast_hash": "26ad1bf6943efd96894ca253c96d3373",
+    "semantic_hash": ""
+  },
+  "docs/uiux/dashboard-reference-study/reference.png": {
+    "mtime": 1794353027.4222405,
+    "seen": 1794358795.2316897,
+    "ast_hash": "e0797dd9412c94fd2ffb594cebceaa3a",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/approval-1440.png": {
+    "mtime": 1794352026.9120586,
+    "seen": 1794358795.2316916,
+    "ast_hash": "36aec0d7f71858dc8b61ce0c9a0adec2",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/approval-390.png": {
+    "mtime": 1794352047.3217187,
+    "seen": 1794358795.2316933,
+    "ast_hash": "afd030229195bab6841dae21e583f147",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/approval-approved-1280.png": {
+    "mtime": 1794356239.2848518,
+    "seen": 1794358795.2316952,
+    "ast_hash": "c611d6f3d2460a94049e95146276dcfc",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/approval-approved-1440.png": {
+    "mtime": 1794357618.778252,
+    "seen": 1794358795.231697,
+    "ast_hash": "d7e541e59f9b4cd4ab1f2bd3f3f40139",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/approval-approved-390.png": {
+    "mtime": 1794357643.3440552,
+    "seen": 1794358795.2316988,
+    "ast_hash": "c2076420b4d3a54120c18e963030b43a",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/approval-approved-768.png": {
+    "mtime": 1794356218.7602324,
+    "seen": 1794358795.2317002,
+    "ast_hash": "c48265fef135d823d81199e8a60c43b4",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/contact-sheet-desktop.png": {
+    "mtime": 1794357667.1351593,
+    "seen": 1794358795.231702,
+    "ast_hash": "eb41e49f2574981b407ee51cfd7a3580",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/contact-sheet-mobile.png": {
+    "mtime": 1794357687.5426495,
+    "seen": 1794358795.2317038,
+    "ast_hash": "4549fcc1c8bf7932950f70c9d3c9ec96",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/dashboard-1280.png": {
+    "mtime": 1794351743.0577443,
+    "seen": 1794358795.2317057,
+    "ast_hash": "a2a33a0f375dd152c99334139df04ab5",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/dashboard-1440.png": {
+    "mtime": 1794351681.748802,
+    "seen": 1794358795.2317069,
+    "ast_hash": "83b91d18edd51b489567b6fcd54367f1",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/dashboard-390.png": {
+    "mtime": 1794351702.1502676,
+    "seen": 1794358795.2317085,
+    "ast_hash": "98464bf60c7a1919713bb0ca0563e338",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/dashboard-768.png": {
+    "mtime": 1794351722.6016598,
+    "seen": 1794358795.23171,
+    "ast_hash": "485890cb3ec5640b6c8a4ef675025c61",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/dashboard-approved-1280.png": {
+    "mtime": 1794354372.1924148,
+    "seen": 1794358795.2317114,
+    "ast_hash": "88ee8a2f62cb7f3c2b9dc9a446c807fa",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/dashboard-approved-1440.png": {
+    "mtime": 1794354373.0998592,
+    "seen": 1794358795.231713,
+    "ast_hash": "f557f67f7f41f54e11a6b1e41a380f1a",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/dashboard-approved-390.png": {
+    "mtime": 1794354371.982348,
+    "seen": 1794358795.2317145,
+    "ast_hash": "d4a07800856d98e42a63098929b76b45",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/dashboard-approved-768.png": {
+    "mtime": 1794354373.4190555,
+    "seen": 1794358795.2317166,
+    "ast_hash": "9c59a8a22b1c8099e31b0dd5df14931a",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/dashboard-approved-comparison.png": {
+    "mtime": 1794354444.034588,
+    "seen": 1794358795.2317183,
+    "ast_hash": "31e7b444badf4a63872f0c359b4058a8",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/dashboard-approved-reference.png": {
+    "mtime": 1794353982.2917905,
+    "seen": 1794358795.2317202,
+    "ast_hash": "cdae2c949640ba82bf89e1154e5389bf",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/finance-1440.png": {
+    "mtime": 1794351887.1306696,
+    "seen": 1794358795.2317214,
+    "ast_hash": "e2cb2879fe80b29afaafb90ee8ebde70",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/finance-390.png": {
+    "mtime": 1794351907.41155,
+    "seen": 1794358795.231723,
+    "ast_hash": "81ffdb99b68a153092fc1c52d110c914",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/finance-approved-1280.png": {
+    "mtime": 1794356321.2108867,
+    "seen": 1794358795.2317247,
+    "ast_hash": "7a8efafe3a52da74d8cb1697187112cd",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/finance-approved-1440.png": {
+    "mtime": 1794356259.7572577,
+    "seen": 1794358795.2317264,
+    "ast_hash": "108c83bca62c2b6cef240e58c32d5614",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/finance-approved-390.png": {
+    "mtime": 1794356281.1817055,
+    "seen": 1794358795.2317529,
+    "ast_hash": "2091073633291d5a4391bb472098d1c5",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/finance-approved-768.png": {
+    "mtime": 1794356300.6977289,
+    "seen": 1794358795.2317548,
+    "ast_hash": "af3b113249d0b358608645f63d5dd140",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/form-1440.png": {
+    "mtime": 1794352077.0609417,
+    "seen": 1794358795.2317562,
+    "ast_hash": "3d4e8d6f8f8d8d2ee170572e55e5e6c1",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/form-390.png": {
+    "mtime": 1794352097.8884761,
+    "seen": 1794358795.2317579,
+    "ast_hash": "f8f5fd86142347cc6fcdb8c2b39aaa52",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/form-approved-1280.png": {
+    "mtime": 1794356157.4249697,
+    "seen": 1794358795.231759,
+    "ast_hash": "d71a151c0e831f00f961a0bbf24e472f",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/form-approved-1440.png": {
+    "mtime": 1794357577.9510446,
+    "seen": 1794358795.2317607,
+    "ast_hash": "c165a6b28461ba698aae477954b04f80",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/form-approved-390.png": {
+    "mtime": 1794357599.1649258,
+    "seen": 1794358795.2317622,
+    "ast_hash": "1d7e36d6134e3dd4c3082350ca5dd243",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/form-approved-768.png": {
+    "mtime": 1794356137.3438349,
+    "seen": 1794358795.231764,
+    "ast_hash": "d8d300a846832253ec8468e9d3370228",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/register-1440.png": {
+    "mtime": 1794351763.9123425,
+    "seen": 1794358795.2317653,
+    "ast_hash": "e49b1d7d07e5b216b04a008d945bee16",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/register-390.png": {
+    "mtime": 1794351784.0998805,
+    "seen": 1794358795.2317667,
+    "ast_hash": "73c95c9f9a63482780788b077d563b0c",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/register-approved-1280.png": {
+    "mtime": 1794356075.4780774,
+    "seen": 1794358795.2317681,
+    "ast_hash": "17332315d8a750ad7c2db2556fe44586",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/register-approved-1440.png": {
+    "mtime": 1794356003.2922947,
+    "seen": 1794358795.2317696,
+    "ast_hash": "4fa04d0aafb6beaecd6f1e7f5e0ed7ba",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/register-approved-390.png": {
+    "mtime": 1794356034.3423278,
+    "seen": 1794358795.231771,
+    "ast_hash": "439d98a42bcd3d871713e78853c96bcc",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/register-approved-768.png": {
+    "mtime": 1794356054.9480894,
+    "seen": 1794358795.2317727,
+    "ast_hash": "5d356bd028a1e12565b07178624b6c77",
+    "semantic_hash": ""
+  },
+  "docs/uiux/workbench-preview/screenshots/system-1440.png": {
+    "mtime": 1794352319.3602438,
+    "seen": 1794358795.2317739,
+    "ast_hash": "4e20c7080fdb795efc4f2c5c339a9cc8",
     "semantic_hash": ""
   },
   "package-lock.json": {

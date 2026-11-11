@@ -1,17 +1,17 @@
-# Graph Report - BLC  (2026-11-10)
+# Graph Report - BLC  (2026-11-11)
 
 ## Corpus Check
-- 208 files · ~255,496 words
+- 215 files · ~262,855 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 11 file(s) not represented in the graph (top: .css 4, .diff 3, (none) 2)
 
 ## Summary
-- 2031 nodes · 3618 edges · 162 communities (145 shown, 17 thin omitted)
-- Extraction: 88% EXTRACTED · 12% INFERRED · 0% AMBIGUOUS · INFERRED: 418 edges (avg confidence: 0.94)
+- 2120 nodes · 3776 edges · 164 communities (149 shown, 15 thin omitted)
+- Extraction: 88% EXTRACTED · 12% INFERRED · 0% AMBIGUOUS · INFERRED: 438 edges (avg confidence: 0.94)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `fb65f79c`
+- Built from commit: `c63bb750`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -46,21 +46,21 @@
 - components.json
 - progress.md
 - HOTFIX BR-APP-001 — HF02-D Completion Report
-- Sidebar
+- Kolom terlihat pada daftar RB_Drafts
 - Task 1 Brief: Design Tokens & Elera Component Classes (`src/style.css`)
 - Rencana alur pengajuan BLC — untuk review
 - document-store.ts
 - Daftar Temuan Bernomor (Numbered Findings)
-- App
+- main.tsx
 - Rencana review: perapian UI dan pemeriksaan alur BLC
 - BR-APP-001 — HF02-B Completion Report (Security Gate Verified)
 - Task 2 Brief: App Shell & Role-Based Operations Navigation (`src/main.tsx`)
 - SDD ledger — plan: docs/superpowers/plans/2026-11-09-ui-ux-elera-overhaul-plan.md
 - Laporan Verifikasi Perbaikan Anti-Slop #001: BLC Procurement System
 - Persiapan integrasi SharePoint
-- .createDocument
+- StatusBadge.tsx
 - Pustaka ApprovalDocs
-- BUSINESS REQUIREMENTS GAP ANALYSIS — PHASE 00
+- DocType
 - 2. Daftar Gap & Plot Hole Antara Panduan v3/v4, Email, dan Aplikasi Saat Ini
 - 4. Rincian Teknis & Skema Per Tabel
 - Rencana Perbaikan UI dan Progress Persetujuan
@@ -96,7 +96,7 @@
 - HF-01 implementation and migration
 - cn
 - Step-by-Step Requirements
-- ExportModal.tsx
+- ExportModal
 - 3.3 Spacing, Shape & Elevation Tokens
 - Step-by-Step Requirements
 - Step-by-Step Requirements
@@ -106,7 +106,7 @@
 - Task 3 Report: Modern UI Component System (Buttons, Badges & Chips)
 - Task 2 Report: Interactive Motion Engine (`src/lib/motion.ts`)
 - package.json
-- calculations.ts
+- BranchRepository
 - Task 7 Brief: Full Verification, Daemon Check & Remote Synchronization
 - repository.ts
 - 5. Feedback, Loading, Empty States & Corporate Motion Engine (`src/lib/motion.ts`)
@@ -122,7 +122,7 @@
 - 3. Rencana Tugas Bertahap (*Bite-Sized Implementation Tasks*)
 - DocumentList
 - Must fix
-- Task 3 Report: Topbar Header Simplification (Feedback 3)
+- ExportModal.tsx
 - MIGRATION & DATA RECONCILIATION PLAN — PHASE 00
 - HF02-A — Database Migration Runbook (Revision 01)
 - Ringkasan pengajuan procurement
@@ -137,8 +137,8 @@
 - Tasks
 - BLC PROCUREMENT PRO — DATABASE ARCHITECTURE v1
 - 2. Organization & Identity REST API Contract
-- ApprovalExplorer.tsx
-- displayPersonName
+- UserRole
+- BentoMetrics.tsx
 - REV-004 ? Evidence and working-tree baseline
 - HF02-A — Identity Reconciliation & Verification Matrix (Revision 01)
 - DocumentDetailModal
@@ -156,7 +156,7 @@
 - 00-component-inventory.md
 - 00-visual-coverage-matrix.md
 - ScriptBuilder
-- FormRC.tsx
+- addWorkingDays
 - HF02-A — Organizational Storage & Identity Readiness (Revision 01)
 - MockStorage
 - MemoryStorage
@@ -164,43 +164,45 @@
 - 9. Centralized CSS & TypeScript Architecture (`src/style.css` & `src/types/design-system.types.ts`)
 - RELATIONAL INTEGRITY & DATABASE CONSTRAINTS REVIEW — PHASE 00
 - input.test.tsx
-- readAttachment
-- Task 2: App Shell & Role-Based Operations Navigation (`src/main.tsx`)
-- HOTFIX BR-APP-001 — HF02-B Implementation Plan
-- 2. Temuan Audit Berdasarkan Tingkat Keparahan (P0 - P3) & Kaidah Anti-Slop
-- button.tsx
+- Kebutuhan produk procurement dan pembayaran
+- BLC PROCUREMENT PRO — DB-01
+- Review Focus
+- 3. Audit Detail Data Master Pengadaan (AUDIT-004)
+- branch-engine.ts
 - scripts
-- Phase 00 ? Functional and workflow mapping
+- BranchConcurrencyCoordinator
 - Task 5 Report: Data Presentation & Table Rigor (DocumentList & ApprovalExplorer)
-- 2. Rancangan Backend & Arsitektur API (Fastify + TypeScript)
+- PRODUCT OWNER DECISION REGISTER — PHASE 00
 - Keputusan Fiksasi Alur Bisnis (Terkunci)
-- Pre-flight Scan
-- Context & Objectives
-- Task 4: Collapsible Hamburger Sidebar with Icon Navigation (Feedback 4)
+- Implementation Tasks
+- DocumentDetailModal.tsx
+- BLC PROCUREMENT PRO — DB-01
+- 2. DDL Implemented in Isolated SQLite
+- StoredAttachment
 
 ## God Nodes (most connected - your core abstractions)
 1. `App()` - 54 edges
 2. `react` - 52 edges
-3. `cn()` - 50 edges
-4. `OrganizationRepository` - 49 edges
-5. `DomainError` - 45 edges
+3. `OrganizationRepository` - 50 edges
+4. `cn()` - 50 edges
+5. `DomainError` - 47 edges
 6. `ApprovalStageEngine` - 42 edges
 7. `ProcurementRepository` - 36 edges
 8. `DocumentList()` - 34 edges
-9. `vitest` - 32 edges
+9. `vitest` - 33 edges
 10. `DocType` - 32 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `1. Executive Summary` --references--> `extractAuthUser()`  [INFERRED]
-  docs/redesign/hotfix-br-app-001-hf02c.md → server/app.ts
 - `2. Kebocoran informasi rekening bank melalui `auditLog` dan respons endpoint mutasi, serta bug kotak rekening kosong di UI` --references--> `visibleDocument()`  [INFERRED]
   docs/superpowers/specs/2026-11-09-ponytail-business-flow-audit.md → server/app.ts
+- `Branch Master Foundation Implementation` --references--> `BranchRepository`  [INFERRED]
+  docs/superpowers/plans/2026-11-10-db01-branch-master-foundation.md → server/branch-engine.ts
+- `Task 2: Branch Repository & REG-05 Deactivation Guard (DB01-01, DB01-04)` --references--> `BranchRepository`  [INFERRED]
+  docs/superpowers/plans/2026-11-10-db01-branch-master-foundation.md → server/branch-engine.ts
+- `1. Executive Summary` --references--> `BranchConcurrencyCoordinator`  [INFERRED]
+  docs/database/db01-completion-report.md → server/branch-engine.ts
 - `3.1. Analisis Skema Eksisting:` --references--> `schemaState()`  [INFERRED]
   docs/database/migration-and-reconciliation-plan.md → server/organization.ts
-- `3. Migration Procedure` --references--> `schemaState()`  [INFERRED]
-  docs/redesign/hf02a-migration-runbook.md → server/organization.ts
-- `1. Readiness State Schema` --references--> `OrganizationRepository`  [INFERRED]
-  docs/redesign/hf02a-storage-readiness.md → server/organization.ts
 
 ## Import Cycles
 - None detected.
@@ -211,11 +213,11 @@
 - **Alasan berbeda untuk status skipped** — docs_media_powerautomate_fireshot_capture_013_blc_procurement_approvalhistory_all_items_caready_sharepoint_com_previous_approval, docs_media_powerautomate_fireshot_capture_013_blc_procurement_approvalhistory_all_items_caready_sharepoint_com_self_approval, docs_media_powerautomate_fireshot_capture_013_blc_procurement_approvalhistory_all_items_caready_sharepoint_com_unused_stage [INFERRED 0.95]
 - **RB/RC: keputusan paralel dan otorisasi** — prd_parallel_rbrc, dbd_approval_groups, tdd_access, tdd_parallel_concurrency, ipd_parallel_access_tests [INFERRED 0.95]
 
-## Communities (162 total, 17 thin omitted)
+## Communities (164 total, 15 thin omitted)
 
 ### Community 0 - "Model data konseptual PostgreSQL"
-Cohesion: 0.08
-Nodes (28): Aturan persetujuan bertahap, Tugas dan peristiwa persetujuan, Kelompok paralel dengan tugas per penyetuju, Transaksi atomik, audit, dan outbox, Model data konseptual PostgreSQL, Migrasi SharePoint dan rekonsiliasi, Versi kebijakan workflow, Identitas Entra dan penugasan role berversi (+20 more)
+Cohesion: 0.14
+Nodes (15): Tugas dan peristiwa persetujuan, Kelompok paralel dengan tugas per penyetuju, Transaksi atomik, audit, dan outbox, Model data konseptual PostgreSQL, Migrasi SharePoint dan rekonsiliasi, Versi kebijakan workflow, Identitas Entra dan penugasan role berversi, Cutover dan rekonsiliasi (+7 more)
 
 ### Community 1 - "Email thread evidence and Finance feedback"
 Cohesion: 0.10
@@ -227,19 +229,19 @@ Nodes (13): Kolom Branch pada RC_Drafts, Kolom CADoc pada RC_Drafts, Tampilan RC
 
 ### Community 3 - "Bukti email dan rancangan hak akses"
 Cohesion: 0.09
-Nodes (31): Usulan tingkat HR 1, Ayu 2, Hery dan Hashimoto 3, Realisasi uang muka AV dan RC, Rancangan proses bisnis, Alur RC historis dan konfirmasi Keuangan, Pengecualian PO rutin atau mobilisasi, Penerima pengingat RC historis, Kebijakan penolakan pada kelompok paralel belum diputuskan, Nilai terutang dan pembayaran PV (+23 more)
+Nodes (32): Usulan tingkat HR 1, Ayu 2, Hery dan Hashimoto 3, Realisasi uang muka AV dan RC, Rancangan proses bisnis, Alur RB historis dan pengecualian aturan lama, Alur RC historis dan konfirmasi Keuangan, Pengecualian PO rutin atau mobilisasi, Penerima pengingat RC historis, Kebijakan penolakan pada kelompok paralel belum diputuskan (+24 more)
 
 ### Community 4 - "main.tsx"
-Cohesion: 0.14
-Nodes (22): rupiah, FormGRProps, rupiah, FormPVProps, PvGenerationPayload, rupiah, FormPVPaymentProps, rupiah (+14 more)
+Cohesion: 0.13
+Nodes (26): Task 1: Domain Types and Financial Calculation Core, OutboxJob, VersionedDocument, FormAVProps, FormGRProps, rupiah, FormPVProps, PvGenerationPayload (+18 more)
 
 ### Community 5 - "SharePoint Site Pages and Notebook"
-Cohesion: 0.11
-Nodes (18): BLC Procurement Notebook, Untitled Page pada notebook, Untitled Section pada notebook, Navigasi ApprovalRegister, Halaman Beranda.aspx, Tampilan halaman dikelompokkan berdasarkan pembuat, Halaman CollabHome.aspx, Navigasi AV_Drafts (+10 more)
+Cohesion: 0.15
+Nodes (13): Navigasi ApprovalRegister, Halaman Beranda.aspx, Tampilan halaman dikelompokkan berdasarkan pembuat, Halaman CollabHome.aspx, Navigasi AV_Drafts, Navigasi PO_Drafts, Navigasi PR_Drafts, Navigasi RB_Drafts (+5 more)
 
 ### Community 6 - "Reimbursement (RB) request form"
-Cohesion: 0.04
-Nodes (48): Alur RB historis dan pengecualian aturan lama, Tampilan All Items pada daftar RB_Drafts, Navigasi ApprovalRegister, Navigasi PR, PO, AV, RB, RC dan PV Drafts, Tombol Edit in grid view, Daftar RB_Drafts tampak kosong pada saat tangkapan, Pilihan Export, Workflows dan Integrate, Kolom Branch (+40 more)
+Cohesion: 0.08
+Nodes (25): RB: nilai dan pajak, RB: persetujuan, RB Attachments — lampiran, RB Branch — cabang, RB BudgetType — jenis anggaran, RB DiscountAmount — diskon, RB: informasi umum, RB HasPPN — penanda PPN (+17 more)
 
 ### Community 7 - "generate-figcraft-design.mjs"
 Cohesion: 0.06
@@ -274,12 +276,12 @@ Cohesion: 0.23
 Nodes (15): Riwayat lama: tiga alasan tahap dilewati, Kolom riwayat keputusan dan pelacakan, Riwayat respons persetujuan SharePoint, Contoh komentar pemeriksaan perjalanan dinas dan aktivitas HR, Komentar kasus mobilisasi nasional ke Finance dan BOD, Hasil approve, reject dan skipped, Contoh penolakan terkait metode pembayaran, Skip karena penyetuju telah menyetujui tahap sebelumnya (+7 more)
 
 ### Community 15 - "ApprovalExplorer.tsx"
-Cohesion: 0.19
-Nodes (20): 1. Ringkasan Diagnostik Impeccable Health Score, [F-01] Approval Register, History, dan Docs Rusak di Layar Mobile (< 600px) — **RESOLVED**, openAttachment(), ApprovalDocsView(), ApprovalHistoryView(), ApprovalRegisterView(), CATEGORY_LABELS, filterRegisterDocuments() (+12 more)
+Cohesion: 0.15
+Nodes (26): 1. Ringkasan Diagnostik Impeccable Health Score, [F-01] Approval Register, History, dan Docs Rusak di Layar Mobile (< 600px) — **RESOLVED**, ApprovalDocsView(), ApprovalDocsViewProps, ApprovalHistoryView(), ApprovalHistoryViewProps, ApprovalRegisterView(), ApprovalRegisterViewProps (+18 more)
 
 ### Community 16 - "FormAV.tsx"
-Cohesion: 0.15
-Nodes (16): 10. Dukungan rincian baris item (`LineItem[]`) pada dokumen PR dan PO, ApproverSelectProps, STANDARD_APPROVERS, FormPOProps, rupiah, FormPRProps, FormRBProps, rupiah (+8 more)
+Cohesion: 0.10
+Nodes (23): 10. Dukungan rincian baris item (`LineItem[]`) pada dokumen PR dan PO, 5. Validasi server pada `submitDocument` belum menegakkan aturan kelengkapan wajib PR, PO, AV, dan RC, ApproverSelectProps, STANDARD_APPROVERS, FormPOProps, rupiah, FormPRProps, FormRBProps (+15 more)
 
 ### Community 17 - "AV_Drafts SharePoint list"
 Cohesion: 0.18
@@ -290,8 +292,8 @@ Cohesion: 0.15
 Nodes (12): compilerOptions, baseUrl, jsx, lib, module, moduleResolution, noEmit, paths (+4 more)
 
 ### Community 20 - "dependencies"
-Cohesion: 0.12
-Nodes (17): dependencies, clsx@^2.1.1, framer-motion@^14.10.1, lucide-react@^1.70.0, @radix-ui/react-label@^2.1.17, @radix-ui/react-slot@^1.5.0, @radix-ui/react-tooltip@^1.4.1, react@^19.0.0 (+9 more)
+Cohesion: 0.10
+Nodes (21): dependencies, class-variance-authority@^0.7.1, clsx@^2.1.1, framer-motion@^14.10.1, lucide-react@^1.70.0, @radix-ui/react-dialog@^1.3.1, @radix-ui/react-slot@^1.5.0, @radix-ui/react-tooltip@^1.4.1 (+13 more)
 
 ### Community 21 - "4. Component Design Specifications (Mapped to `src/components/`)"
 Cohesion: 0.18
@@ -302,20 +304,20 @@ Cohesion: 0.10
 Nodes (19): 1. Maksud dan Tujuan (Intent & The Why), 1. Purchase Request (PR), 2. Purchase Order (PO), 2. Sasaran, Batasan Cakupan, dan Anti-Sasaran (Goals, Non-Goals, Anti-Goals), 3. Batasan Teknis (Constraints), 3. Cash Advance (AV), 4. Pendekatan yang Dipertimbangkan (Approaches), 4. Reimbursement (RB) (+11 more)
 
 ### Community 23 - "OrganizationRepository"
-Cohesion: 0.21
-Nodes (7): 2. Invarian Wajib Sistem (Mandatory System Invariants), 2. Deliverables & Implementation Checklist, Task 4: Organizational Assignment & Eligibility Integration, OrganizationRepository, required(), setup(), DomainError
+Cohesion: 0.22
+Nodes (8): 2. Invarian Wajib Sistem (Mandatory System Invariants), 2. Deliverables & Implementation Checklist, Task 3: User Primary Branch Integration & Legacy Reconciliation (DB01-03), Task 4: Organizational Assignment & Eligibility Integration, OrganizationRepository, required(), setup(), DomainError
 
 ### Community 24 - "Daftar PV_Drafts di SharePoint"
 Cohesion: 0.18
 Nodes (11): Tampilan All Items pada PV_Drafts, Navigasi draf dan riwayat persetujuan BLC Procurement, Kolom Draft pada daftar PV, Daftar PV_Drafts kosong pada saat tangkapan, Kolom InvoiceNo pada daftar PV, Kolom ParentDoc pada daftar PV, Kolom PaymentDueDate pada daftar PV, Kolom PaymentMethod pada daftar PV (+3 more)
 
 ### Community 25 - "sign-in.tsx"
-Cohesion: 0.23
-Nodes (15): lucide-react, ROLE_DEFINITIONS, RoleSwitcherProps, StaffBeranda(), Badge(), BadgeProps, badgeVariants, Card (+7 more)
+Cohesion: 0.26
+Nodes (13): lucide-react, StaffBeranda(), Badge(), BadgeProps, badgeVariants, Card, CardContent, CardDescription (+5 more)
 
 ### Community 26 - "FormRC"
-Cohesion: 0.18
-Nodes (27): [F-08] Ketiadaan Masking Format Mata Uang pada Input Nilai Rupiah — **RESOLVED**, Cakupan Inspeksi Kode, A. Pilihan atasan, Task 4: Interactive Document Forms (PR, PO, AV, RB, RC, PV), Fase 1: Finalisasi UI/UX & Pembersihan Bloat (Frontend Polish), Audit of Remaining Bloat & Performance Bottlenecks, Tasks, Global Constraints (+19 more)
+Cohesion: 0.13
+Nodes (35): [F-08] Ketiadaan Masking Format Mata Uang pada Input Nilai Rupiah — **RESOLVED**, Cakupan Inspeksi Kode, A. Pilihan atasan, Task 4: Interactive Document Forms (PR, PO, AV, RB, RC, PV), Fase 1: Finalisasi UI/UX & Pembersihan Bloat (Frontend Polish), Audit of Remaining Bloat & Performance Bottlenecks, Tasks, Global Constraints (+27 more)
 
 ### Community 27 - "components.json"
 Cohesion: 0.11
@@ -325,9 +327,9 @@ Nodes (17): aliases, components, hooks, lib, ui, utils, iconLibrary, rsc (+9 mor
 Cohesion: 0.06
 Nodes (32): 10. End-to-End Test Results & Evidence Matrix (REV-D01), 11. Production Isolation & Security Verification (REV-D03), 12. Microsoft 365 Integration Gap Assessment (REV-D04), 12 Scenarios Verification Table, 13. Payment Voucher Creation & Workflow Compliance Verification (Final Gate), 14. Migration Dry Run Results, 15. Deployment Readiness Assessment, 16. Changed Files Report (+24 more)
 
-### Community 31 - "Sidebar"
-Cohesion: 0.19
-Nodes (11): Pendalaman REV-003, Phase 00 ? Role dan permissions, getUserInitials(), Sidebar(), SidebarProps, Files Changed, Issues or Concerns, Self-Review Findings (+3 more)
+### Community 31 - "Kolom terlihat pada daftar RB_Drafts"
+Cohesion: 0.09
+Nodes (22): Tampilan All Items pada daftar RB_Drafts, Navigasi ApprovalRegister, Navigasi PR, PO, AV, RB, RC dan PV Drafts, Tombol Edit in grid view, Daftar RB_Drafts tampak kosong pada saat tangkapan, Pilihan Export, Workflows dan Integrate, Kolom Branch, Kolom ID (+14 more)
 
 ### Community 32 - "Task 1 Brief: Design Tokens & Elera Component Classes (`src/style.css`)"
 Cohesion: 0.40
@@ -335,19 +337,19 @@ Nodes (4): Goal:, Steps:, Target Files:, Task 1 Brief: Design Tokens & Elera Com
 
 ### Community 33 - "Rencana alur pengajuan BLC — untuk review"
 Cohesion: 0.07
-Nodes (28): Bukti dan batas pemeriksaan, Hal lain yang ditanyakan notes, Hasil pemeriksaan F-01 sampai F-17, Keputusan yang dipertahankan, P0 — Kebenaran data, privasi, dan definisi, P1 — Tata letak dan kejelasan tindakan, P2 — Keterkaitan dokumen dan isian yang sudah direncanakan, P3 — Aturan bisnis dan kesiapan integrasi (+20 more)
+Nodes (27): Bukti dan batas pemeriksaan, Hal lain yang ditanyakan notes, Keputusan yang dipertahankan, P0 — Kebenaran data, privasi, dan definisi, P1 — Tata letak dan kejelasan tindakan, P2 — Keterkaitan dokumen dan isian yang sudah direncanakan, P3 — Aturan bisnis dan kesiapan integrasi, Pemeriksaan wajib pada setiap tahap implementasi (+19 more)
 
 ### Community 34 - "document-store.ts"
-Cohesion: 0.34
-Nodes (13): Task 2: Multi-Document Repository and State Machine Store, 6. Duplikasi penuh state machine bisnis di sisi klien (`src/store/document-store.ts`, `src/draft.ts`, `src/draft-store.ts`), approveDocumentStage(), createEmptyDocument(), generateDocNumber(), generatePvFromSource(), loadAllDocuments(), persistAllDocuments() (+5 more)
+Cohesion: 0.29
+Nodes (15): Task 2: Multi-Document Repository and State Machine Store, 6. Duplikasi penuh state machine bisnis di sisi klien (`src/store/document-store.ts`, `src/draft.ts`, `src/draft-store.ts`), calculatePvNet(), approveDocumentStage(), createEmptyDocument(), generateDocNumber(), generatePvFromSource(), loadAllDocuments() (+7 more)
 
 ### Community 35 - "Daftar Temuan Bernomor (Numbered Findings)"
 Cohesion: 0.07
 Nodes (26): Audit UI/UX Anti-Slop #001: BLC Procurement System, Daftar Temuan Bernomor (Numbered Findings), [F-01] HIGH — Fictional Testimonials pada Layar Sign-In, [F-02] HIGH — Tombol Google SSO dan Kontrol Interaktif Fiktif pada Sign-In, [F-03] HIGH — Perhitungan Nilai dan Metrik Pengadaan Menggandakan Dokumen Induk & Turunan, [F-04] HIGH — Adopsi Mentah Template "Spike Next.js Pro Architecture", [F-05] HIGH — Horizontal Overflow pada Resolusi Kerja Standar (956px - 1366px), [F-06] HIGH — Kontras Teks Muted Gagal Standar Aksesibilitas WCAG AA (+18 more)
 
-### Community 36 - "App"
-Cohesion: 0.19
-Nodes (19): api(), clearApiToken(), hasApiToken(), setApiToken(), App(), completeLogin(), handleApproveDoc(), handleConfirmGeneratePv() (+11 more)
+### Community 36 - "main.tsx"
+Cohesion: 0.06
+Nodes (47): Pendalaman REV-003, Phase 00 ? Role dan permissions, BR-APP-001 ? aturan disetujui, implementasi tertunda, Phase 00 ? Functional and workflow mapping, api(), clearApiToken(), hasApiToken(), setApiToken() (+39 more)
 
 ### Community 37 - "Rencana review: perapian UI dan pemeriksaan alur BLC"
 Cohesion: 0.13
@@ -355,7 +357,7 @@ Nodes (14): 0. Pulihkan pratinjau dan ambil baseline, 1. Perapian kerangka, navi
 
 ### Community 38 - "BR-APP-001 — HF02-B Completion Report (Security Gate Verified)"
 Cohesion: 0.10
-Nodes (22): 10. Legacy Compatibility, 11. PM Control Results, 12. Testing Results, 13. Changed Files, 14. Remaining Risks & HF02-C Readiness, 15.1 Trust Boundary & Call Site Inspection, 15.2 Security Gate Verification Matrix, 15. Security Gate Verification — StageResolutionOptions Authorization (+14 more)
+Nodes (22): 10. Legacy Compatibility, 11. PM Control Results, 13. Changed Files, 14. Remaining Risks & HF02-C Readiness, 15.1 Trust Boundary & Call Site Inspection, 15.2 Security Gate Verification Matrix, 15. Security Gate Verification — StageResolutionOptions Authorization, 1. Executive Summary (+14 more)
 
 ### Community 39 - "Task 2 Brief: App Shell & Role-Based Operations Navigation (`src/main.tsx`)"
 Cohesion: 0.40
@@ -373,17 +375,17 @@ Nodes (4): Hasil Verifikasi Otomatis, Laporan Verifikasi Perbaikan Anti-Slop #00
 Cohesion: 0.40
 Nodes (4): Catatan teknis, Keputusan sebelum integrasi, Persiapan integrasi SharePoint, Tahapan migrasi
 
-### Community 43 - ".createDocument"
-Cohesion: 0.42
-Nodes (3): resolveApproverName(), Self-Review Findings, What You Implemented
+### Community 43 - "StatusBadge.tsx"
+Cohesion: 0.17
+Nodes (14): Task 1: Design Tokens & Foundation (CSS & Types), getStatusConfig(), StatusBadgeProps, StatusBadgeValue, StatusConfig, ApprovalStepState, ButtonVariant, ControlSize (+6 more)
 
 ### Community 44 - "Pustaka ApprovalDocs"
 Cohesion: 0.18
 Nodes (12): Tautan ApprovalHistory, Tautan ApprovalRegister, Pustaka ApprovalDocs, Tangkapan pustaka ApprovalDocs BLC Procurement, Label kolom Indonesia dan Jepang, Kolom dokumen dan metadata, Tautan daftar draf PR, PO, AV, RB, RC, dan PV, Tampilan folder kosong pada tangkapan (+4 more)
 
-### Community 45 - "BUSINESS REQUIREMENTS GAP ANALYSIS — PHASE 00"
-Cohesion: 0.05
-Nodes (37): 1. Executive Summary & Metodologi Evaluasi, 2. Matriks Gap Analysis Bisnis & Database, 3. Rincian Kesenjangan Prioritas P0 (Kritis untuk Produksi), 4. Kesenjangan Prioritas P1 (Operasional & Skalabilitas), 5. Ringkasan Justifikasi: Mengapa Enum Statis Tertentu Harus Dipertahankan, BUSINESS REQUIREMENTS GAP ANALYSIS — PHASE 00, GAP-P0-01: Ketiadaan Master Vendor & Rekening Bank Rekanan, GAP-P0-02: Ketiadaan Master Rekening Bank Internal Perusahaan (BLC Cash Accounts) (+29 more)
+### Community 45 - "DocType"
+Cohesion: 0.14
+Nodes (15): 1. Executive Summary & Metodologi Evaluasi, 2. Matriks Gap Analysis Bisnis & Database, 3. Rincian Kesenjangan Prioritas P0 (Kritis untuk Produksi), 4. Kesenjangan Prioritas P1 (Operasional & Skalabilitas), 5. Ringkasan Justifikasi: Mengapa Enum Statis Tertentu Harus Dipertahankan, BUSINESS REQUIREMENTS GAP ANALYSIS — PHASE 00, GAP-P0-01: Ketiadaan Master Vendor & Rekening Bank Rekanan, GAP-P0-02: Ketiadaan Master Rekening Bank Internal Perusahaan (BLC Cash Accounts) (+7 more)
 
 ### Community 46 - "2. Daftar Gap & Plot Hole Antara Panduan v3/v4, Email, dan Aplikasi Saat Ini"
 Cohesion: 0.17
@@ -398,12 +400,12 @@ Cohesion: 0.14
 Nodes (13): 1. Nama orang untuk tampilan dan sumber status, 2. Adaptasi progress indicator dan drawer, 3. Daftar pengajuan dan filter register, 4. Strip metrik dan sidebar, 5. Verifikasi menyeluruh, Batasan global, Fokus peninjauan, Kondisi awal proyek (+5 more)
 
 ### Community 49 - "ProcurementRepository"
-Cohesion: 0.18
-Nodes (3): PersistedState, ProcurementRepository, StoredAttachment
+Cohesion: 0.21
+Nodes (4): ProcurementRepository, resolveApproverName(), Self-Review Findings, What You Implemented
 
 ### Community 50 - "react"
-Cohesion: 0.20
-Nodes (8): react, react-dom, vitest, actions, noop, ModalDialogProps, WORKSPACE_STORAGE_KEY, INITIAL_SEED_DOCUMENTS
+Cohesion: 0.23
+Nodes (7): react, react-dom, vitest, actions, noop, ModalDialogProps, INITIAL_SEED_DOCUMENTS
 
 ### Community 51 - "10. Design Documentation: Component Implementation & Do / Don't Guidelines"
 Cohesion: 0.67
@@ -418,16 +420,16 @@ Cohesion: 0.18
 Nodes (11): Penyetuju tahap pertama dipilih pemohon, Permintaan pengajuan AV, Formulir AV Drafts untuk uang muka, Biaya lain dan diskon AV, Lampiran formulir AV, Transfer sebagai metode pembayaran AV, Nilai dan pajak AV, Metode dan tujuan pembayaran AV (+3 more)
 
 ### Community 55 - "ModalDialog"
-Cohesion: 0.17
-Nodes (11): [F-02] Formulir Modal Tidak Memiliki Focus Trap & Escape Handler — **RESOLVED**, Global Constraints, Review Focus, Rincian Tugas Pelaksanaan, Task 1: Harmonisasi Token Desain, Kontras Warna WCAG AA, dan Reduced Motion, Task 2: Standardisasi Modal Dialog (Focus Trap, Escape Handler, dan Focus Restoration), Task 3: Overhaul Approval Explorer (Aksesibilitas Semantik, Eliminasi Palette Bloat, dan Mobile Card Stack), Task 4: Pembersihan Gaya Inline & Penyatuan Desain Komponen (BentoMetrics, StaffBeranda, Topbar) (+3 more)
+Cohesion: 0.09
+Nodes (20): 1. Impeccable Diagnostic Health Score (5 Dimensi), 2. Temuan Audit Berdasarkan Tingkat Keparahan (P0 - P3) & Kaidah Anti-Slop, Audit UI/UX Impeccable & Taste-Skills #002: BLC Procurement System, [P0] BLOCKING / HIGH, [P1] MAJOR / HIGH, [P2] MINOR / MEDIUM, [F-02] Formulir Modal Tidak Memiliki Focus Trap & Escape Handler — **RESOLVED**, Koreksi REV-001 (+12 more)
 
 ### Community 56 - "Tampilan daftar draf PO"
 Cohesion: 0.22
 Nodes (9): Alur PR, PO, GR, dan PV, Relasi dokumen request_links, Tampilan daftar kosong pada saat tangkapan, Kolom umum draf PO: judul, cabang, tujuan, tanggal kebutuhan dan anggaran, Kolom nominal draf PO: subtotal, PPN, biaya lain, diskon, total dan mata uang, Kolom permintaan submit dan penyetuju pertama pada draf PO, Tampilan daftar draf PO, Kolom referensi draf PO: nomor PO, PR induk dan IAM (+1 more)
 
 ### Community 57 - "stage-engine.ts"
-Cohesion: 0.10
-Nodes (21): 6. Changed Files Report, Review Focus, Task 1: Existing Approval Workflow Inspection & Baseline Verification (HF02B-001), Task 2: Approval Stage Data Model & SQLite Schema (HF02B-002, HF02B-004), Task 3: Submission-Time Approver Snapshot Engine (HF02B-003), Task 4: Independent Stage State Machine & Progression (HF02B-005, HF02B-006, HF02B-007), Task 5: PM Controls & Legacy Compatibility Verification (HF02B-008, PM-001, PM-002, PM-003), Task 6: Documentation & Deliverables (HF02-B Completion Report) (+13 more)
+Cohesion: 0.14
+Nodes (14): 6. Changed Files Report, Task 2: Approval Stage Data Model & SQLite Schema (HF02B-002, HF02B-004), AppServerOptions, ApprovalDecisionRecord, ApprovalIdempotencyRecord, ApprovalStageAssignmentRecord, ApprovalStageReassignmentRecord, ApprovalStageRecord (+6 more)
 
 ### Community 58 - "displayPersonName"
 Cohesion: 0.31
@@ -470,8 +472,8 @@ Cohesion: 0.10
 Nodes (19): 1.1 Context & Background, 1.2 Core Objective, 1. Intent & The Why, 2.1 Goals, 2.2 Non-Goals, 2.3 Anti-Goals, 2. Goals, Non-Goals & Anti-Goals, 3. Constraints (+11 more)
 
 ### Community 70 - "organization.ts"
-Cohesion: 0.15
-Nodes (11): AccountLifecycleStatus, Assignment, AssignmentReviewItem, identityState(), IdentityVerificationStatus, migrateOrganization(), namesV1, namesV2 (+3 more)
+Cohesion: 0.17
+Nodes (14): 3. Idempotency & Repeatability Verification, 3. Migration Procedure, migrateBranchMaster(), AccountLifecycleStatus, Assignment, AssignmentReviewItem, identityState(), IdentityVerificationStatus (+6 more)
 
 ### Community 71 - "Task 2 Report: Responsive Stepper Redesign & Connector Line Alignment"
 Cohesion: 0.20
@@ -482,16 +484,16 @@ Cohesion: 0.22
 Nodes (8): 1. Adaptasi Palet Warna (NEXGEN Blue → BLC Corporate Red), 2. Tipografi (Lato Typeface Hierarchy), 3. Komponen UI Kit Utama (Mengikuti Layout Slide 4_3), 4. Breakpoint Responsif, A. Palet Utama (Main Brand Palette), B. Palet Netral (Neutral Grays - 100% Mengikuti Standar NEXGEN), BLC Procurement Design System & UI Kit Specification, C. Palet Pendukung Status (Functional Support Colors)
 
 ### Community 73 - "Review Focus"
-Cohesion: 0.20
-Nodes (9): Global Constraints, Review Focus, Task 1: Purge AI Slop and Fictional Assets from Sign-In & UI Utilities, Task 2: Standardize `src/style.css` on Official BLC Design Tokens & Purge Spike Pro Template, Task 4: Fix Status Badge Semantics & Table Responsiveness in `DocumentList.tsx`, Task 5: Consolidate Module Accents and Clean Up `StaffBeranda.tsx`, Task 6: End-to-End Verification & Verification Report, UI/UX Operational Cockpit & Anti-Slop Implementation Plan (+1 more)
+Cohesion: 0.18
+Nodes (10): Global Constraints, Review Focus, Task 1: Purge AI Slop and Fictional Assets from Sign-In & UI Utilities, Task 2: Standardize `src/style.css` on Official BLC Design Tokens & Purge Spike Pro Template, Task 3: Replace Bento Grid with Operational Action Queue Bar (`ActionQueueBar.tsx`), Task 4: Fix Status Badge Semantics & Table Responsiveness in `DocumentList.tsx`, Task 5: Consolidate Module Accents and Clean Up `StaffBeranda.tsx`, Task 6: End-to-End Verification & Verification Report (+2 more)
 
 ### Community 74 - ".ensureIntegrity"
-Cohesion: 0.29
-Nodes (6): Changes Made, Concerns / Regressions, Git Commit, Summary, Task 1 Report: Approver Name Data Integrity & Resolution (Feedback 3), Verification & Test Results
+Cohesion: 0.20
+Nodes (8): Context & Objectives, Task 1: Approver Name Data Integrity & Resolution (Feedback 3), Changes Made, Concerns / Regressions, Git Commit, Summary, Task 1 Report: Approver Name Data Integrity & Resolution (Feedback 3), Verification & Test Results
 
 ### Community 75 - "StatusBadge.tsx"
-Cohesion: 0.11
-Nodes (20): 14. Execution Strategy (6-Phase SDD Implementation Plan), Task 3: Modern UI Component System (Buttons, Badges & Chips), FilterChip(), getStatusConfig(), StatusBadge(), StatusBadgeProps, StatusBadgeValue, StatusConfig (+12 more)
+Cohesion: 0.15
+Nodes (15): 14. Execution Strategy (6-Phase SDD Implementation Plan), Task 3: Modern UI Component System (Buttons, Badges & Chips), FilterChip(), StatusBadge(), Pre-flight Scan, SDD ledger — plan: docs/superpowers/plans/2026-11-09-enterprise-design-system-and-interactive-motion.md, Files to Modify/Create, Objective (+7 more)
 
 ### Community 76 - "Task 2: Responsive Stepper Redesign & Connector Line Alignment (Feedback 1)"
 Cohesion: 0.50
@@ -506,16 +508,16 @@ Cohesion: 0.17
 Nodes (11): API (all organization endpoints restricted to ADMIN), Changed files and HF-02 readiness, Existing application master, Explicit top-level source observations, HF-01 implementation and migration, HF-01 ? Organizational data assessment, Identity reconciliation, Isolated setup example (+3 more)
 
 ### Community 79 - "cn"
-Cohesion: 0.13
-Nodes (19): Phase 00 ? Technical architecture audit, Task 4: Implementasi Dialog & Sheet (Modal & Side-Drawer), DialogContent, DialogDescription, DialogFooter(), DialogHeader(), DialogOverlay, DialogTitle (+11 more)
+Cohesion: 0.14
+Nodes (16): Phase 00 ? Technical architecture audit, DialogContent, DialogDescription, DialogFooter(), DialogOverlay, DialogTitle, Table, TableBody (+8 more)
 
 ### Community 80 - "Step-by-Step Requirements"
 Cohesion: 0.18
 Nodes (10): Files to Modify/Create, Objective, Plan Reference, Step 1: Write failing test in `src/style.test.ts`, Step 2: Run test to verify failure, Step 3: Create `src/types/design-system.types.ts`, Step 4: Update `src/style.css` with Section 9.1 tokens, Step 5: Verification & Commit (+2 more)
 
-### Community 81 - "ExportModal.tsx"
-Cohesion: 0.06
-Nodes (35): 7. Responsive Design Architecture (7 Breakpoints & 200% Zoom), Enterprise Design System & Interactive Motion Implementation Plan, Global Constraints, Review Focus, Task 1: Design Tokens & Foundation (CSS & Types), Task 2: Interactive Motion Engine (`src/lib/motion.ts`), Task 4: Approval Stepper & Payment Settlement Node, Task 5: Data Presentation & Table Rigor (DocumentList & ApprovalExplorer) (+27 more)
+### Community 81 - "ExportModal"
+Cohesion: 0.11
+Nodes (16): 7. Responsive Design Architecture (7 Breakpoints & 200% Zoom), Enterprise Design System & Interactive Motion Implementation Plan, Global Constraints, Review Focus, Task 2: Interactive Motion Engine (`src/lib/motion.ts`), Task 4: Approval Stepper & Payment Settlement Node, Task 5: Data Presentation & Table Rigor (DocumentList & ApprovalExplorer), Task 6: Modern Export Modal & Shell Refinement (+8 more)
 
 ### Community 82 - "3.3 Spacing, Shape & Elevation Tokens"
 Cohesion: 0.22
@@ -538,8 +540,8 @@ Cohesion: 0.25
 Nodes (7): Files to Modify, Objective, Plan Reference, Step 1: Add unit test in `src/components/elera-workspace.test.tsx`, Step 3: Verification & Commit, Step-by-Step Requirements, Task 5 Brief: Data Presentation & Table Rigor (DocumentList & ApprovalExplorer)
 
 ### Community 87 - "ApprovalProgress.tsx"
-Cohesion: 0.08
-Nodes (30): Review Focus, Task 1: Clean Compact Approval Progress in Document Table (Feedback 1 & 2), Task 2: Approver Name Resolution from API and Corporate Directory (Feedback 2), Task 3: Topbar Header Simplification (Feedback 3), Task 4: Collapsible Hamburger Sidebar with Icon Navigation (Feedback 4), Task 6: Final Verification & Smoke Test, ApprovalProgressProps, ProgressIndicatorDemo() (+22 more)
+Cohesion: 0.07
+Nodes (36): Phase 00 ? Migration assessment, Review Focus, Task 1: Clean Compact Approval Progress in Document Table (Feedback 1 & 2), Task 2: Approver Name Resolution from API and Corporate Directory (Feedback 2), Task 3: Topbar Header Simplification (Feedback 3), Task 4: Collapsible Hamburger Sidebar with Icon Navigation (Feedback 4), Task 6: Final Verification & Smoke Test, ApprovalProgress() (+28 more)
 
 ### Community 88 - "Task 3 Report: Modern UI Component System (Buttons, Badges & Chips)"
 Cohesion: 0.33
@@ -553,17 +555,17 @@ Nodes (4): Concerns, Execution Summary, Task 2 Report: Interactive Motion Engine
 Cohesion: 0.12
 Nodes (22): devDependencies, autoprefixer@^10.6.2, postcss@^8.5.32, tailwindcss@^4.3.5, tsx@^4.23.15, @types/node@^26.6.6, @types/react@^19.0.0, @types/react-dom@^19.0.0 (+14 more)
 
-### Community 91 - "calculations.ts"
-Cohesion: 0.20
-Nodes (13): Task 1: Domain Types and Financial Calculation Core, 5. Validasi server pada `submitDocument` belum menegakkan aturan kelengkapan wajib PR, PO, AV, dan RC, calculatePoTotal(), calculatePvNet(), calculateRcOutcome(), PoCalculationInput, PoCalculationResult, PvCalculationInput (+5 more)
+### Community 91 - "BranchRepository"
+Cohesion: 0.26
+Nodes (4): BranchDomainError, BranchRepository, mapAuditRow(), mapBranchRow()
 
 ### Community 92 - "Task 7 Brief: Full Verification, Daemon Check & Remote Synchronization"
 Cohesion: 0.40
 Nodes (4): Objective, Plan Reference, Step-by-Step Requirements, Task 7 Brief: Full Verification, Daemon Check & Remote Synchronization
 
 ### Community 93 - "repository.ts"
-Cohesion: 0.13
-Nodes (10): BLCAppServer, server, OutboxJob, PvGenerationOptions, VersionedDocument, ALLOWED_MIME_TYPES, AttachmentCategory, LocalAttachmentStorage (+2 more)
+Cohesion: 0.11
+Nodes (9): 12. Testing Results, BLCAppServer, server, migrateApprovalEngine(), ALLOWED_MIME_TYPES, AttachmentCategory, LocalAttachmentStorage, MAX_ATTACHMENT_BYTES (+1 more)
 
 ### Community 94 - "5. Feedback, Loading, Empty States & Corporate Motion Engine (`src/lib/motion.ts`)"
 Cohesion: 0.40
@@ -578,12 +580,12 @@ Cohesion: 0.11
 Nodes (17): 1. DB-01 — Branch Master Foundation, 1. Executive Summary, 2.1. Audit Alur Rantai Dokumen Finansial, 2.2. Aturan Validasi Dokumen Induk & Saldo Terutang (Parent Rules & REC-02):, 2. DB-02 — Organizational Integrity (Flat Units & REC-03 Safe Migration), 2. Integritas Data Finansial, Rantai Dokumen & Pembayaran Sebagian (Task DBH-004, REC-01 & REC-02), 3.1. Matriks Otorisasi Berbasis Peran (RBAC Matrix), 3.2. Penegakan Otorisasi Kunci: (+9 more)
 
 ### Community 97 - "auth.ts"
-Cohesion: 0.21
-Nodes (11): authenticateCredentials(), AuthUser, base64UrlEncode(), JwtClaims, ROLE_TO_EMAIL, SEEDED_USERS, signJwt(), admin (+3 more)
+Cohesion: 0.23
+Nodes (10): AuthUser, base64UrlDecode(), base64UrlEncode(), JwtClaims, ROLE_TO_EMAIL, SEEDED_USERS, signJwt(), verifyJwt() (+2 more)
 
 ### Community 98 - "app.ts"
-Cohesion: 0.18
-Nodes (14): Phase 00 ? UX findings berbasis bukti, Revisi 01, Matriks Status Kemampuan (5 Capabilities), canViewAttachments(), createAppServer(), handleFetch(), extractAuthUser(), jsonResponse() (+6 more)
+Cohesion: 0.16
+Nodes (16): Phase 00 ? UX findings berbasis bukti, Revisi 01, 1. Executive Summary, Matriks Status Kemampuan (5 Capabilities), Hasil pemeriksaan F-01 sampai F-17, canViewAttachments(), createAppServer(), handleFetch() (+8 more)
 
 ### Community 99 - "REV-003 ? Functional risk assessment"
 Cohesion: 0.50
@@ -594,40 +596,40 @@ Cohesion: 0.09
 Nodes (21): 10. Formulir Ringkasan Pengambilan Keputusan Product Owner, 1. Executive Summary & Tujuan Kuesioner, 2. Kelompok 1: Users & Roles (Pengguna & Hak Akses), 3. Kelompok 2: Branches (Pengelolaan Kantor Cabang), 4. Kelompok 3: Divisions & Organization (Struktur Organisasi & Divisi), 5. Kelompok 4: Document Types & Numbering (Jenis & Penomoran Dokumen), 6. Kelompok 5: Approval Configuration (Kewenangan & Tahapan Persetujuan), 7. Kelompok 6: Vendors & Banking (Master Rekanan & Rekening Bank) (+13 more)
 
 ### Community 101 - "sheet.tsx"
-Cohesion: 0.22
-Nodes (9): @radix-ui/react-dialog@^1.3.1, @radix-ui/react-dialog, SheetContent, SheetContentProps, SheetDescription, SheetFooter(), SheetOverlay, SheetTitle (+1 more)
+Cohesion: 0.21
+Nodes (10): Task 4: Implementasi Dialog & Sheet (Modal & Side-Drawer), DialogHeader(), SheetContent, SheetContentProps, SheetDescription, SheetFooter(), SheetHeader(), SheetOverlay (+2 more)
 
 ### Community 102 - "BR-APP-001 ? Analisis dampak dan rencana implementasi"
 Cohesion: 0.22
 Nodes (8): BR-APP-001 ? Analisis dampak dan rencana implementasi, Dependencies, risiko dan keputusan lanjutan, Invarian yang wajib, Kondisi aktual dan dampak, Rencana kerja setelah otorisasi fase pengembangan, Test cases yang dapat diverifikasi, Usulan model dan kontrak ? untuk review, bukan keputusan final, AuditLogEntry
 
 ### Community 103 - ".ensureIntegrity"
-Cohesion: 0.17
-Nodes (11): 1. Context & Objectives, 2. Architecture & Design Decisions, 3. Step-by-Step Tasks, A. Data Integrity (`src/domain/display-name.ts` & `ApprovalProgress.tsx`), B. Responsive Stepper (`progress-indicator.tsx` & `progress-indicator.css`), C. Design System Status Badges (`src/style.css` & `ApprovalStepper.tsx`), Implementation Plan: UI/UX Remediation — Approval Stepper & Document List, Task 1: Approver Name Data Integrity & Resolution (Feedback 3) (+3 more)
+Cohesion: 0.12
+Nodes (16): 1. Context & Objectives, 2. Architecture & Design Decisions, 3. Step-by-Step Tasks, A. Data Integrity (`src/domain/display-name.ts` & `ApprovalProgress.tsx`), B. Responsive Stepper (`progress-indicator.tsx` & `progress-indicator.css`), C. Design System Status Badges (`src/style.css` & `ApprovalStepper.tsx`), Implementation Plan: UI/UX Remediation — Approval Stepper & Document List, Task 1: Approver Name Data Integrity & Resolution (Feedback 3) (+8 more)
 
 ### Community 104 - "3. Rencana Tugas Bertahap (*Bite-Sized Implementation Tasks*)"
 Cohesion: 0.20
 Nodes (9): 1. Analisis Kesiapan Proyek (*Current State vs shadcn/ui Requirements*), 2. Struktur File & Modul yang Dihasilkan, 3. Rencana Tugas Bertahap (*Bite-Sized Implementation Tasks*), 4. Keuntungan & Nilai Tambah bagi Proyek BLC, Integrasi shadcn/ui Implementation Plan, Task 1: Setup Dependensi Fondasi, `components.json`, dan Token CSS shadcn/ui, Task 2: Implementasi Komponen Primitif Button & Badge shadcn/ui, Task 3: Implementasi Komponen Form Primitives (Input, Label, Textarea) (+1 more)
 
 ### Community 105 - "DocumentList"
-Cohesion: 0.25
-Nodes (11): Phase 00 ? Migration assessment, ApprovalProgress(), canCreatePvFromDoc(), DocumentList(), getDocAmount(), getDocTypeVisual(), requiresRoleAction(), rupiah (+3 more)
+Cohesion: 0.24
+Nodes (11): canCreatePvFromDoc(), DocumentList(), DocumentListProps, getDocAmount(), getDocTypeVisual(), requiresRoleAction(), rupiah, Input (+3 more)
 
 ### Community 106 - "Must fix"
 Cohesion: 0.17
 Nodes (11): 1. Mass-assignment pada `updateDocument` memungkinkan Pemohon menyetujui dokumennya sendiri (`status: 'APPROVED'`), 2. Kebocoran informasi rekening bank melalui `auditLog` dan respons endpoint mutasi, serta bug kotak rekening kosong di UI, 3. Deadlock alur bisnis `RC` berstatus `DEFICIT` (Kekurangan Dana Uang Muka) antara pembuatan PV, pembayaran PV, dan konfirmasi Finance, 4. Status BoD paralel menggantung (`PENDING`) ketika salah satu anggota Direksi menolak (`REJECT`) dokumen, 7. Koneksi SQLite dibuka-tutup pada setiap operasi dan `idempotencyCache` tumbuh tanpa batas, 8. Pewarisan data antar-dokumen (`PR -> PO -> AV -> RC`) dan pilihan tarif pajak belum seragam, 9. Perhitungan `pendingForRoleCount` untuk `ATASAN` dan kolom ekspor CSV belum akurat untuk audit Finance, Must fix (+3 more)
 
-### Community 107 - "Task 3 Report: Topbar Header Simplification (Feedback 3)"
-Cohesion: 0.29
-Nodes (7): Topbar(), Files Changed, Issues or Concerns, Self-Review Findings, Task 3 Report: Topbar Header Simplification (Feedback 3), What Was Implemented, What Was Tested and Test Results
+### Community 107 - "ExportModal.tsx"
+Cohesion: 0.23
+Nodes (11): framer-motion, ExportModalProps, rupiah, FilterChipProps, corporateTransition, drawerMotionVariants, hoverableCardProps, modalEnterTransition (+3 more)
 
 ### Community 108 - "MIGRATION & DATA RECONCILIATION PLAN — PHASE 00"
 Cohesion: 0.12
 Nodes (16): 1. Executive Summary, 2.1. Pemetaan Master Cabang Eksisting (Explicit Branch Mapping), 2.2. Rekonsiliasi Pengguna ke `primary_branch_id`:, 2. Pemetaan Data Eksisting ke Skema Baru (Data Reconciliation), 3.1. Analisis Skema Eksisting:, 3.2. Prosedur Migrasi Aditif Berkelanjutan (Phase DB-02):, 3. Runbook Migrasi Aman Tabel Eksisting `org_units` (TASK REC-03), 4.1. Rekonsiliasi Dokumen RC (Realisasi Kasbon REC-01): (+8 more)
 
 ### Community 109 - "HF02-A — Database Migration Runbook (Revision 01)"
-Cohesion: 0.25
-Nodes (7): 1. Migration Overview, 2. Pre-Migration Checklist, 3. Migration Procedure, 4. Idempotency & Re-run Verification, 5. Rollback Strategy, HF02-A — Database Migration Runbook (Revision 01), Schema Version 2 Additions:
+Cohesion: 0.29
+Nodes (6): 1. Migration Overview, 2. Pre-Migration Checklist, 4. Idempotency & Re-run Verification, 5. Rollback Strategy, HF02-A — Database Migration Runbook (Revision 01), Schema Version 2 Additions:
 
 ### Community 110 - "Ringkasan pengajuan procurement"
 Cohesion: 0.19
@@ -654,8 +656,8 @@ Cohesion: 0.50
 Nodes (3): Git Commit, Task 5 Report: End-to-End Role Integration, Tagged Approver Selection, and Direct Submission (Notes), Test Results
 
 ### Community 116 - "Tampilan daftar SharePoint tanpa baris data"
-Cohesion: 0.29
-Nodes (7): Tampilan daftar SharePoint tanpa baris data, Kolom Title, Branch, Purpose dan RequiredDate, Kolom BudgetType, Kolom SubtotalAmount, PPN, OtherCosts, DiscountAmount, TotalAmount dan Currency, Kolom PRNo dan IAMNo, Kolom PreviousRegiste… dengan label terpotong, Kolom SubmitRequested dan Stage1Approver
+Cohesion: 0.17
+Nodes (12): BLC Procurement Notebook, Untitled Page pada notebook, Untitled Section pada notebook, Tampilan daftar SharePoint tanpa baris data, Kolom Title, Branch, Purpose dan RequiredDate, Kolom BudgetType, Kolom SubtotalAmount, PPN, OtherCosts, DiscountAmount, TotalAmount dan Currency, Kolom PRNo dan IAMNo (+4 more)
 
 ### Community 117 - "Review Focus"
 Cohesion: 0.22
@@ -663,7 +665,7 @@ Nodes (8): Global Constraints, HOTFIX BR-APP-001 — HF02-A Revision 01 Implemen
 
 ### Community 118 - "BR-APP-001 — HF02-C Completion Report (Revision 01)"
 Cohesion: 0.12
-Nodes (16): 1. Executive Summary, 2. Business Workflow Mapping Matrix, 3. 17 Automated Acceptance Test Matrix Results (Section 4), 4. Security & Data Integrity Verification (SEC-001 s/d SEC-005), 5. Automated Test Results & Code Quality, 7. Unresolved Business Rules Assessment, 8. Stage Gate Confirmation, BR-APP-001 — HF02-C Completion Report (Revision 01) (+8 more)
+Nodes (15): 2. Business Workflow Mapping Matrix, 3. 17 Automated Acceptance Test Matrix Results (Section 4), 4. Security & Data Integrity Verification (SEC-001 s/d SEC-005), 5. Automated Test Results & Code Quality, 7. Unresolved Business Rules Assessment, 8. Stage Gate Confirmation, BR-APP-001 — HF02-C Completion Report (Revision 01), Distribusi Test Suite: (+7 more)
 
 ### Community 119 - "Tasks"
 Cohesion: 0.17
@@ -677,13 +679,13 @@ Nodes (10): 1. Executive Summary, 2. Kepatuhan Terhadap Keputusan Bisnis Product
 Cohesion: 0.29
 Nodes (6): 1. Authentication & Backward Compatibility, 2. Organization & Identity REST API Contract, HF02-A — Integration Contract & API Specification (Revision 01), Identity Management (ADR-ID-001, ADR-ID-002, ADR-ID-003), Organizational Assignments, Organizational Storage & Units
 
-### Community 122 - "ApprovalExplorer.tsx"
-Cohesion: 0.15
-Nodes (15): Task 3: Telemetry Stats Strip (`src/components/BentoMetrics.tsx`), DashboardMetrics, ApprovalDocsViewProps, ApprovalHistoryViewProps, ApprovalRegisterViewProps, DocLibraryItem, HistoryRow, BentoMetricsProps (+7 more)
+### Community 122 - "UserRole"
+Cohesion: 0.28
+Nodes (8): Task 2: App Shell & Role-Based Operations Navigation (`src/main.tsx`), DocumentDetailModalProps, ROLE_DEFINITIONS, RoleSwitcherProps, StaffBerandaProps, AuthAccount, OperationNavItem, UserRole
 
-### Community 123 - "displayPersonName"
-Cohesion: 0.13
-Nodes (15): Task 3: Replace Bento Grid with Operational Action Queue Bar (`ActionQueueBar.tsx`), ACTIVITY_LABELS, BentoMetrics(), formatCompactRupiah(), getDocAmount(), MODULE_NAMES, ROLE_TITLES, rupiah (+7 more)
+### Community 123 - "BentoMetrics.tsx"
+Cohesion: 0.27
+Nodes (9): Task 3: Telemetry Stats Strip (`src/components/BentoMetrics.tsx`), ACTIVITY_LABELS, BentoMetrics(), BentoMetricsProps, formatCompactRupiah(), getDocAmount(), MODULE_NAMES, ROLE_TITLES (+1 more)
 
 ### Community 124 - "REV-004 ? Evidence and working-tree baseline"
 Cohesion: 0.33
@@ -694,8 +696,8 @@ Cohesion: 0.40
 Nodes (4): 1. Reconciliation Policy & Verification Workflow, 2. Seed Identity Reconciliation Baseline, 3. Operational Assignment Protection, HF02-A — Identity Reconciliation & Verification Matrix (Revision 01)
 
 ### Community 126 - "DocumentDetailModal"
-Cohesion: 0.20
-Nodes (9): Document Workspace & Multi-Stage Approval Frontend Implementation Plan, Global Constraints, Review Focus, Task 5: Document List, Detail Modal, and Main Workspace Shell, Task 6: End-to-End Simulation Testing & Seed Data, DocumentDetailModal(), handleApprove(), handleReject() (+1 more)
+Cohesion: 0.29
+Nodes (6): Document Workspace & Multi-Stage Approval Frontend Implementation Plan, Global Constraints, Review Focus, Task 3: Visual Approval Stepper and Role Bar Components, Task 5: Document List, Detail Modal, and Main Workspace Shell, Task 6: End-to-End Simulation Testing & Seed Data
 
 ### Community 127 - "DATABASE ENTITY RELATIONSHIP DIAGRAM — PHASE 00"
 Cohesion: 0.29
@@ -706,8 +708,8 @@ Cohesion: 0.29
 Nodes (6): 1. Overview & Architectural Decisions, 2. Canonical Identity Model & Durability (ADR-ID-001), 3. Account Lifecycle Foundation (ADR-ID-003), 4. Identity Verification Mechanism (ADR-ID-002), HF02-A — Persistent Identity Architecture (Revision 01), Separation of Concerns (ADR-ID-002)
 
 ### Community 129 - "4. Master Tasklist Pengembangan Menuju Production (Urutan Eksekusi)"
-Cohesion: 0.22
-Nodes (9): 1. Rancangan Database Production (PostgreSQL Schema & Integrity), 3. Finalisasi Touch pada UI/UX (Menuju Production), 4. Master Tasklist Pengembangan Menuju Production (Urutan Eksekusi), A. Skema Tabel Utama & Cara Penerapannya, BLC Procurement Production Roadmap, Architecture & Tasklist, Fase 2: Fondasi Monorepo, Database PostgreSQL & Shared Domain, Fase 3: Implementasi Backend API & Mesin Persetujuan Atomik, Fase 4: Integrasi Frontend–Backend, Pengujian E2E & Kesiapan Rilis (+1 more)
+Cohesion: 0.17
+Nodes (12): 1. Rancangan Database Production (PostgreSQL Schema & Integrity), 2. Rancangan Backend & Arsitektur API (Fastify + TypeScript), 3. Finalisasi Touch pada UI/UX (Menuju Production), 4. Master Tasklist Pengembangan Menuju Production (Urutan Eksekusi), A. Skema Tabel Utama & Cara Penerapannya, A. Struktur Monorepo / Paket Kode, B. Kontrak Endpoint REST API (`/api/v1`), BLC Procurement Production Roadmap, Architecture & Tasklist (+4 more)
 
 ### Community 130 - "DATABASE TEST PLAN — PHASE 00"
 Cohesion: 0.18
@@ -718,8 +720,8 @@ Cohesion: 0.20
 Nodes (6): @tailwindcss/vite@^4.3.5, vite@^6.3.0, @vitejs/plugin-react@^4.4.0, @tailwindcss/vite, vite, @vitejs/plugin-react
 
 ### Community 132 - "RoleSwitcher"
-Cohesion: 0.20
-Nodes (10): Task 3: Visual Approval Stepper and Role Bar Components, BLC Procurement UI De-Bloat & Performance Overhaul Plan, Task 1: Compress `RoleSwitcher` into a Single-Row Segmented Pill Bar, Task 2: Deduplicate Controls in `src/main.tsx` & `src/components/BentoMetrics.tsx`, Task 3: Strip Redundant `.form-intro` Headers Across All 6 Modal Forms, Task 4: Remove Dead Checkbox & Verbose Copy in `ExportModal.tsx`, Task 5: Streamline `DocumentDetailModal.tsx` & `ApprovalStepper.tsx`, Task 6: Memoize Aggregations & Extract Hot-Path Inline Styles to CSS (+2 more)
+Cohesion: 0.22
+Nodes (9): BLC Procurement UI De-Bloat & Performance Overhaul Plan, Task 1: Compress `RoleSwitcher` into a Single-Row Segmented Pill Bar, Task 2: Deduplicate Controls in `src/main.tsx` & `src/components/BentoMetrics.tsx`, Task 3: Strip Redundant `.form-intro` Headers Across All 6 Modal Forms, Task 4: Remove Dead Checkbox & Verbose Copy in `ExportModal.tsx`, Task 5: Streamline `DocumentDetailModal.tsx` & `ApprovalStepper.tsx`, Task 6: Memoize Aggregations & Extract Hot-Path Inline Styles to CSS, Task-by-Task Implementation Plan (+1 more)
 
 ### Community 133 - "HF02-A — Test Evidence & Verification Report (Revision 01)"
 Cohesion: 0.50
@@ -733,9 +735,9 @@ Nodes (8): Commits Created, Files Changed, GREEN Passing Output (Step 4), Issues
 Cohesion: 0.40
 Nodes (4): 1. Executive Summary, 3. Verification & Test Evidence, 4. Remaining Risks & Boundaries, BR-APP-001 — HF02-A Revision 01 Completion Report
 
-### Community 141 - "FormRC.tsx"
-Cohesion: 0.27
-Nodes (7): FormAVProps, handleAvSelect(), handleDateChange(), FormRCProps, rupiah, addWorkingDays(), AVDocument
+### Community 141 - "addWorkingDays"
+Cohesion: 0.50
+Nodes (3): handleAvSelect(), handleDateChange(), addWorkingDays()
 
 ### Community 142 - "HF02-A — Organizational Storage & Identity Readiness (Revision 01)"
 Cohesion: 0.50
@@ -754,64 +756,80 @@ Cohesion: 0.22
 Nodes (8): 1. Executive Summary, 3. Matriks Integritas Relasional Antar-Tabel, 4. Analisis Strategi Pengindeksan (Indexing Strategy), 5. Konfigurasi Mesin SQLite Enterprise & Prosedur Pemeriksaan Integritas, Aksi Referensial (Referential Actions):, Prosedur Pemeriksaan Integritas Otomatis (DB-REVIEW-03):, Relational Integrity, Database Constraints & Invariants Specification (Task DBH-003 & REC-01 s/d REC-04), RELATIONAL INTEGRITY & DATABASE CONSTRAINTS REVIEW — PHASE 00
 
 ### Community 148 - "input.test.tsx"
-Cohesion: 0.43
-Nodes (4): Label, labelVariants, Textarea, TextareaProps
+Cohesion: 0.31
+Nodes (6): @radix-ui/react-label@^2.1.17, @radix-ui/react-label, Label, labelVariants, Textarea, TextareaProps
 
-### Community 149 - "readAttachment"
-Cohesion: 0.25
-Nodes (7): FormGR(), handleFileChange(), handleFileChange(), handleFileChange(), handleFileChange(), handleFileChange(), readAttachment()
+### Community 149 - "Kebutuhan produk procurement dan pembayaran"
+Cohesion: 0.15
+Nodes (13): Aturan persetujuan bertahap, Rencana irisan awal draf PR, Validasi draf PR, Halaman BLC Procurement draf PR, Persetujuan bertahap dan riwayat, Design system aplikasi kerja, Kebutuhan produk procurement dan pembayaran, Status approval terpisah dari pembayaran (+5 more)
 
-### Community 150 - "Task 2: App Shell & Role-Based Operations Navigation (`src/main.tsx`)"
-Cohesion: 0.25
-Nodes (7): Koreksi REV-001, Phase 00 ? Page inventory, Task 2: App Shell & Role-Based Operations Navigation (`src/main.tsx`), AuthAccount, getInitialWorkspaceTab(), getVisibleOperationsNav(), WorkspaceTab
+### Community 150 - "BLC PROCUREMENT PRO — DB-01"
+Cohesion: 0.14
+Nodes (13): 1. Executive Summary, 2. Scope & Implementation Matrix, 3.1. Test Suite Results (`npm test`), 3.2. TypeScript Compilation & Production Build (`npm run build`), 3.3. Database Freeze Verification, 3. Verification & Test Evidence, 4. Modified & Created Files Summary, 5. Stage Gate & Next Steps (+5 more)
 
-### Community 151 - "HOTFIX BR-APP-001 — HF02-B Implementation Plan"
-Cohesion: 0.50
-Nodes (3): Approval Snapshot & Independent Stage Engine, Global Constraints, HOTFIX BR-APP-001 — HF02-B Implementation Plan
+### Community 151 - "Review Focus"
+Cohesion: 0.18
+Nodes (10): Approval Snapshot & Independent Stage Engine, Global Constraints, HOTFIX BR-APP-001 — HF02-B Implementation Plan, Review Focus, Task 1: Existing Approval Workflow Inspection & Baseline Verification (HF02B-001), Task 3: Submission-Time Approver Snapshot Engine (HF02B-003), Task 4: Independent Stage State Machine & Progression (HF02B-005, HF02B-006, HF02B-007), Task 5: PM Controls & Legacy Compatibility Verification (HF02B-008, PM-001, PM-002, PM-003) (+2 more)
 
-### Community 152 - "2. Temuan Audit Berdasarkan Tingkat Keparahan (P0 - P3) & Kaidah Anti-Slop"
-Cohesion: 0.29
-Nodes (6): 1. Impeccable Diagnostic Health Score (5 Dimensi), 2. Temuan Audit Berdasarkan Tingkat Keparahan (P0 - P3) & Kaidah Anti-Slop, Audit UI/UX Impeccable & Taste-Skills #002: BLC Procurement System, [P0] BLOCKING / HIGH, [P1] MAJOR / HIGH, [P2] MINOR / MEDIUM
+### Community 152 - "3. Audit Detail Data Master Pengadaan (AUDIT-004)"
+Cohesion: 0.15
+Nodes (13): 1. Klasifikasi Master Data (AUDIT-002), 2.1. Master Pengguna (`app_users`), 2.2. Peran & Kewenangan (Role & Permission), 2.3. Struktur Organisasi (`org_units` & `org_assignments`), 2. Audit Detail User, Role & Organisasi (AUDIT-003), 3.1. Jenis Dokumen (Document Types), 3.2. Cabang (Branches), 3.3. Anggaran & Pembayaran (Budget & Payment) (+5 more)
 
-### Community 153 - "button.tsx"
-Cohesion: 0.33
-Nodes (4): class-variance-authority@^0.7.1, class-variance-authority, ButtonProps, buttonVariants
+### Community 153 - "branch-engine.ts"
+Cohesion: 0.22
+Nodes (10): Task 1: Isolated Branch Master SQLite Schema & Migration Engine (DB01-01), ActiveTransactionsCheckResult, BranchAuditAction, BranchAuditRecord, BranchRecord, CreateBranchInput, OFFICIAL_BRANCH_SEEDS, RawAuditRow (+2 more)
 
 ### Community 154 - "scripts"
 Cohesion: 0.40
 Nodes (5): scripts, build, dev, server, test
 
-### Community 155 - "Phase 00 ? Functional and workflow mapping"
-Cohesion: 0.50
-Nodes (3): BR-APP-001 ? aturan disetujui, implementasi tertunda, Phase 00 ? Functional and workflow mapping, handleCreateRelated()
+### Community 155 - "BranchConcurrencyCoordinator"
+Cohesion: 0.22
+Nodes (9): 1. Problem Statement & Threat Analysis (PM Condition 02), 2. Technical Solution: `BranchConcurrencyCoordinator`, 3. Test Execution & Evidence, BLC PROCUREMENT PRO — DB-01, Concurrency & Cross-Storage Race Condition Report (PM Condition 02), Karakteristik & Mekanisme Kunci, Test End-to-End: REST API Concurrency Guard, Test T11: `BranchConcurrencyCoordinator` Unit Test (+1 more)
 
 ### Community 156 - "Task 5 Report: Data Presentation & Table Rigor (DocumentList & ApprovalExplorer)"
 Cohesion: 0.50
 Nodes (3): 2. Test Verification, 3. Files Modified & Committed, Task 5 Report: Data Presentation & Table Rigor (DocumentList & ApprovalExplorer)
 
-### Community 157 - "2. Rancangan Backend & Arsitektur API (Fastify + TypeScript)"
-Cohesion: 0.67
-Nodes (3): 2. Rancangan Backend & Arsitektur API (Fastify + TypeScript), A. Struktur Monorepo / Paket Kode, B. Kontrak Endpoint REST API (`/api/v1`)
+### Community 157 - "PRODUCT OWNER DECISION REGISTER — PHASE 00"
+Cohesion: 0.17
+Nodes (11): 1. Executive Summary, 2. Matriks Keputusan Arsitektur Final (Confirmed Architecture Decisions), 3. Hasil Rekonsiliasi Teknis Akhir (REC-01 s/d REC-04), 4. Item Keputusan Bisnis yang Masih Terbuka (Remaining Business Decisions), 5. Ringkasan Status Dokumen & Pengesahan, Final Design Addendum, Reconciliation & Decisions Sign-Off, PRODUCT OWNER DECISION REGISTER — PHASE 00, REC-01: Rekonsiliasi Jenis Dokumen (Document Type Reconciliation) (+3 more)
+
+### Community 159 - "Implementation Tasks"
+Cohesion: 0.18
+Nodes (10): BLC PROCUREMENT PRO — DB-01 IMPLEMENTATION PLAN, Branch Master Foundation Implementation, Global Constraints, Implementation Tasks, Review Focus & Critical Verification Criteria, Task 2: Branch Repository & REG-05 Deactivation Guard (DB01-01, DB01-04), Task 4: Admin Branch Management REST API (DB01-02), Task 5: Concurrency Safety & Race Condition Protection (DB01-04) (+2 more)
+
+### Community 160 - "DocumentDetailModal.tsx"
+Cohesion: 0.29
+Nodes (6): openAttachment(), DocumentDetailModal(), handleApprove(), handleReject(), runDecision(), rupiah
+
+### Community 161 - "BLC PROCUREMENT PRO — DB-01"
+Cohesion: 0.22
+Nodes (8): 1. Official Corporate Source Analysis (PM Condition 01), 2. Legacy User Reconciliation Matrix (DB01-03), 3. Aturan Integritas Cabang (Validation Safeguards), BLC PROCUREMENT PRO — DB-01, Branch Master & User Legacy Reconciliation Report, Matriks Rekonsiliasi Pengguna Aktif BLC, Pemetaan Sel Workbook vs Nama Resmi Cabang, Rekonsiliasi Akun Tidak Terpetakan (Unmapped Accounts)
+
+### Community 162 - "2. DDL Implemented in Isolated SQLite"
+Cohesion: 0.22
+Nodes (8): 1. Operational Database Integrity Check (Safety Gate), 2. DDL Implemented in Isolated SQLite, BLC PROCUREMENT PRO — DB-01, Migration & Database Safety Verification Report, Perluasan: `app_users.primary_branch_id`, Tabel: `branch_audit`, Tabel: `branch_schema_version`, Tabel: `branches`
 
 ## Knowledge Gaps
 - **188 isolated node(s):** `Tugas dan peristiwa persetujuan`, `Versi kebijakan workflow`, `Identitas Entra dan penugasan role berversi`, `Validasi matriks jenis, cabang, nilai, orang dan tindakan`, `UAT dan pengujian lintas fase` (+183 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1020 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **17 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1061 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **15 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `DocType` connect `ApprovalExplorer.tsx` to `Rincian Fase Implementasi:`, `app.ts`, `document-store.ts`, `main.tsx`, `MASTER DATA SCHEMA PROPOSAL — PHASE 00`, `DocumentList`, `.createDocument`, `displayPersonName`, `BUSINESS REQUIREMENTS GAP ANALYSIS — PHASE 00`, `ApprovalExplorer.tsx`, `4. Analisis Mendalam Kesiapan Komponen Kritis`, `ProcurementRepository`, `OrganizationRepository`, `BLC PROCUREMENT PRO — DATABASE ARCHITECTURE v1`, `sign-in.tsx`, `FormRC`, `calculations.ts`, `repository.ts`?**
-  _High betweenness centrality (0.077) - this node is a cross-community bridge._
+- **Why does `DocType` connect `DocType` to `Rincian Fase Implementasi:`, `app.ts`, `document-store.ts`, `main.tsx`, `main.tsx`, `UserRole`, `MASTER DATA SCHEMA PROPOSAL — PHASE 00`, `DocumentList`, `ApprovalExplorer.tsx`, `4. Analisis Mendalam Kesiapan Komponen Kritis`, `ProcurementRepository`, `PRODUCT OWNER DECISION REGISTER — PHASE 00`, `OrganizationRepository`, `BLC PROCUREMENT PRO — DATABASE ARCHITECTURE v1`, `sign-in.tsx`, `FormRC`, `BentoMetrics.tsx`, `3. Audit Detail Data Master Pengadaan (AUDIT-004)`?**
+  _High betweenness centrality (0.067) - this node is a cross-community bridge._
 - **Are the 7 inferred relationships involving `App()` (e.g. with `Task 4: Collapsible Hamburger Sidebar with Icon Navigation (Feedback 4)` and `Task 2: App Shell & Role-Based Operations Navigation (`src/main.tsx`)`) actually correct?**
   _`App()` has 7 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `Tugas dan peristiwa persetujuan`, `Versi kebijakan workflow`, `Identitas Entra dan penugasan role berversi` to the rest of the system?**
   _188 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Model data konseptual PostgreSQL` be split into smaller, more focused modules?**
-  _Cohesion score 0.0812807881773399 - nodes in this community are weakly interconnected._
-- **Why does `vitest` connect `react` to `auth.ts`, `document-store.ts`, `FormRC`, `main.tsx`, `sheet.tsx`, `organization.ts`, `vite.config.ts`, `displayPersonName`, `FormRC.tsx`, `ApprovalExplorer.tsx`, `cn`, `FormAV.tsx`, `ExportModal.tsx`, `input.test.tsx`, `button.tsx`, `package.json`, `calculations.ts`, `repository.ts`?**
-  _High betweenness centrality (0.072) - this node is a cross-community bridge._
-- **Are the 4 inferred relationships involving `cn()` (e.g. with `Phase 00 ? Technical architecture audit` and `Kondisi awal proyek`) actually correct?**
-  _`cn()` has 4 INFERRED edges - model-reasoned connections that need verification._
+  _Cohesion score 0.14285714285714285 - nodes in this community are weakly interconnected._
+- **Why does `vitest` connect `react` to `vite.config.ts`, `main.tsx`, `addWorkingDays`, `ApprovalExplorer.tsx`, `FormAV.tsx`, `input.test.tsx`, `dependencies`, `branch-engine.ts`, `FormRC`, `sign-in.tsx`, `DocumentDetailModal.tsx`, `document-store.ts`, `cn`, `ApprovalProgress.tsx`, `package.json`, `repository.ts`, `auth.ts`, `sheet.tsx`, `.ensureIntegrity`, `ExportModal.tsx`?**
+  _High betweenness centrality (0.052) - this node is a cross-community bridge._
+- **Are the 10 inferred relationships involving `OrganizationRepository` (e.g. with `2. Invarian Wajib Sistem (Mandatory System Invariants)` and `1. Readiness State Schema`) actually correct?**
+  _`OrganizationRepository` has 10 INFERRED edges - model-reasoned connections that need verification._
 - **Should `Email thread evidence and Finance feedback` be split into smaller, more focused modules?**
   _Cohesion score 0.10098522167487685 - nodes in this community are weakly interconnected._

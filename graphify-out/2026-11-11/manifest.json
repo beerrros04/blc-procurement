@@ -456,9 +456,9 @@
     "semantic_hash": ""
   },
   "server/app.ts": {
-    "mtime": 1794326779.9457116,
-    "seen": 1794327505.8625906,
-    "ast_hash": "f17a31f5c470907e30349a09d687623f",
+    "mtime": 1794330305.7045405,
+    "seen": 1794330462.2271066,
+    "ast_hash": "3ab2f0090e0404b08c18d5ac18104ca1",
     "semantic_hash": ""
   },
   "server/auth.ts": {
@@ -474,9 +474,9 @@
     "semantic_hash": ""
   },
   "server/server.test.ts": {
-    "mtime": 1794228166.1408954,
-    "seen": 1794327505.8626018,
-    "ast_hash": "48d40905d0ad0c1f0281caff7b634006",
+    "mtime": 1794330230.886769,
+    "seen": 1794330462.22773,
+    "ast_hash": "742592b87875008fddcec33c4db9db6b",
     "semantic_hash": ""
   },
   "server/storage.ts": {
@@ -1206,15 +1206,15 @@
     "semantic_hash": ""
   },
   "server/organization.test.ts": {
-    "mtime": 1794326779.9457116,
-    "seen": 1794327505.8625965,
-    "ast_hash": "9b6d1ab11d3563e7140d957ef3ac6531",
+    "mtime": 1794329838.8915083,
+    "seen": 1794330462.2275732,
+    "ast_hash": "6a0fbc338355811e5b15841542c33111",
     "semantic_hash": ""
   },
   "server/organization.ts": {
-    "mtime": 1794326779.9472206,
-    "seen": 1794327505.8625984,
-    "ast_hash": "83ebe264edfe109d0157d3e4c14f6765",
+    "mtime": 1794329859.9985332,
+    "seen": 1794330462.2275758,
+    "ast_hash": "9186fd399222e0cdead42bf1d034d7b7",
     "semantic_hash": ""
   },
   "docs/redesign/00-accessibility-baseline.md": {
@@ -1653,6 +1653,48 @@
     "mtime": 1794328326.002676,
     "seen": 1794328488.492112,
     "ast_hash": "a03c6e63358ae3afc53d41139c357062",
+    "semantic_hash": ""
+  },
+  "server/branch-engine.test.ts": {
+    "mtime": 1794330330.8222015,
+    "seen": 1794330462.227385,
+    "ast_hash": "4f5313601ec1cbff4851fd5199a5647a",
+    "semantic_hash": ""
+  },
+  "server/branch-engine.ts": {
+    "mtime": 1794330349.5664682,
+    "seen": 1794330462.2273881,
+    "ast_hash": "cc18a37fefc2d06dd3f8d614b42a69f4",
+    "semantic_hash": ""
+  },
+  "docs/database/db01-branch-reconciliation.md": {
+    "mtime": 1794330400.1364253,
+    "seen": 1794330462.2524357,
+    "ast_hash": "60eab81b1dc3efa4b6d59aae652fef64",
+    "semantic_hash": ""
+  },
+  "docs/database/db01-completion-report.md": {
+    "mtime": 1794330439.3400824,
+    "seen": 1794330462.25244,
+    "ast_hash": "d1642a510e6d155af4c94f6ab26fbafe",
+    "semantic_hash": ""
+  },
+  "docs/database/db01-concurrency-test-report.md": {
+    "mtime": 1794330410.2796676,
+    "seen": 1794330462.2524421,
+    "ast_hash": "d80567c6b096078ffb0c0c30a17890e8",
+    "semantic_hash": ""
+  },
+  "docs/database/db01-migration-verification.md": {
+    "mtime": 1794330421.1726427,
+    "seen": 1794330462.2524436,
+    "ast_hash": "01e57a8130159219bf0812e20cfcda6e",
+    "semantic_hash": ""
+  },
+  "docs/superpowers/plans/2026-11-10-db01-branch-master-foundation.md": {
+    "mtime": 1794328955.0635507,
+    "seen": 1794330462.2586312,
+    "ast_hash": "e15f66a1e6714103e926e68b64d612d5",
     "semantic_hash": ""
   },
   "package-lock.json": {
