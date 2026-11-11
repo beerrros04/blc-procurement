@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>BLC Workbench — Approved Core Workspaces Preview</title>
+  <link rel="stylesheet" href="workspaces-approved.css">
+  <style>
+    .hub-container { max-width: 900px; margin: 40px auto; padding: 24px; }
+    .hub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px; }
+    .hub-card { display: block; text-decoration: none; color: inherit; padding: 20px; border-radius: 16px; background: #fff; border: 1px solid #e2e8f0; transition: all 0.2s; }
+    .hub-card:hover { border-color: #dc2626; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(220, 38, 38, 0.08); }
+    .hub-card h3 { margin: 0 0 6px; font-size: 18px; color: #0f172a; display: flex; align-items: center; justify-content: space-between; }
+    .hub-card p { margin: 0; font-size: 13px; color: #64748b; line-height: 1.4; }
+    .hub-badge { font-size: 11px; padding: 3px 8px; border-radius: 6px; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="hub-container">
+    <div style="text-align:center; margin-bottom: 32px;">
+      <span class="logo" style="margin: 0 auto 12px; width: 48px; height: 48px; font-size: 24px;">B</span>
+      <h1 style="font-size: 30px; margin: 0 0 8px; font-weight: 800;">BLC Procurement Pro</h1>
+      <p style="font-size: 15px; color: #59615f; margin: 0;">Ruang Kerja Terpadu — Visual Handoff & Preview (Phase 02)</p>
+      <span class="role-pill" style="margin-top: 12px;"><i></i> Seluruh Layar Mengadopsi Desain Dashboard yang Disetujui PO</span>
+    </div>
+
+    <div class="hub-grid">
+      <a href="dashboard-approved.html" class="hub-card">
+        <h3><span>⌂ &nbsp; Dashboard</span> <span class="hub-badge" style="background:#fee2e2; color:#b91c1c;">Disetujui PO</span></h3>
+        <p>4 KPI, grafik batang PR 6 bulan, antrean perhatian, prioritas harian, donut status, dan grafik cabang.</p>
+      </a>
+
+      <a href="register-approved.html" class="hub-card">
+        <h3><span>▤ &nbsp; Dokumen Pengadaan</span> <span class="hub-badge" style="background:#dcfce7; color:#15803d;">Screen 01</span></h3>
+        <p>Register data tabel efisien, filter cepat tipe/status/cabang, dan adaptasi kartu pada mobile (REG-03).</p>
+      </a>
+
+      <a href="form-approved.html" class="hub-card">
+        <h3><span>✏ &nbsp; Formulir PR</span> <span class="hub-badge" style="background:#dcfce7; color:#15803d;">Screen 02</span></h3>
+        <p>Formulir 2-kolom seimbang, tabel rincian barang, unggah lampiran, dan ringkasan estimasi sticky.</p>
+      </a>
+
+      <a href="approval-approved.html" class="hub-card">
+        <h3><span>◉ &nbsp; Ruang Persetujuan</span> <span class="hub-badge" style="background:#dcfce7; color:#15803d;">Screen 03</span></h3>
+        <p>Split master-detail, antrean tugas personal, stage engine stepper, dan tombol keputusan (Setujui / Tolak).</p>
+      </a>
+
+      <a href="finance-approved.html" class="hub-card">
+        <h3><span>▣ &nbsp; Keuangan & Pembayaran</span> <span class="hub-badge" style="background:#dcfce7; color:#15803d;">Screen 04</span></h3>
+        <p>Seksi terpisah: Dokumen sumber siap PV (PO/AV/RB) dan Antrean pencatatan realisasi mutasi bank.</p>
+      </a>
+
+      <a href="dashboard-approved-comparison.html" class="hub-card">
+        <h3><span>⚖ &nbsp; Komparasi Referensi PO</span> <span class="hub-badge" style="background:#f1f5f9; color:#475569;">QA Sheet</span></h3>
+        <p>Perbandingan langsung sisi-ke-sisi antara gambar acuan PO dan render mockup dashboard BLC.</p>
+      </a>
+    </div>
+
+    <footer style="margin-top: 36px; text-align: center; color: #94a3b8; font-size: 12px;">
+      Data sintetis · Preview visual terisolasi · Backend & database tidak dimodifikasi
+    </footer>
+  </div>
+</body>
+</html>

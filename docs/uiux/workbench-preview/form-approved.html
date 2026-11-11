@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BLC Procurement — Formulir Purchase Request (PR)</title>
+  <link rel="stylesheet" href="workspaces-approved.css">
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <span class="logo">B</span>
+        <span><b>BLC Caready</b><small>Procurement Pro</small></span>
+      </div>
+      <p class="nav-label">RUANG KERJA</p>
+      <nav aria-label="Navigasi utama">
+        <a href="dashboard-approved.html"><span>⌂</span> Dashboard</a>
+        <a href="register-approved.html"><span>▤</span> Dokumen</a>
+        <a href="approval-approved.html"><span>◉</span> Persetujuan</a>
+        <a href="finance-approved.html"><span>▣</span> Keuangan</a>
+        <p class="nav-label">PENGATURAN</p>
+        <a class="selected" href="form-approved.html"><span>✏</span> Formulir PR</a>
+        <a href="#"><span>⚙</span> Administrasi</a>
+        <a href="#"><span>♙</span> Profil saya</a>
+      </nav>
+      <div class="sidebar-spacer"></div>
+    </aside>
+
+    <main>
+      <header class="top">
+        <button class="menu" aria-expanded="false" aria-controls="sidebar" aria-label="Buka navigasi">☰</button>
+        <label class="search">
+          <span aria-hidden="true">⌕</span>
+          <input placeholder="Cari nomor atau judul dokumen" aria-label="Cari nomor atau judul dokumen">
+          <kbd>⌘ F</kbd>
+        </label>
+        <div class="account">
+          <span class="bell" aria-label="Notifikasi">♧<i></i></span>
+          <span class="avatar">BS</span>
+          <span class="user"><b>Budi Santoso</b><small>Pemohon Cabang Bekasi</small></span>
+          <span aria-hidden="true">⌄</span>
+        </div>
+      </header>
+
+      <div class="page" id="form">
+        <div class="heading">
+          <div>
+            <h1>Formulir Purchase Request</h1>
+            <p>Buat draf pengadaan baru untuk operasional cabang atau kantor pusat.</p>
+          </div>
+          <div class="actions">
+            <span class="badge status-draft" style="font-size:12px; padding:6px 12px;">Draf Baru · PR-2026-014</span>
+            <a href="register-approved.html" style="text-decoration:none;"><button class="ghost">← Kembali ke Dokumen</button></a>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <!-- Kolom Formulir Utama (Kiri) -->
+          <div class="card form-card">
+            <!-- Seksi 1: Informasi Dasar -->
+            <div class="form-section">
+              <h2 class="form-section-title"><span>1</span> Informasi Dasar Pengadaan</h2>
+              <div class="field-group full">
+                <div class="field">
+                  <label for="f-title">Judul Pengadaan <span class="req">*</span></label>
+                  <input id="f-title" value="Perangkat kerja laptop & monitor cabang" placeholder="Misal: Pembelian Laptop Staf Admin">
+                  <span class="field-hint">Berikan judul pengadaan yang deskriptif dan mencerminkan kebutuhan.</span>
+                </div>
+              </div>
+              <div class="field-group">
+                <div class="field">
+                  <label for="f-branch">Cabang Pemohon <span class="req">*</span></label>
+                  <select id="f-branch">
+                    <option selected>Bekasi</option>
+                    <option>Surabaya</option>
+                    <option>Medan</option>
+                    <option>Cibinong</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="f-budget">Tipe Anggaran <span class="req">*</span></label>
+                  <select id="f-budget">
+                    <option selected>OPEX (Operational Expenditure)</option>
+                    <option>CAPEX (Capital Expenditure)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field-group">
+                <div class="field">
+                  <label for="f-date">Tanggal Kebutuhan <span class="req">*</span></label>
+                  <input type="date" id="f-date" value="2026-11-20">
+                </div>
+                <div class="field">
+                  <label for="f-iam">Nomor IAM / Justifikasi</label>
+                  <input id="f-iam" value="IAM-2026-BKS-088" placeholder="Contoh: IAM-2026-BKS-088">
+                  <span class="field-hint">Wajib dilampirkan jika nilai pengadaan di atas ketentuan plafon.</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Seksi 2: Rincian Kebutuhan & Estimasi Biaya -->
+            <div class="form-section">
+              <h2 class="form-section-title"><span>2</span> Rincian Item Barang & Biaya</h2>
+              <table class="items-table">
+                <thead>
+                  <tr>
+                    <th>Deskripsi Barang / Jasa</th>
+                    <th style="width:70px;">Jumlah</th>
+                    <th style="width:80px;">Satuan</th>
+                    <th style="width:140px; text-align:right;">Harga Satuan (Rp)</th>
+                    <th style="width:140px; text-align:right;">Subtotal (Rp)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><input value="Laptop Lenovo ThinkPad L14 Gen 4" style="width:100%;"></td>
+                    <td><input type="number" value="1" style="width:100%;"></td>
+                    <td><input value="Unit" style="width:100%;"></td>
+                    <td><input value="10.500.000" style="width:100%; text-align:right;"></td>
+                    <td style="text-align:right; font-weight:700; font-variant-numeric:tabular-nums;">Rp 10.500.000</td>
+                  </tr>
+                  <tr>
+                    <td><input value="Monitor Dell 24 Inch IPS FHD" style="width:100%;"></td>
+                    <td><input type="number" value="1" style="width:100%;"></td>
+                    <td><input value="Unit" style="width:100%;"></td>
+                    <td><input value="2.000.000" style="width:100%; text-align:right;"></td>
+                    <td style="text-align:right; font-weight:700; font-variant-numeric:tabular-nums;">Rp 2.000.000</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div style="margin-top:10px;">
+                <button type="button" class="secondary" style="font-size:12px; padding:7px 14px;">＋ Tambah baris item</button>
+              </div>
+            </div>
+
+            <!-- Seksi 3: Penugasan Penyetuju Awal & Catatan -->
+            <div class="form-section">
+              <h2 class="form-section-title"><span>3</span> Penetapan Penyetuju Awal & Catatan</h2>
+              <div class="field-group full">
+                <div class="field">
+                  <label for="f-approver">Pilih Atasan Langsung (Penyetuju Tahap 1) <span class="req">*</span></label>
+                  <select id="f-approver">
+                    <option selected>Hendra Wijaya (Supervisor Operasional Cabang Bekasi)</option>
+                    <option>Bambang Sudirman (Kepala Cabang Bekasi)</option>
+                  </select>
+                  <span class="field-hint">Penyetuju harus berasal dari penugasan (assignment) aktif yang sah di cabang Anda.</span>
+                </div>
+              </div>
+              <div class="field-group full">
+                <div class="field">
+                  <label for="f-notes">Catatan & Keterangan Tambahan</label>
+                  <textarea id="f-notes" placeholder="Tuliskan justifikasi singkat kebutuhan perangkat untuk staf baru..."></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- Seksi 4: Lampiran Dokumen -->
+            <div class="form-section">
+              <h2 class="form-section-title"><span>4</span> Lampiran & Dokumen Pendukung</h2>
+              <div class="upload-box">
+                <span style="font-size:24px;">📁</span>
+                <p>Klik atau seret file quotation & memo ke area ini</p>
+                <small>Format PDF, DOCX, atau PNG (Maksimal 10 MB)</small>
+              </div>
+              <div class="attached-files">
+                <div class="file-row">
+                  <span>📄 quotation-vendor-laptop-bekasi.pdf (1.2 MB)</span>
+                  <button type="button" class="ghost" style="padding:2px 8px; color:#dc2626;">Hapus</button>
+                </div>
+                <div class="file-row">
+                  <span>📄 memo-justifikasi-kebutuhan.docx (420 KB)</span>
+                  <button type="button" class="ghost" style="padding:2px 8px; color:#dc2626;">Hapus</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Bar -->
+            <div class="form-actions-bar">
+              <a href="register-approved.html" style="text-decoration:none;"><button type="button" class="ghost">Batal</button></a>
+              <button type="button" class="secondary">Simpan Sebagai Draf</button>
+              <button type="button" class="primary">Ajukan Pengadaan Sekarang →</button>
+            </div>
+          </div>
+
+          <!-- Kolom Ringkasan Finansial & Workflow (Kanan) -->
+          <div class="summary-card">
+            <div class="card">
+              <div class="total-box">
+                <small>Estimasi Nilai Pengajuan</small>
+                <strong>Rp 12.500.000</strong>
+              </div>
+
+              <div class="total-rows">
+                <div class="total-row">
+                  <span>Subtotal 2 Barang</span>
+                  <span style="font-variant-numeric:tabular-nums;">Rp 12.500.000</span>
+                </div>
+                <div class="total-row">
+                  <span>Estimasi Ongkos Kirim</span>
+                  <span>Rp 0</span>
+                </div>
+                <div class="total-row">
+                  <span>Pajak & Bea</span>
+                  <span>Termasuk</span>
+                </div>
+                <div class="total-row bold">
+                  <span>Total Kebutuhan PR</span>
+                  <span style="font-variant-numeric:tabular-nums; color:#b91c1c;">Rp 12.500.000</span>
+                </div>
+              </div>
+
+              <hr style="border:0; border-top:1px solid #f1f5f9; margin:18px 0;">
+
+              <h3 style="font-size:14px; font-weight:700; margin:0 0 10px; color:#0f172a;">Simulasi Alur Persetujuan (Workflow)</h3>
+              <p style="font-size:12px; color:#64748b; margin:0 0 14px;">Pengajuan PR akan melewati tahapan evaluasi berikut sesuai aturan BLC:</p>
+
+              <div class="stepper-vert">
+                <div class="step-item active">
+                  <div class="step-icon">1</div>
+                  <div class="step-content">
+                    <strong>Tahap 1: Atasan Langsung</strong>
+                    <small>Hendra Wijaya (Supervisor Bekasi)</small>
+                  </div>
+                </div>
+                <div class="step-item">
+                  <div class="step-icon">2</div>
+                  <div class="step-content">
+                    <strong>Tahap 2: Tim Teknis & Reviewer</strong>
+                    <small>Ayu Martina (Reviewer Pengadaan IT)</small>
+                  </div>
+                </div>
+                <div class="step-item">
+                  <div class="step-icon">3</div>
+                  <div class="step-content">
+                    <strong>Tahap 3: Persetujuan Direksi (2 Keputusan Independen)</strong>
+                    <small>Tahap 3A: Direktur (Hery) &nbsp;·&nbsp; Tahap 3B: Presdir (Hashimoto)</small>
+                  </div>
+                </div>
+              </div>
+
+              <div style="background:#f8fafc; border-radius:10px; padding:12px; margin-top:16px; border:1px solid #e2e8f0; font-size:11px; color:#475569;">
+                <b>Catatan Kewenangan:</b> Hak persetujuan melekat pada penugasan aktif (assignment), bukan sekadar role akun.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <footer style="text-align:right; color:#59615f; font-size:11px; margin:24px 4px 12px;">
+          Data sintetis · Contoh formulir pengadaan BLC · Bukan aplikasi operasional
+        </footer>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const menu = document.querySelector('.menu');
+    menu.addEventListener('click', () => {
+      const open = document.querySelector('.sidebar').classList.toggle('open');
+      menu.setAttribute('aria-expanded', String(open));
+      menu.setAttribute('aria-label', open ? 'Tutup navigasi' : 'Buka navigasi');
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        document.querySelector('.sidebar').classList.remove('open');
+        menu.setAttribute('aria-expanded', 'false');
+      }
+    });
+  </script>
+</body>
+</html>

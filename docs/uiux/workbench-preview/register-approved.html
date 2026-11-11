@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BLC Procurement — Dokumen Pengadaan (Register)</title>
+  <link rel="stylesheet" href="workspaces-approved.css">
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <span class="logo">B</span>
+        <span><b>BLC Caready</b><small>Procurement Pro</small></span>
+      </div>
+      <p class="nav-label">RUANG KERJA</p>
+      <nav aria-label="Navigasi utama">
+        <a href="dashboard-approved.html"><span>⌂</span> Dashboard</a>
+        <a class="selected" href="register-approved.html"><span>▤</span> Dokumen</a>
+        <a href="approval-approved.html"><span>◉</span> Persetujuan</a>
+        <a href="finance-approved.html"><span>▣</span> Keuangan</a>
+        <p class="nav-label">PENGATURAN</p>
+        <a href="form-approved.html"><span>✏</span> Formulir PR</a>
+        <a href="#"><span>⚙</span> Administrasi</a>
+        <a href="#"><span>♙</span> Profil saya</a>
+      </nav>
+      <div class="sidebar-spacer"></div>
+      <!-- Area bawah sidebar dibiarkan bernapas kosong (tanpa banner promosi) -->
+    </aside>
+
+    <main>
+      <header class="top">
+        <button class="menu" aria-expanded="false" aria-controls="sidebar" aria-label="Buka navigasi">☰</button>
+        <label class="search">
+          <span aria-hidden="true">⌕</span>
+          <input placeholder="Cari nomor atau judul dokumen" aria-label="Cari nomor atau judul dokumen">
+          <kbd>⌘ F</kbd>
+        </label>
+        <div class="account">
+          <span class="bell" aria-label="Notifikasi">♧<i></i></span>
+          <span class="avatar">BS</span>
+          <span class="user"><b>Pengguna contoh</b><small>Assignment ilustrasi</small></span>
+          <span aria-hidden="true">⌄</span>
+        </div>
+      </header>
+
+      <div class="page" id="register">
+        <div class="heading">
+          <div>
+            <h1>Dokumen Pengadaan</h1>
+            <p>Cari, filter, dan pantau seluruh dokumen pengadaan lintas cabang (REG-03).</p>
+          </div>
+          <div class="actions">
+            <span class="role-pill"><i></i> Mode Baca Global (REG-03)</span>
+            <button class="secondary">⤓ Ekspor data</button>
+            <a href="form-approved.html" style="text-decoration:none;"><button class="primary">＋ &nbsp; Buat pengajuan</button></a>
+          </div>
+        </div>
+
+        <!-- Filter Toolbar -->
+        <div class="register-filters">
+          <div class="filter-search">
+            <span aria-hidden="true">⌕</span>
+            <input placeholder="Cari nomor dokumen, judul, atau pemohon..." aria-label="Filter cepat">
+          </div>
+          <select class="filter-select" aria-label="Filter jenis dokumen">
+            <option>Semua jenis (PR, PO, AV, RB, PV, GR)</option>
+            <option>Purchase Request (PR)</option>
+            <option>Purchase Order (PO)</option>
+            <option>Advance (AV)</option>
+            <option>Reimbursement (RB)</option>
+            <option>Payment Voucher (PV)</option>
+            <option>Goods Receipt (GR)</option>
+          </select>
+          <select class="filter-select" aria-label="Filter status dokumen">
+            <option>Semua status</option>
+            <option>Draf</option>
+            <option>Ditinjau (In Review)</option>
+            <option>Disetujui (Approved)</option>
+            <option>Ditolak (Rejected)</option>
+            <option>Dibayar (Paid)</option>
+          </select>
+          <select class="filter-select" aria-label="Filter cabang">
+            <option>Semua cabang</option>
+            <option>Surabaya</option>
+            <option>Bekasi</option>
+            <option>Medan</option>
+            <option>Cibinong</option>
+          </select>
+          <div class="filter-chips">
+            <span>Filter aktif:</span>
+            <span class="chip">Periode: Jul–Des 2026</span>
+            <span class="chip">Cabang: Semua (4 aktif)</span>
+            <span style="margin-left:auto; font-weight:600; color:#0f172a;">Menampilkan 6 dari 22 dokumen</span>
+          </div>
+        </div>
+
+        <!-- Data Table Container (Desktop) -->
+        <div class="card table-card">
+          <div class="table-wrap">
+            <table class="reg-table">
+              <thead>
+                <tr>
+                  <th>Tipe & Nomor</th>
+                  <th>Judul Pengadaan & Keperluan</th>
+                  <th>Pemohon & Cabang</th>
+                  <th>Tanggal</th>
+                  <th style="text-align:right;">Nominal (Rp)</th>
+                  <th>Tahap Saat Ini</th>
+                  <th>Status</th>
+                  <th style="text-align:center;">Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <span class="badge badge-pr">PR</span>
+                    <strong class="doc-num">PR-2026-014</strong>
+                  </td>
+                  <td>
+                    <span class="doc-num">Perangkat kerja laptop & monitor</span>
+                    <span class="doc-meta">Penggantian perangkat operasional staf baru</span>
+                  </td>
+                  <td>
+                    <span class="doc-num">Budi Santoso</span>
+                    <span class="doc-meta">Cabang Bekasi</span>
+                  </td>
+                  <td>11 Nov 2026</td>
+                  <td class="money">Rp 12.500.000</td>
+                  <td><span class="badge status-review">Tahap 2 · Reviewer (Ayu)</span></td>
+                  <td><span class="badge status-review">Ditinjau</span></td>
+                  <td style="text-align:center;"><a href="approval-approved.html"><button class="action-btn secondary">Detail →</button></a></td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <span class="badge badge-po">PO</span>
+                    <strong class="doc-num">PO-2026-028</strong>
+                  </td>
+                  <td>
+                    <span class="doc-num">Pengadaan genset & UPS operasional</span>
+                    <span class="doc-meta">Vendor: PT Sarana Tehnik</span>
+                  </td>
+                  <td>
+                    <span class="doc-num">Rahmat Hidayat</span>
+                    <span class="doc-meta">Cabang Surabaya</span>
+                  </td>
+                  <td>10 Nov 2026</td>
+                  <td class="money">Rp 27.250.000</td>
+                  <td><span class="badge status-review">Tahap 1 · Atasan Cabang</span></td>
+                  <td><span class="badge status-review">Ditinjau</span></td>
+                  <td style="text-align:center;"><button class="action-btn secondary">Detail →</button></td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <span class="badge badge-pv">PV</span>
+                    <strong class="doc-num">PV-2026-007</strong>
+                  </td>
+                  <td>
+                    <span class="doc-num">Pembayaran tagihan vendor peralatan</span>
+                    <span class="doc-meta">Dokumen sumber: PO-2026-028</span>
+                  </td>
+                  <td>
+                    <span class="doc-num">Finance Staff (Ayu)</span>
+                    <span class="doc-meta">Kantor Pusat</span>
+                  </td>
+                  <td>09 Nov 2026</td>
+                  <td class="money">Rp 27.250.000</td>
+                  <td><span class="badge status-review">Tahap 2 · Direktur (Hery)</span></td>
+                  <td><span class="badge status-review">Ditinjau</span></td>
+                  <td style="text-align:center;"><a href="finance-approved.html"><button class="action-btn secondary">Detail →</button></a></td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <span class="badge badge-av">AV</span>
+                    <strong class="doc-num">AV-2026-011</strong>
+                  </td>
+                  <td>
+                    <span class="doc-num">Perjalanan dinas survei cabang Medan</span>
+                    <span class="doc-meta">Tiket pesawat & akomodasi tim audit</span>
+                  </td>
+                  <td>
+                    <span class="doc-num">Siti Rahma</span>
+                    <span class="doc-meta">Cabang Medan</span>
+                  </td>
+                  <td>08 Nov 2026</td>
+                  <td class="money">Rp 4.500.000</td>
+                  <td><span class="badge status-approved">Persetujuan selesai</span></td>
+                  <td><span class="badge status-approved">Disetujui</span></td>
+                  <td style="text-align:center;"><button class="action-btn secondary">Detail →</button></td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <span class="badge badge-rb">RB</span>
+                    <strong class="doc-num">RB-2026-006</strong>
+                  </td>
+                  <td>
+                    <span class="doc-num">Reimbursement konsumsi koordinasi cabang</span>
+                    <span class="doc-meta">Bukti struk terlampir lengkap</span>
+                  </td>
+                  <td>
+                    <span class="doc-num">Budi Santoso</span>
+                    <span class="doc-meta">Cabang Bekasi</span>
+                  </td>
+                  <td>08 Nov 2026</td>
+                  <td class="money">Rp 750.000</td>
+                  <td><span class="badge status-draft">Belum diajukan</span></td>
+                  <td><span class="badge status-draft">Draf</span></td>
+                  <td style="text-align:center;"><button class="action-btn secondary">Edit →</button></td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <span class="badge badge-gr">GR</span>
+                    <strong class="doc-num">GR-2026-003</strong>
+                  </td>
+                  <td>
+                    <span class="doc-num">Penerimaan barang inventaris kantor</span>
+                    <span class="doc-meta">Surat jalan SJ-77192 tervalidasi</span>
+                  </td>
+                  <td>
+                    <span class="doc-num">Doni Prasetyo</span>
+                    <span class="doc-meta">Cabang Cibinong</span>
+                  </td>
+                  <td>07 Nov 2026</td>
+                  <td class="money">Rp 15.000.000</td>
+                  <td><span class="badge status-draft">Selesai (Tanpa Approval)</span></td>
+                  <td><span class="badge status-approved">Selesai</span></td>
+                  <td style="text-align:center;"><button class="action-btn secondary">Detail →</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Mobile Cards Layout (Tampil saat <= 800px) -->
+          <div class="mobile-cards">
+            <div class="mob-card">
+              <div class="mob-card-head">
+                <div><span class="badge badge-pr">PR</span> <strong>PR-2026-014</strong></div>
+                <span class="badge status-review">Ditinjau</span>
+              </div>
+              <div class="mob-card-title">Perangkat kerja laptop & monitor</div>
+              <div class="mob-card-meta">Budi Santoso · Bekasi · 11 Nov 2026</div>
+              <div class="mob-card-meta">Tahap aktif: <b>Tahap 2 · Reviewer (Ayu)</b></div>
+              <div class="mob-card-foot">
+                <span class="mob-card-amount">Rp 12.500.000</span>
+                <a href="approval-approved.html"><button class="action-btn secondary">Detail →</button></a>
+              </div>
+            </div>
+
+            <div class="mob-card">
+              <div class="mob-card-head">
+                <div><span class="badge badge-po">PO</span> <strong>PO-2026-028</strong></div>
+                <span class="badge status-review">Ditinjau</span>
+              </div>
+              <div class="mob-card-title">Pengadaan genset & UPS operasional</div>
+              <div class="mob-card-meta">Rahmat Hidayat · Surabaya · 10 Nov 2026</div>
+              <div class="mob-card-meta">Tahap aktif: <b>Tahap 1 · Atasan Cabang</b></div>
+              <div class="mob-card-foot">
+                <span class="mob-card-amount">Rp 27.250.000</span>
+                <button class="action-btn secondary">Detail →</button>
+              </div>
+            </div>
+
+            <div class="mob-card">
+              <div class="mob-card-head">
+                <div><span class="badge badge-pv">PV</span> <strong>PV-2026-007</strong></div>
+                <span class="badge status-review">Ditinjau</span>
+              </div>
+              <div class="mob-card-title">Pembayaran vendor peralatan</div>
+              <div class="mob-card-meta">Finance Staff (Ayu) · 09 Nov 2026</div>
+              <div class="mob-card-meta">Tahap aktif: <b>Tahap 2 · Direktur (Hery)</b></div>
+              <div class="mob-card-foot">
+                <span class="mob-card-amount">Rp 27.250.000</span>
+                <a href="finance-approved.html"><button class="action-btn secondary">Detail →</button></a>
+              </div>
+            </div>
+
+            <div class="mob-card">
+              <div class="mob-card-head">
+                <div><span class="badge badge-av">AV</span> <strong>AV-2026-011</strong></div>
+                <span class="badge status-approved">Disetujui</span>
+              </div>
+              <div class="mob-card-title">Perjalanan dinas survei Medan</div>
+              <div class="mob-card-meta">Siti Rahma · Medan · 08 Nov 2026</div>
+              <div class="mob-card-meta">Tahap: <b>Persetujuan selesai</b></div>
+              <div class="mob-card-foot">
+                <span class="mob-card-amount">Rp 4.500.000</span>
+                <button class="action-btn secondary">Detail →</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="reg-footer">
+            <span>Baris 1 sampai 6 dari total 22 dokumen</span>
+            <span>Halaman 1 dari 4 &nbsp; <button class="action-btn secondary">Selanjutnya →</button></span>
+          </div>
+        </div>
+
+        <footer style="text-align:right; color:#59615f; font-size:11px; margin:24px 4px 12px;">
+          Data sintetis · Dokumen pengadaan BLC · Bukan aplikasi operasional
+        </footer>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const menu = document.querySelector('.menu');
+    menu.addEventListener('click', () => {
+      const open = document.querySelector('.sidebar').classList.toggle('open');
+      menu.setAttribute('aria-expanded', String(open));
+      menu.setAttribute('aria-label', open ? 'Tutup navigasi' : 'Buka navigasi');
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        document.querySelector('.sidebar').classList.remove('open');
+        menu.setAttribute('aria-expanded', 'false');
+      }
+    });
+  </script>
+</body>
+</html>

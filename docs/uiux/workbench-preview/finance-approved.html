@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BLC Procurement — Keuangan & Pembayaran (Finance Workspace)</title>
+  <link rel="stylesheet" href="workspaces-approved.css">
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <span class="logo">B</span>
+        <span><b>BLC Caready</b><small>Procurement Pro</small></span>
+      </div>
+      <p class="nav-label">RUANG KERJA</p>
+      <nav aria-label="Navigasi utama">
+        <a href="dashboard-approved.html"><span>⌂</span> Dashboard</a>
+        <a href="register-approved.html"><span>▤</span> Dokumen</a>
+        <a href="approval-approved.html"><span>◉</span> Persetujuan</a>
+        <a class="selected" href="finance-approved.html"><span>▣</span> Keuangan</a>
+        <p class="nav-label">PENGATURAN</p>
+        <a href="form-approved.html"><span>✏</span> Formulir PR</a>
+        <a href="#"><span>⚙</span> Administrasi</a>
+        <a href="#"><span>♙</span> Profil saya</a>
+      </nav>
+      <div class="sidebar-spacer"></div>
+    </aside>
+
+    <main>
+      <header class="top">
+        <button class="menu" aria-expanded="false" aria-controls="sidebar" aria-label="Buka navigasi">☰</button>
+        <label class="search">
+          <span aria-hidden="true">⌕</span>
+          <input placeholder="Cari nomor PV, dokumen sumber, atau vendor" aria-label="Cari dokumen keuangan">
+          <kbd>⌘ F</kbd>
+        </label>
+        <div class="account">
+          <span class="bell" aria-label="Notifikasi">♧<i></i></span>
+          <span class="avatar" style="background:#e0f2fe; color:#0369a1;">FS</span>
+          <span class="user"><b>Staf Keuangan</b><small>Finance Operations</small></span>
+          <span aria-hidden="true">⌄</span>
+        </div>
+      </header>
+
+      <div class="page" id="finance">
+        <div class="heading">
+          <div>
+            <h1>Keuangan & Pembayaran</h1>
+            <p>Kelola penerbitan Payment Voucher (PV) dan pencatatan realisasi mutasi kas/bank.</p>
+          </div>
+          <div class="actions">
+            <span class="role-pill"><i></i> Otorisasi: Finance Operations</span>
+            <a href="register-approved.html" style="text-decoration:none;"><button class="secondary">Register Keuangan</button></a>
+          </div>
+        </div>
+
+        <!-- Tata Letak 2 Seksi Operasional Keuangan -->
+        <div class="finance-split">
+          <!-- Seksi A: Dokumen Sumber Siap Diterbitkan PV -->
+          <div class="card finance-card">
+            <div class="card-head">
+              <div>
+                <h2>A. Menunggu Penerbitan PV</h2>
+                <p>Dokumen PO, AV, dan RB yang telah disetujui penuh. <b>PR tidak dapat dijadikan sumber langsung PV (BR-01).</b></p>
+              </div>
+              <span class="badge status-review">3 Dokumen Siap</span>
+            </div>
+
+            <div class="source-list">
+              <!-- Item 1: PO-2026-028 -->
+              <div class="source-item">
+                <div class="source-item-head">
+                  <div>
+                    <span class="badge badge-po">PO</span>
+                    <strong style="margin-left:4px;">PO-2026-028</strong>
+                  </div>
+                  <span class="badge status-approved">Disetujui Penuh</span>
+                </div>
+                <div class="source-title">Pengadaan genset & UPS kantor operasional</div>
+                <div class="source-meta">
+                  Vendor: <b>PT Sarana Tehnik Nusantara</b> · Cabang Surabaya<br>
+                  Persetujuan selesai pada 10 Nov 2026
+                </div>
+                <div class="source-item-foot">
+                  <div>
+                    <small style="color:#64748b; display:block;">Nilai Tagihan Sumber</small>
+                    <span class="source-amount">Rp 27.250.000</span>
+                  </div>
+                  <button type="button" class="primary" style="font-size:12px; padding:8px 14px;">＋ &nbsp; Buat Payment Voucher</button>
+                </div>
+              </div>
+
+              <!-- Item 2: AV-2026-011 -->
+              <div class="source-item">
+                <div class="source-item-head">
+                  <div>
+                    <span class="badge badge-av">AV</span>
+                    <strong style="margin-left:4px;">AV-2026-011</strong>
+                  </div>
+                  <span class="badge status-approved">Disetujui Penuh</span>
+                </div>
+                <div class="source-title">Uang muka perjalanan dinas tim audit cabang</div>
+                <div class="source-meta">
+                  Penerima: <b>Siti Rahma</b> · Cabang Medan<br>
+                  Persetujuan selesai pada 08 Nov 2026
+                </div>
+                <div class="source-item-foot">
+                  <div>
+                    <small style="color:#64748b; display:block;">Nilai Uang Muka</small>
+                    <span class="source-amount">Rp 4.500.000</span>
+                  </div>
+                  <button type="button" class="primary" style="font-size:12px; padding:8px 14px;">＋ &nbsp; Buat Payment Voucher</button>
+                </div>
+              </div>
+
+              <!-- Item 3: RB-2026-009 -->
+              <div class="source-item">
+                <div class="source-item-head">
+                  <div>
+                    <span class="badge badge-rb">RB</span>
+                    <strong style="margin-left:4px;">RB-2026-009</strong>
+                  </div>
+                  <span class="badge status-approved">Disetujui Penuh</span>
+                </div>
+                <div class="source-title">Reimbursement konsumsi rapat koordinasi cabang</div>
+                <div class="source-meta">
+                  Penerima: <b>Budi Santoso</b> · Cabang Bekasi<br>
+                  Persetujuan selesai pada 08 Nov 2026
+                </div>
+                <div class="source-item-foot">
+                  <div>
+                    <small style="color:#64748b; display:block;">Nilai Penggantian</small>
+                    <span class="source-amount">Rp 750.000</span>
+                  </div>
+                  <button type="button" class="primary" style="font-size:12px; padding:8px 14px;">＋ &nbsp; Buat Payment Voucher</button>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top:14px; padding:10px 14px; background:#f8fafc; border-radius:10px; font-size:11px; color:#475569; border:1px solid #e2e8f0;">
+              ℹ <b>Aturan Integritas (BR-01):</b> PV hanya diterbitkan secara eksplisit oleh staf Keuangan atas dasar dokumen PO/AV/RB sah.
+            </div>
+          </div>
+
+          <!-- Seksi B: Antrean & Realisasi Pembayaran PV -->
+          <div class="card finance-card">
+            <div class="card-head">
+              <div>
+                <h2>B. Antrean & Pencatatan Pembayaran</h2>
+                <p>PV yang disetujui Direksi. <b>Status disetujui bukan bukti pembayaran (BR-06).</b></p>
+              </div>
+              <span class="badge status-review">1 Menunggu Bayar</span>
+            </div>
+
+            <div class="source-list">
+              <!-- Item 1: PV-2026-007 (Menunggu Bayar) -->
+              <div class="source-item" style="border-left: 4px solid #eab308; background:#fffdf5;">
+                <div class="source-item-head">
+                  <div>
+                    <span class="badge badge-pv">PV</span>
+                    <strong style="margin-left:4px;">PV-2026-007</strong>
+                    <small style="color:#64748b; margin-left:6px;">Sumber: PO-2026-028</small>
+                  </div>
+                  <span class="badge status-review">Disetujui (Belum Dibayar)</span>
+                </div>
+                <div class="source-title">Pembayaran vendor peralatan genset Surabaya</div>
+                <div class="source-meta">
+                  Penerima: <b>PT Sarana Tehnik Nusantara</b><br>
+                  Rekening: <span class="masked-account">Mandiri •••• 7712</span> &nbsp; <span class="due-pill">Jatuh Tempo: 18 Nov 2026</span><br>
+                  <small style="color:#0284c7;">Alur Approval Selesai: Finance Reviewer → Hery → Hashimoto</small>
+                </div>
+                <div class="source-item-foot">
+                  <div>
+                    <small style="color:#64748b; display:block;">Nominal Bayar</small>
+                    <span class="source-amount" style="color:#b91c1c;">Rp 27.250.000</span>
+                  </div>
+                  <button type="button" class="primary" style="font-size:12px; padding:8px 14px; background:#0284c7; border-color:#0284c7;">💳 &nbsp; Catat Pembayaran Bank</button>
+                </div>
+              </div>
+
+              <!-- Item 2: PV-2026-006 (Sudah Dibayar) -->
+              <div class="source-item">
+                <div class="source-item-head">
+                  <div>
+                    <span class="badge badge-pv">PV</span>
+                    <strong style="margin-left:4px;">PV-2026-006</strong>
+                    <small style="color:#64748b; margin-left:6px;">Sumber: PO-2026-014</small>
+                  </div>
+                  <span class="badge status-paid">✓ Dibayar (PAID)</span>
+                </div>
+                <div class="source-title">Pembayaran vendor laptop Lenovo ThinkPad</div>
+                <div class="source-meta">
+                  Penerima: <b>PT Mitra Solusi Komputindo</b><br>
+                  Rekening: <span class="masked-account">BCA •••• 4421</span><br>
+                  Dibayar pada 10 Nov 2026, 14:15 · Ref: <code>TRX-20261110-8891</code>
+                </div>
+                <div class="source-item-foot">
+                  <div>
+                    <small style="color:#64748b; display:block;">Nominal Realisasi</small>
+                    <span class="source-amount">Rp 12.500.000</span>
+                  </div>
+                  <button type="button" class="secondary" style="font-size:12px; padding:6px 12px;">Bukti Transfer ⤓</button>
+                </div>
+              </div>
+
+              <!-- Item 3: PV-2026-005 (Sudah Dibayar) -->
+              <div class="source-item">
+                <div class="source-item-head">
+                  <div>
+                    <span class="badge badge-pv">PV</span>
+                    <strong style="margin-left:4px;">PV-2026-005</strong>
+                    <small style="color:#64748b; margin-left:6px;">Sumber: AV-2026-008</small>
+                  </div>
+                  <span class="badge status-paid">✓ Dibayar (PAID)</span>
+                </div>
+                <div class="source-title">Penyaluran uang muka operasional cabang Cibinong</div>
+                <div class="source-meta">
+                  Penerima: <b>Bambang Sudirman</b><br>
+                  Rekening: <span class="masked-account">BRI •••• 9901</span><br>
+                  Dibayar pada 08 Nov 2026, 10:05 · Ref: <code>TRX-20261108-0122</code>
+                </div>
+                <div class="source-item-foot">
+                  <div>
+                    <small style="color:#64748b; display:block;">Nominal Realisasi</small>
+                    <span class="source-amount">Rp 3.800.000</span>
+                  </div>
+                  <button type="button" class="secondary" style="font-size:12px; padding:6px 12px;">Bukti Transfer ⤓</button>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top:14px; padding:10px 14px; background:#f0fdf4; border-radius:10px; font-size:11px; color:#166534; border:1px solid #bbf7d0;">
+              ✓ <b>Audit Pembayaran (BR-06):</b> Rekening disamarkan (masked) untuk keamanan data, dan mutasi dicatat setelah transfer bank tuntas.
+            </div>
+          </div>
+        </div>
+
+        <footer style="text-align:right; color:#59615f; font-size:11px; margin:24px 4px 12px;">
+          Data sintetis · Ruang keuangan & pembayaran BLC · Bukan aplikasi operasional
+        </footer>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const menu = document.querySelector('.menu');
+    menu.addEventListener('click', () => {
+      const open = document.querySelector('.sidebar').classList.toggle('open');
+      menu.setAttribute('aria-expanded', String(open));
+      menu.setAttribute('aria-label', open ? 'Tutup navigasi' : 'Buka navigasi');
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        document.querySelector('.sidebar').classList.remove('open');
+        menu.setAttribute('aria-expanded', 'false');
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BLC Procurement — Ruang Persetujuan (Approval Workspace)</title>
+  <link rel="stylesheet" href="workspaces-approved.css">
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <span class="logo">B</span>
+        <span><b>BLC Caready</b><small>Procurement Pro</small></span>
+      </div>
+      <p class="nav-label">RUANG KERJA</p>
+      <nav aria-label="Navigasi utama">
+        <a href="dashboard-approved.html"><span>⌂</span> Dashboard</a>
+        <a href="register-approved.html"><span>▤</span> Dokumen</a>
+        <a class="selected" href="approval-approved.html"><span>◉</span> Persetujuan</a>
+        <a href="finance-approved.html"><span>▣</span> Keuangan</a>
+        <p class="nav-label">PENGATURAN</p>
+        <a href="form-approved.html"><span>✏</span> Formulir PR</a>
+        <a href="#"><span>⚙</span> Administrasi</a>
+        <a href="#"><span>♙</span> Profil saya</a>
+      </nav>
+      <div class="sidebar-spacer"></div>
+    </aside>
+
+    <main>
+      <header class="top">
+        <button class="menu" aria-expanded="false" aria-controls="sidebar" aria-label="Buka navigasi">☰</button>
+        <label class="search">
+          <span aria-hidden="true">⌕</span>
+          <input placeholder="Cari nomor atau judul dokumen" aria-label="Cari nomor atau judul dokumen">
+          <kbd>⌘ F</kbd>
+        </label>
+        <div class="account">
+          <span class="bell" aria-label="Notifikasi">♧<i></i></span>
+          <span class="avatar" style="background:#fef3c7; color:#92400e;">AM</span>
+          <span class="user"><b>Ayu Martina</b><small>Reviewer Teknis / Finance</small></span>
+          <span aria-hidden="true">⌄</span>
+        </div>
+      </header>
+
+      <div class="page" id="approval">
+        <div class="heading">
+          <div>
+            <h1>Ruang Persetujuan</h1>
+            <p>Tinjau dokumen yang ditugaskan kepada Anda dan berikan keputusan otorisasi yang sah.</p>
+          </div>
+          <div class="actions">
+            <span class="role-pill"><i></i> Tugas Aktif: Reviewer Teknis</span>
+            <a href="register-approved.html" style="text-decoration:none;"><button class="secondary">Semua Dokumen</button></a>
+          </div>
+        </div>
+
+        <div class="approval-grid">
+          <!-- Kolom Kiri: Antrean Persetujuan (Master Queue) -->
+          <div class="card queue-card">
+            <div class="queue-tabs">
+              <button type="button" class="tab-btn active">Menunggu Keputusan (2)</button>
+              <button type="button" class="tab-btn">Riwayat Selesai (14)</button>
+            </div>
+
+            <div class="queue-list">
+              <!-- Item 1: Selected (PR-2026-014) -->
+              <div class="queue-item selected" tabindex="0" aria-label="Dokumen PR-2026-014 dipilih">
+                <div class="queue-item-top">
+                  <div>
+                    <span class="badge badge-pr">PR</span>
+                    <strong style="margin-left:4px; font-size:12px;">PR-2026-014</strong>
+                  </div>
+                  <span class="badge status-review">Tahap 2 Aktif</span>
+                </div>
+                <div class="queue-item-title">Perangkat kerja laptop & monitor</div>
+                <div class="queue-item-meta">
+                  <span>Budi Santoso · Cabang Bekasi</span>
+                  <span class="queue-item-amount">Rp 12.500.000</span>
+                </div>
+                <div style="margin-top:6px; font-size:11px; color:#b91c1c; font-weight:600;">
+                  ● Menunggu evaluasi teknis Anda
+                </div>
+              </div>
+
+              <!-- Item 2: PO-2026-028 -->
+              <div class="queue-item" tabindex="0">
+                <div class="queue-item-top">
+                  <div>
+                    <span class="badge badge-po">PO</span>
+                    <strong style="margin-left:4px; font-size:12px;">PO-2026-028</strong>
+                  </div>
+                  <span class="badge status-review">Tahap 1 Aktif</span>
+                </div>
+                <div class="queue-item-title">Pengadaan genset & UPS kantor</div>
+                <div class="queue-item-meta">
+                  <span>Rahmat Hidayat · Surabaya</span>
+                  <span class="queue-item-amount">Rp 27.250.000</span>
+                </div>
+                <div style="margin-top:6px; font-size:11px; color:#64748b;">
+                  Menunggu persetujuan Atasan Cabang
+                </div>
+              </div>
+
+              <!-- Item 3: Contoh Alur Sekuensial PV (BR-03) -->
+              <div class="queue-item" tabindex="0">
+                <div class="queue-item-top">
+                  <div>
+                    <span class="badge badge-pv">PV</span>
+                    <strong style="margin-left:4px; font-size:12px;">PV-2026-007</strong>
+                  </div>
+                  <span class="badge status-review">Alur Khusus PV</span>
+                </div>
+                <div class="queue-item-title">Pembayaran vendor peralatan genset</div>
+                <div class="queue-item-meta">
+                  <span>Sumber: PO-2026-028</span>
+                  <span class="queue-item-amount">Rp 27.250.000</span>
+                </div>
+                <div style="margin-top:6px; font-size:11px; color:#475569;">
+                  <i>Alur Sekuensial: Finance Reviewer → Direktur (Hery) → Presdir (Hashimoto)</i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Kolom Kanan: Lembar Telaah Dokumen & Keputusan (Detail Panel) -->
+          <div class="card doc-detail-card">
+            <div class="detail-header">
+              <div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span class="badge badge-pr" style="font-size:12px;">Purchase Request</span>
+                  <strong style="font-size:14px; color:#475569;">PR-2026-014</strong>
+                  <span class="badge status-review">Sedang Ditinjau</span>
+                </div>
+                <h2 class="detail-title">Perangkat kerja laptop & monitor cabang</h2>
+                <p style="margin:4px 0 0; font-size:13px; color:#64748b;">Diajukan oleh Budi Santoso (Bekasi) pada 11 Nov 2026, 08:30 WIB</p>
+              </div>
+              <div>
+                <span style="font-size:11px; color:#64748b; display:block; text-align:right;">Nilai Pengajuan</span>
+                <div class="detail-amount">Rp 12.500.000</div>
+              </div>
+            </div>
+
+            <!-- Stepper Horizontal Tahapan Approval (Stage Engine) -->
+            <div class="stepper-horiz">
+              <div class="h-step done">
+                <div class="h-step-icon">✓</div>
+                <strong>Tahap 1: Atasan Langsung</strong>
+                <small>Hendra Wijaya (Disetujui 09:20)</small>
+              </div>
+              <div class="h-step active">
+                <div class="h-step-icon">2</div>
+                <strong>Tahap 2: Reviewer Teknis</strong>
+                <small style="color:#b45309; font-weight:700;">Menunggu Keputusan Anda</small>
+              </div>
+              <div class="h-step">
+                <div class="h-step-icon">3</div>
+                <strong>Tahap 3: Direksi Independen</strong>
+                <small>3A: Hery &nbsp;·&nbsp; 3B: Hashimoto</small>
+              </div>
+            </div>
+
+            <!-- Rincian Metadata Dokumen -->
+            <div class="info-grid">
+              <div class="info-cell">
+                <span>Cabang Pengaju</span>
+                <strong>Bekasi (Operasional)</strong>
+              </div>
+              <div class="info-cell">
+                <span>Tipe Anggaran</span>
+                <strong>OPEX (IT Perangkat)</strong>
+              </div>
+              <div class="info-cell">
+                <span>Nomor IAM</span>
+                <strong>IAM-2026-BKS-088</strong>
+              </div>
+              <div class="info-cell">
+                <span>Tanggal Kebutuhan</span>
+                <strong>20 November 2026</strong>
+              </div>
+              <div class="info-cell">
+                <span>Lampiran Bukti</span>
+                <strong>2 Dokumen Terverifikasi</strong>
+              </div>
+              <div class="info-cell">
+                <span>Persetujuan Lanjutan</span>
+                <strong>2 Direksi Independen (Hery & Hashimoto)</strong>
+              </div>
+            </div>
+
+            <!-- Rincian Item Barang -->
+            <h3 style="font-size:14px; font-weight:700; margin:16px 0 8px; color:#0f172a;">Rincian Barang yang Diminta</h3>
+            <table class="items-table">
+              <thead>
+                <tr>
+                  <th>Nama Barang</th>
+                  <th style="text-align:center;">Jumlah</th>
+                  <th style="text-align:right;">Estimasi Satuan</th>
+                  <th style="text-align:right;">Total Nominal</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><b>Laptop Lenovo ThinkPad L14 Gen 4</b><br><small style="color:#64748b;">Intel Core i5, RAM 16GB, SSD 512GB</small></td>
+                  <td style="text-align:center;">1 Unit</td>
+                  <td style="text-align:right; font-variant-numeric:tabular-nums;">Rp 10.500.000</td>
+                  <td style="text-align:right; font-weight:700; font-variant-numeric:tabular-nums;">Rp 10.500.000</td>
+                </tr>
+                <tr>
+                  <td><b>Monitor Dell 24 Inch IPS FHD</b><br><small style="color:#64748b;">HDMI & DisplayPort input, adjustable stand</small></td>
+                  <td style="text-align:center;">1 Unit</td>
+                  <td style="text-align:right; font-variant-numeric:tabular-nums;">Rp 2.000.000</td>
+                  <td style="text-align:right; font-weight:700; font-variant-numeric:tabular-nums;">Rp 2.000.000</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- Kotak Otorisasi & Keputusan Penyetuju (Sesuai BR-02: HANYA SETUJUI & TOLAK) -->
+            <div class="decision-box">
+              <h3>Berikan Keputusan Otorisasi (Tahap 2)</h3>
+              <p>Sebagai Reviewer Teknis yang ditugaskan, Anda memiliki kewenangan untuk menyetujui atau menolak pengajuan ini. Keputusan akan dicatat permanen dalam audit trail.</p>
+              
+              <label for="dec-notes" style="display:block; font-size:12px; font-weight:650; color:#7f1d1d; margin-bottom:4px;">
+                Catatan Keputusan / Alasan Penolakan:
+              </label>
+              <textarea id="dec-notes" placeholder="Tuliskan catatan teknis atau justifikasi persetujuan (wajib diisi apabila menolak pengajuan)..."></textarea>
+              
+              <div class="decision-actions">
+                <button type="button" class="destructive">✕ &nbsp; Tolak Pengajuan</button>
+                <button type="button" class="primary">✓ &nbsp; Setujui Pengajuan →</button>
+              </div>
+              <div style="font-size:11px; color:#7f1d1d; margin-top:8px; text-align:right;">
+                * Sesuai aturan alur kerja (BR-02), opsi keputusan adalah <b>Setujui</b> dan <b>Tolak</b>.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <footer style="text-align:right; color:#59615f; font-size:11px; margin:24px 4px 12px;">
+          Data sintetis · Contoh ruang persetujuan BLC · Bukan aplikasi operasional
+        </footer>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const menu = document.querySelector('.menu');
+    menu.addEventListener('click', () => {
+      const open = document.querySelector('.sidebar').classList.toggle('open');
+      menu.setAttribute('aria-expanded', String(open));
+      menu.setAttribute('aria-label', open ? 'Tutup navigasi' : 'Buka navigasi');
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        document.querySelector('.sidebar').classList.remove('open');
+        menu.setAttribute('aria-expanded', 'false');
+      }
+    });
+  </script>
+</body>
+</html>
